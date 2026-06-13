@@ -63,23 +63,26 @@ def extract_id_from_url(url):
 
 # ── HTTP fetch with retry ────────────────────────────────────────────────────
 
-http_semaphore = asyncio.Semaphore(50)
+http_semaphore = asyncio.Semaphore(100)
 
 async def fetch(session, url, retries=4):
     if not url: return None
     for attempt in range(retries):
+        status = None
         try:
             async with http_semaphore:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                    if resp.status == 200:
+                    status = resp.status
+                    if status == 200:
                         return await resp.json()
-                    elif resp.status in (429, 502, 503, 504):
-                        await asyncio.sleep(attempt + 1)
-                        continue
         except Exception as e:
             if attempt == retries - 1:
                 log.warning(f"Fetch failed: {url} -> {e}")
+
+        # Sleep OUTSIDE the semaphore so other tasks can use it
+        if status in (429, 502, 503, 504) or status is None:
             await asyncio.sleep(attempt + 1)
+
     return None
 
 # ── Batch ensure functions (no DB SELECT, just fetch-and-insert unknown) ─────
@@ -789,7 +792,7 @@ async def worker(pool, session, queue, progress_file, worker_id):
         try:
             await asyncio.wait_for(
                 process_match(pool, session, event_url, progress_file),
-                timeout=90  # Skip any match that takes longer than 90 seconds
+                timeout=300  # 5 minutes — enough for large matches with 700+ HTTP requests
             )
             progress['done'] += 1
             elapsed = time.time() - progress['start']
@@ -834,7 +837,7 @@ async def main():
     if progress['total'] == 0: return
 
     db_url = os.getenv("DATABASE_URL")
-    pool = await asyncpg.create_pool(db_url, min_size=5, max_size=15)
+    pool = await asyncpg.create_pool(db_url, min_size=5, max_size=25)
     
     # ── Pre-warm caches ──
     log.info("Pre-warming caches from DB...")
