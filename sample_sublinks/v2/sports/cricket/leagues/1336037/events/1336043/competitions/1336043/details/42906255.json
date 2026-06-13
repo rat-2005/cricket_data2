@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42906255",
+  "id": "42906255",
+  "uid": "s:200~e:1336043~c:1336043~d:42906255",
+  "clock": "00:00",
+  "date": "2023-6-19 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "mediaId": 0,
+  "period": 3,
+  "periodText": "3rd innings",
+  "shortPeriodText": "3rd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "It's very overcast now, and the groundstaff are poised on the boundary edge with the hover cover.",
+  "text": "got him, what an incredible gully fielder Cameron Green is! Length ball in the corridor, straightens on Duckett, and he offers a bit of a loose response, hanging his bat out, looking for a lazy off-side push. Thick edge, and Green dives low to his left to grab it. Just as in the case of his second-innings catch of Shubman Gill last week, the umpires send it upstairs, but this time it's very clear that Green has wrapped his fingers nicely around the ball by the time his hand hits the turf",
+  "postText": "",
+  "shortText": "Cummins to Duckett, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 300804,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/521637"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/1076713"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 0,
+    "balls": 28,
+    "wickets": 1,
+    "overs": 4.4,
+    "conceded": 9
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/446548"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 0,
+    "balls": 6,
+    "wickets": 0,
+    "overs": 1.0,
+    "conceded": 1
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/521637"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 19,
+    "faced": 28,
+    "fours": 1,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/665053"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 7,
+    "faced": 24,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251892",
+    "runRate": 3.11,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 3,
+    "balls": 52,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 1,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 2,
+    "day": 3,
+    "fallOfWickets": 1,
+    "trailBy": 0,
+    "leadBy": 34,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 27
+  },
+  "over": {
+    "ball": 4,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 1,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 9,
+    "runs": 0,
+    "wickets": 1,
+    "overs": 8.4,
+    "actual": 8.4,
+    "unique": 8.04
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/521637"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/1076713"
+      },
+      "isKeeper": false
+    },
+    "text": "BM Duckett c Green b Cummins 19 (46m 28b 1x4 0x6) SR: 67.85",
+    "minutes": 46,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687099168000
+}

@@ -1,0 +1,31 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/1/partnerships/7",
+  "wicketNumber": 7,
+  "wicketName": "7th",
+  "fowType": "out",
+  "overs": 4.1,
+  "runs": 26,
+  "runRate": 6.24,
+  "start": {
+    "overs": "61.4",
+    "runs": 297,
+    "wickets": 6
+  },
+  "end": {
+    "overs": "65.5",
+    "runs": 323,
+    "wickets": 7
+  },
+  "batsmen": [
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/8917",
+      "balls": "17",
+      "runs": 18
+    },
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/303669",
+      "balls": "8",
+      "runs": 4
+    }
+  ]
+}

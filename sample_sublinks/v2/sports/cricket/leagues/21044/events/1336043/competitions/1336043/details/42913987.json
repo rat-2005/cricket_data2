@@ -1,0 +1,158 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/events/1336043/competitions/1336043/details/42913987",
+  "id": "42913987",
+  "uid": "s:200~e:1336043~c:1336043~d:42913987",
+  "clock": "00:00",
+  "date": "2023-6-21 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 4,
+  "periodText": "4th innings",
+  "shortPeriodText": "4th innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "<strong>Chopped on!</strong> Robinson has brought Edgbaston back to life! He used the crease well, got it on a length from wide and Green tried to steer it towards third. It angled in close which meant Green had little to no room to work with, Inside edge took the ball onto the stumps.",
+  "postText": "Karthik: \"A roar at the three wishes pub, North London. Is that a wicket?\" On cue",
+  "shortText": "Robinson to Green, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 406304,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/527776"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/1076713"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/527776"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 4,
+    "balls": 76,
+    "wickets": 2,
+    "overs": 12.4,
+    "conceded": 29
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/303669"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 1,
+    "balls": 30,
+    "wickets": 0,
+    "overs": 5.0,
+    "conceded": 9
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/1076713"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 28,
+    "faced": 66,
+    "fours": 2,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/215155"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 59,
+    "faced": 175,
+    "fours": 7,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251931",
+    "runRate": 3.01,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 4,
+    "balls": 382,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 6,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 281,
+    "session": 3,
+    "day": 5,
+    "fallOfWickets": 6,
+    "trailBy": 88,
+    "leadBy": 0,
+    "remainingRuns": 89,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 192
+  },
+  "over": {
+    "ball": 4,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 1,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 64,
+    "runs": 0,
+    "wickets": 1,
+    "overs": 63.4,
+    "actual": 63.4,
+    "unique": 63.04
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "bowled",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/527776"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/1076713"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/0"
+      },
+      "isKeeper": false
+    },
+    "text": "C Green  b Robinson 28 (75m 66b 2x4 0x6) SR: 42.42",
+    "minutes": 75,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687277320000
+}

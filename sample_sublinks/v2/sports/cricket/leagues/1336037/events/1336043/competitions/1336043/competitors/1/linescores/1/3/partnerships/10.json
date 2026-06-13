@@ -1,0 +1,31 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/3/partnerships/10",
+  "wicketNumber": 10,
+  "wicketName": "10th",
+  "fowType": "out",
+  "overs": 4.3,
+  "runs": 17,
+  "runRate": 3.77,
+  "start": {
+    "overs": "61.5",
+    "runs": 256,
+    "wickets": 9
+  },
+  "end": {
+    "overs": "66.2",
+    "runs": 273,
+    "wickets": 10
+  },
+  "batsmen": [
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/8608",
+      "balls": "14",
+      "runs": 12
+    },
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/10617",
+      "balls": "13",
+      "runs": 5
+    }
+  ]
+}

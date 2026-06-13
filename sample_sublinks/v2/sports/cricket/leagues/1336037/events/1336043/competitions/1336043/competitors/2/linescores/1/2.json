@@ -1,0 +1,33 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2",
+  "period": 2,
+  "value": 2,
+  "displayValue": 2,
+  "source": {
+    "description": "Feedback",
+    "id": 1
+  },
+  "wickets": 10,
+  "runs": 386,
+  "overs": 116.1,
+  "isBatting": true,
+  "fours": 38,
+  "sixes": 9,
+  "score": "386 & 282/8 (92.3 ov, target 281)",
+  "description": "all out",
+  "isCurrent": 0,
+  "target": 0,
+  "followOn": 0,
+  "statistics": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2/statistics/0"
+  },
+  "leaders": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2/leaders"
+  },
+  "partnerships": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2/partnerships"
+  },
+  "fow": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2/fow"
+  }
+}

@@ -1,0 +1,860 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/statistics",
+  "competition": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "splits": {
+    "id": "0",
+    "name": "Total",
+    "abbreviation": "Total",
+    "categories": [
+      {
+        "name": "general",
+        "displayName": "General",
+        "shortDisplayName": "General",
+        "abbreviation": "gen",
+        "stats": [
+          {
+            "name": "ballLimit",
+            "displayName": "Ball Limit",
+            "shortDisplayName": "BL",
+            "description": "Ball Limit",
+            "abbreviation": "BL",
+            "type": "balllimit",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "balls",
+            "displayName": "Balls",
+            "shortDisplayName": "B",
+            "description": "Balls",
+            "abbreviation": "B",
+            "type": "balls",
+            "value": "468",
+            "displayValue": "468"
+          },
+          {
+            "name": "bpo",
+            "displayName": "Bpo",
+            "shortDisplayName": "B",
+            "description": "Bpo",
+            "abbreviation": "B",
+            "type": "bpo",
+            "value": "6",
+            "displayValue": "6"
+          },
+          {
+            "name": "byes",
+            "displayName": "Byes",
+            "shortDisplayName": "B",
+            "description": "Byes",
+            "abbreviation": "B",
+            "type": "byes",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "extras",
+            "displayName": "Extras",
+            "shortDisplayName": "E",
+            "description": "Extras",
+            "abbreviation": "E",
+            "type": "extras",
+            "value": "9",
+            "displayValue": "9"
+          },
+          {
+            "name": "lead",
+            "displayName": "Lead",
+            "shortDisplayName": "L",
+            "description": "Lead",
+            "abbreviation": "L",
+            "type": "lead",
+            "value": "393",
+            "displayValue": "393"
+          },
+          {
+            "name": "legbyes",
+            "displayName": "Legbyes",
+            "shortDisplayName": "L",
+            "description": "Legbyes",
+            "abbreviation": "L",
+            "type": "legbyes",
+            "value": "6",
+            "displayValue": "6"
+          },
+          {
+            "name": "liveCurrent",
+            "displayName": "Live Current",
+            "shortDisplayName": "LC",
+            "description": "Live Current",
+            "abbreviation": "LC",
+            "type": "livecurrent",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "minutes",
+            "displayName": "Minutes",
+            "shortDisplayName": "M",
+            "description": "Minutes",
+            "abbreviation": "M",
+            "type": "minutes",
+            "value": "",
+            "displayValue": ""
+          },
+          {
+            "name": "miscounted",
+            "displayName": "Miscounted",
+            "shortDisplayName": "M",
+            "description": "Miscounted",
+            "abbreviation": "M",
+            "type": "miscounted",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "noballs",
+            "displayName": "Noballs",
+            "shortDisplayName": "N",
+            "description": "Noballs",
+            "abbreviation": "N",
+            "type": "noballs",
+            "value": "3",
+            "displayValue": "3"
+          },
+          {
+            "name": "oldPenaltyOrBonus",
+            "displayName": "Old Penalty Or Bonus",
+            "shortDisplayName": "OPOB",
+            "description": "Old Penalty Or Bonus",
+            "abbreviation": "OPOB",
+            "type": "oldpenaltyorbonus",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "overLimit",
+            "displayName": "Over Limit",
+            "shortDisplayName": "OL",
+            "description": "Over Limit",
+            "abbreviation": "OL",
+            "type": "overlimit",
+            "value": "0.0",
+            "displayValue": "0.0"
+          },
+          {
+            "name": "overLimitRunRate",
+            "displayName": "Over Limit Run Rate",
+            "shortDisplayName": "OLRR",
+            "description": "Over Limit Run Rate",
+            "abbreviation": "OLRR",
+            "type": "overlimitrunrate",
+            "value": "",
+            "displayValue": ""
+          },
+          {
+            "name": "overSplitLimit",
+            "displayName": "Over Split Limit",
+            "shortDisplayName": "OSL",
+            "description": "Over Split Limit",
+            "abbreviation": "OSL",
+            "type": "oversplitlimit",
+            "value": "0.0",
+            "displayValue": "0.0"
+          },
+          {
+            "name": "overs",
+            "displayName": "Overs",
+            "shortDisplayName": "O",
+            "description": "Overs",
+            "abbreviation": "O",
+            "type": "overs",
+            "value": "78.0",
+            "displayValue": "78.0"
+          },
+          {
+            "name": "oversDocked",
+            "displayName": "Overs Docked",
+            "shortDisplayName": "OD",
+            "description": "Overs Docked",
+            "abbreviation": "OD",
+            "type": "oversdocked",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "penalties",
+            "displayName": "Penalties",
+            "shortDisplayName": "P",
+            "description": "Penalties",
+            "abbreviation": "P",
+            "type": "penalties",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "penaltiesFieldEnd",
+            "displayName": "Penalties Field End",
+            "shortDisplayName": "PFE",
+            "description": "Penalties Field End",
+            "abbreviation": "PFE",
+            "type": "penaltiesfieldend",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "penaltiesFieldStart",
+            "displayName": "Penalties Field Start",
+            "shortDisplayName": "PFS",
+            "description": "Penalties Field Start",
+            "abbreviation": "PFS",
+            "type": "penaltiesfieldstart",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "runRate",
+            "displayName": "Run Rate",
+            "shortDisplayName": "RR",
+            "description": "Run Rate",
+            "abbreviation": "RR",
+            "type": "runrate",
+            "value": "5.03",
+            "displayValue": "5.03"
+          },
+          {
+            "name": "runs",
+            "displayName": "Runs",
+            "shortDisplayName": "R",
+            "description": "Runs",
+            "abbreviation": "R",
+            "type": "runs",
+            "value": "393",
+            "displayValue": "393"
+          },
+          {
+            "name": "target",
+            "displayName": "Target",
+            "shortDisplayName": "T",
+            "description": "Target",
+            "abbreviation": "T",
+            "type": "target",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "targetachievedMinutes",
+            "displayName": "Targetachieved Minutes",
+            "shortDisplayName": "TM",
+            "description": "Targetachieved Minutes",
+            "abbreviation": "TM",
+            "type": "targetachievedminutes",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "targetachievedOvers",
+            "displayName": "Targetachieved Overs",
+            "shortDisplayName": "TO",
+            "description": "Targetachieved Overs",
+            "abbreviation": "TO",
+            "type": "targetachievedovers",
+            "value": "0.0",
+            "displayValue": "0.0"
+          },
+          {
+            "name": "targetachievedRuns",
+            "displayName": "Targetachieved Runs",
+            "shortDisplayName": "TR",
+            "description": "Targetachieved Runs",
+            "abbreviation": "TR",
+            "type": "targetachievedruns",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "targetachievedWickets",
+            "displayName": "Targetachieved Wickets",
+            "shortDisplayName": "TW",
+            "description": "Targetachieved Wickets",
+            "abbreviation": "TW",
+            "type": "targetachievedwickets",
+            "value": "0",
+            "displayValue": "0"
+          },
+          {
+            "name": "wickets",
+            "displayName": "Wickets",
+            "shortDisplayName": "W",
+            "description": "Wickets",
+            "abbreviation": "W",
+            "type": "wickets",
+            "value": "8",
+            "displayValue": "8"
+          },
+          {
+            "name": "wides",
+            "displayName": "Wides",
+            "shortDisplayName": "W",
+            "description": "Wides",
+            "abbreviation": "W",
+            "type": "wides",
+            "value": "0",
+            "displayValue": "0"
+          }
+        ]
+      }
+    ],
+    "overs": [
+      [
+        {
+          "number": "1",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "2",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "3",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "4",
+          "runs": "4",
+          "wicket": [
+            {
+              "ballsFaced": "10",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42896771",
+                "shortText": "Hazlewood to Duckett, OUT",
+                "text": "<strong>caught behind! That's why you dangle it wider to Duckett!</strong> Back of a length, angled across the left-hander, he tries to cut again, gets a thin edge and it barely carries to Carey as he moves well coming forward to take a low catch"
+              },
+              "dismissalCard": "c",
+              "fours": "2",
+              "fow": "22/1",
+              "minutes": "18",
+              "number": 1,
+              "over": "3.4",
+              "runs": 12,
+              "shortText": "c &dagger;Carey b Hazlewood",
+              "sixes": 0,
+              "strikeRate": "120"
+            }
+          ]
+        },
+        {
+          "number": "5",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "6",
+          "runs": "3",
+          "wicket": []
+        },
+        {
+          "number": "7",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "8",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "9",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "10",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "11",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "12",
+          "runs": "4",
+          "wicket": []
+        },
+        {
+          "number": "13",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "14",
+          "runs": "3",
+          "wicket": []
+        },
+        {
+          "number": "15",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "16",
+          "runs": "4",
+          "wicket": []
+        },
+        {
+          "number": "17",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "18",
+          "runs": "8",
+          "wicket": [
+            {
+              "ballsFaced": "44",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42896911",
+                "shortText": "Lyon to Pope, OUT",
+                "text": "skidding on, Pope is struck on the knee roll... Ahsan Raza shakes his head but Australia <b>review</b>. Stuck on the crease, playing across the line, this looks very tight. Did it pitch in line? Yes, and it's three reds for Pope! Brilliant review and Australia have their second of the morning. There was just enough doubt for the umpire, but none whatsoever for Hawk-Eye. Lyon on the board for the series"
+              },
+              "dismissalCard": "lbw",
+              "fours": "2",
+              "fow": "92/2",
+              "minutes": "60",
+              "number": 2,
+              "over": "17.6",
+              "runs": 31,
+              "shortText": "lbw b Lyon",
+              "sixes": 0,
+              "strikeRate": "70.45"
+            }
+          ]
+        },
+        {
+          "number": "19",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "20",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "21",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "22",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "23",
+          "runs": "3",
+          "wicket": []
+        },
+        {
+          "number": "24",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "25",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "26",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "27",
+          "runs": "4",
+          "wicket": [
+            {
+              "ballsFaced": "73",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42896963",
+                "shortText": "Boland to Crawley, OUT",
+                "text": "<b>jaffa!</b> Leaps from a length and takes the glove through to Carey! Or does it...? Marais Erasmus and Crawley are unmoved, Australia perplexed. Cummins <b>reviews</b>, and this is going to be overturned. Clearly brushed the thumb on the bottom hand, Chris Gaffaney doesn't take long to overturn the decision. Boland has taken some unaccustomed punishment but nips in on the brink of lunch to give Australia a third wicket and some respite, as they walk off following their first skirmish with Bazball!"
+              },
+              "dismissalCard": "c",
+              "fours": "7",
+              "fow": "124/3",
+              "minutes": "118",
+              "number": 3,
+              "over": "26.4",
+              "runs": 61,
+              "shortText": "c &dagger;Carey b Boland",
+              "sixes": 0,
+              "strikeRate": "83.56"
+            }
+          ]
+        },
+        {
+          "number": "28",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "29",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "30",
+          "runs": "9",
+          "wicket": []
+        },
+        {
+          "number": "31",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "32",
+          "runs": "4",
+          "wicket": []
+        },
+        {
+          "number": "33",
+          "runs": "11",
+          "wicket": []
+        },
+        {
+          "number": "34",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "35",
+          "runs": "9",
+          "wicket": []
+        },
+        {
+          "number": "36",
+          "runs": "4",
+          "wicket": []
+        },
+        {
+          "number": "37",
+          "runs": "0",
+          "wicket": []
+        },
+        {
+          "number": "38",
+          "runs": "2",
+          "wicket": [
+            {
+              "ballsFaced": "37",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42897093",
+                "shortText": "Lyon to Brook, OUT",
+                "text": "<strong>bowled him! Extraordinary! Off the thigh pad!</strong> Shorter length, some extra spin and bounce, it hits the thigh pad as he shoulder's arms late, it bounces high up in the air, everyone lost sight of it, it came down and landed on the back of Brook's leg and bounced onto the stumps! Brook didn't think to look up and knock it away with his bat or body!"
+              },
+              "dismissalCard": "",
+              "fours": "4",
+              "fow": "175/4",
+              "minutes": "45",
+              "number": 4,
+              "over": "37.2",
+              "runs": 32,
+              "shortText": " b Lyon",
+              "sixes": 0,
+              "strikeRate": "86.48"
+            }
+          ]
+        },
+        {
+          "number": "39",
+          "runs": "1",
+          "wicket": [
+            {
+              "ballsFaced": "8",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42897113",
+                "shortText": "Hazlewood to Stokes, OUT",
+                "text": "<strong>Given caught behind! Australia jubilant</strong>. Stokes isn't sure he's hit it. He checks with Root and decides to review. Fuller length but not a half volley, he tries to drive on the up against the angle and seems to get a little scratch through to Carey. Ultraedge shows a bit spike! England lose the review and their captain."
+              },
+              "dismissalCard": "c",
+              "fours": 0,
+              "fow": "176/5",
+              "minutes": "6",
+              "number": 5,
+              "over": "38.4",
+              "runs": 1,
+              "shortText": "c &dagger;Carey b Hazlewood",
+              "sixes": 0,
+              "strikeRate": "12.5"
+            }
+          ]
+        },
+        {
+          "number": "40",
+          "runs": "3",
+          "wicket": []
+        },
+        {
+          "number": "41",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "42",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "43",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "44",
+          "runs": "11",
+          "wicket": []
+        },
+        {
+          "number": "45",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "46",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "47",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "48",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "49",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "50",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "51",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "52",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "53",
+          "runs": "12",
+          "wicket": []
+        },
+        {
+          "number": "54",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "55",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "56",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "57",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "58",
+          "runs": "10",
+          "wicket": []
+        },
+        {
+          "number": "59",
+          "runs": "1",
+          "wicket": []
+        },
+        {
+          "number": "60",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "61",
+          "runs": "10",
+          "wicket": []
+        },
+        {
+          "number": "62",
+          "runs": "6",
+          "wicket": [
+            {
+              "ballsFaced": "78",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42897528",
+                "shortText": "Lyon to Bairstow, OUT",
+                "text": "<strong>stumped! Bairstow runs past one!</strong> Beautifully bowled. Bairstow went too early, 57mph, good length with some drop, Bairstow goes through with the stroke despite being nowhere near the pitch, tries to whip square and it goes through the gate, easy stumping for Carey."
+              },
+              "dismissalCard": "st",
+              "fours": "12",
+              "fow": "297/6",
+              "minutes": "102",
+              "number": 6,
+              "over": "61.4",
+              "runs": 78,
+              "shortText": "st &dagger;Carey b Lyon",
+              "sixes": 0,
+              "strikeRate": "100"
+            }
+          ]
+        },
+        {
+          "number": "63",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "64",
+          "runs": "10",
+          "wicket": []
+        },
+        {
+          "number": "65",
+          "runs": "10",
+          "wicket": []
+        },
+        {
+          "number": "66",
+          "runs": "3",
+          "wicket": [
+            {
+              "ballsFaced": "17",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42897613",
+                "shortText": "Lyon to Ali, OUT",
+                "text": "<strong>another stumping! Another wild premeditated shot</strong>. He skipped down early trying to go over long on, completely done in flight, nowhere near the pitch, he goes through with the shot, it spins and bounces past the edge, Carey completes a very easy stumping"
+              },
+              "dismissalCard": "st",
+              "fours": "2",
+              "fow": "323/7",
+              "minutes": "19",
+              "number": 7,
+              "over": "65.5",
+              "runs": 18,
+              "shortText": "st &dagger;Carey b Lyon",
+              "sixes": "1",
+              "strikeRate": "105.88"
+            }
+          ]
+        },
+        {
+          "number": "67",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "68",
+          "runs": "8",
+          "wicket": []
+        },
+        {
+          "number": "69",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "70",
+          "runs": "6",
+          "wicket": []
+        },
+        {
+          "number": "71",
+          "runs": "4",
+          "wicket": [
+            {
+              "ballsFaced": "21",
+              "details": {
+                "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42897711",
+                "shortText": "Green to Broad, OUT",
+                "text": "<b>hits a length, hits off stump!</b> Broad is left pirouetting on the spot, looking down the fairway to see where his tee shot had ended up... Maybe he was expecting something shorter, but Green kept the ball up and pinged the bails. England still swinging, but eight down now"
+              },
+              "dismissalCard": "",
+              "fours": "2",
+              "fow": "350/8",
+              "minutes": "22",
+              "number": 8,
+              "over": "70.4",
+              "runs": 16,
+              "shortText": " b Green",
+              "sixes": 0,
+              "strikeRate": "76.19"
+            }
+          ]
+        },
+        {
+          "number": "72",
+          "runs": "0",
+          "wicket": []
+        },
+        {
+          "number": "73",
+          "runs": "2",
+          "wicket": []
+        },
+        {
+          "number": "74",
+          "runs": "3",
+          "wicket": []
+        },
+        {
+          "number": "75",
+          "runs": "7",
+          "wicket": []
+        },
+        {
+          "number": "76",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "77",
+          "runs": "5",
+          "wicket": []
+        },
+        {
+          "number": "78",
+          "runs": "20",
+          "wicket": []
+        }
+      ]
+    ]
+  }
+}

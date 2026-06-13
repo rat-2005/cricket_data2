@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42913759",
+  "id": "42913759",
+  "uid": "s:200~e:1336043~c:1336043~d:42913759",
+  "clock": "00:00",
+  "date": "2023-6-21 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 4,
+  "periodText": "4th innings",
+  "shortPeriodText": "4th innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "<b>gottim, snaffled at slip! Moeen Munir Ali!</b> What a moment. Head landed a couple of body blows but Moeen puts him flat on the canvas with a superb delivery that pitches on a length and rips away, jams the shoulder of the bat and loops to Root at slip. Started with a helping of filth and then the jaffa. <i>That</i> will make the pain of his spinning finger feel worth it",
+  "postText": "In walks Cameron Green. Slip, leg slip and short leg. Edgbaston beginning to tick again",
+  "shortText": "Ali to Head, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 404405,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/8917"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/303669"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/530011"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/8917"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 2,
+    "balls": 47,
+    "wickets": 1,
+    "overs": 7.5,
+    "conceded": 34
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 3,
+    "balls": 96,
+    "wickets": 3,
+    "overs": 16.0,
+    "conceded": 42
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/530011"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 16,
+    "faced": 24,
+    "fours": 3,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 39,
+    "faced": 128,
+    "fours": 6,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251931",
+    "runRate": 3.18,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 4,
+    "balls": 269,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 5,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 281,
+    "session": 2,
+    "day": 5,
+    "fallOfWickets": 5,
+    "trailBy": 137,
+    "leadBy": 0,
+    "remainingRuns": 138,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 143
+  },
+  "over": {
+    "ball": 5,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 45,
+    "runs": 10,
+    "wickets": 1,
+    "overs": 44.5,
+    "actual": 44.5,
+    "unique": 44.05
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/8917"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/530011"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/303669"
+      },
+      "isKeeper": false
+    },
+    "text": "TM Head c Root b Ali 16 (36m 24b 3x4 0x6) SR: 66.66",
+    "minutes": 36,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687271477000
+}

@@ -1,0 +1,24 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/4",
+  "period": 4,
+  "value": 4,
+  "displayValue": 4,
+  "source": {
+    "description": "Feedback",
+    "id": 1
+  },
+  "wickets": 0,
+  "runs": 0,
+  "overs": 92.3,
+  "isBatting": false,
+  "description": "target reached",
+  "isCurrent": 1,
+  "target": 281,
+  "followOn": 0,
+  "statistics": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/4/statistics/0"
+  },
+  "leaders": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/4/leaders"
+  }
+}

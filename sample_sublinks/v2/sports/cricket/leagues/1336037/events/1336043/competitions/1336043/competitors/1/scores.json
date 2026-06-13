@@ -1,0 +1,12 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/scores",
+  "place": 2,
+  "innings": "3",
+  "value": "393/8d & 273",
+  "displayValue": "393/8d & 273",
+  "winner": "false",
+  "source": {
+    "id": 1,
+    "description": "Basic/Manual"
+  }
+}

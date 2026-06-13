@@ -1,0 +1,36 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/status",
+  "clock": 0,
+  "addedClock": 0,
+  "displayClock": "0'",
+  "presentLocalTime": "",
+  "period": 4,
+  "featuredAthletes": [
+    {
+      "abbreviation": "POTM",
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/215155"
+      },
+      "displayName": "Player Of The Match",
+      "linescores": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/events/1336043/competitions/1336043/competitors/2/roster/215155/linescores"
+      },
+      "name": "playerOfTheMatch",
+      "playerId": 215155,
+      "shortDisplayName": "POTM",
+      "team": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+      }
+    }
+  ],
+  "dayNumber": 5,
+  "longSummary": "Australia won by 2 wickets",
+  "summary": "Australia won by 2 wkts",
+  "type": {
+    "id": "1",
+    "description": "Result",
+    "detail": "Final",
+    "shortDetail": "Final",
+    "state": "post"
+  }
+}

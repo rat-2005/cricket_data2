@@ -1,0 +1,158 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42904530",
+  "id": "42904530",
+  "uid": "s:200~e:1336043~c:1336043~d:42904530",
+  "clock": "00:00",
+  "date": "2023-6-19 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 2,
+  "periodText": "2nd innings",
+  "shortPeriodText": "2nd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "Now there's a ring of off-side catchers to mirror those on the leg side.",
+  "text": "Bowled him!!! Robinson yorks Khawaja now, but it's more a case of Khawaja yorking himself. Looks to step out and break out of the stranglehold of the front-of-the-wicket umbrella field, makes room to drive inside-out, and he ends up far too close to the pitch of the ball. His off stump is ripped out, and a terrific, terrific innings has finally come to an end",
+  "postText": "",
+  "shortText": "Robinson to Khawaja, OUT",
+  "homeScore": "0",
+  "awayScore": "372/7",
+  "scoreValue": 0,
+  "sequence": 211204,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 3,
+    "balls": 124,
+    "wickets": 1,
+    "overs": 20.4,
+    "conceded": 55
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 4,
+    "balls": 126,
+    "wickets": 2,
+    "overs": 21.0,
+    "conceded": 54
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 141,
+    "faced": 321,
+    "fours": 14,
+    "runs": 0,
+    "sixes": 3
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 27,
+    "faced": 52,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 2
+  },
+  "innings": {
+    "id": "251829",
+    "runRate": 3.3,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 2,
+    "balls": 676,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 7,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 3,
+    "fallOfWickets": 7,
+    "trailBy": 21,
+    "leadBy": 0,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 372
+  },
+  "over": {
+    "ball": 4,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 1,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 113,
+    "runs": 0,
+    "wickets": 1,
+    "overs": 112.4,
+    "actual": 112.4,
+    "unique": 112.04
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "bowled",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/0"
+      },
+      "isKeeper": false
+    },
+    "text": "UT Khawaja  b Robinson 141 (478m 321b 14x4 3x6) SR: 43.92",
+    "minutes": 478,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687088090000
+}

@@ -1,0 +1,158 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/events/1336043/competitions/1336043/details/42909145",
+  "id": "42909145",
+  "uid": "s:200~e:1336043~c:1336043~d:42909145",
+  "clock": "00:00",
+  "date": "2023-6-20 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "mediaId": 0,
+  "period": 3,
+  "periodText": "3rd innings",
+  "shortPeriodText": "3rd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "ohmygosh, that's a moment of pure talismanic force from Cummins! Route-one cricket, and when it's executed just right, it's absolutely unplayable. Fast, inswinging yorker that absolutely howitzers through Pope's desperate attempt to jam his bat down, and leaves his stumps in an absolute mess. What a moment in this mad, mad morning. We'll have to check replays to see if this is conventional swinfg or reverse. Oh, it's a proper, old-fashioned inswinger",
+  "postText": "",
+  "shortText": "Cummins to Pope, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 301606,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/887207"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 1,
+    "balls": 54,
+    "wickets": 2,
+    "overs": 9.0,
+    "conceded": 22
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/446548"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 1,
+    "balls": 30,
+    "wickets": 1,
+    "overs": 5.0,
+    "conceded": 32
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/887207"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 14,
+    "faced": 16,
+    "fours": 2,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/303669"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 30,
+    "faced": 33,
+    "fours": 4,
+    "runs": 0,
+    "sixes": 1
+  },
+  "innings": {
+    "id": "251892",
+    "runRate": 4.52,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 3,
+    "balls": 102,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 3,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 4,
+    "fallOfWickets": 3,
+    "trailBy": 0,
+    "leadBy": 84,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 77
+  },
+  "over": {
+    "ball": 6,
+    "balls": 6,
+    "complete": true,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 17,
+    "runs": 5,
+    "wickets": 1,
+    "overs": 16.6,
+    "actual": 16.6,
+    "unique": 16.06
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "bowled",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/887207"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/0"
+      },
+      "isKeeper": false
+    },
+    "text": "OJ Pope  b Cummins 14 (42m 16b 2x4 0x6) SR: 87.5",
+    "minutes": 42,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687170777000
+}

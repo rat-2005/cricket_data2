@@ -1,0 +1,12 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/4/fow/7",
+  "wicketNumber": 7,
+  "wicketOver": 71.6,
+  "fowType": "out",
+  "runs": 209,
+  "runsScored": 65,
+  "ballsFaced": 197,
+  "athlete": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/215155"
+  }
+}

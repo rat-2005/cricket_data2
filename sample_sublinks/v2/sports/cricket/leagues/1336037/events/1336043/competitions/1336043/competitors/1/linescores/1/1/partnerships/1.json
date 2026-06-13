@@ -1,0 +1,31 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/1/partnerships/1",
+  "wicketNumber": 1,
+  "wicketName": "1st",
+  "fowType": "out",
+  "overs": 3.4,
+  "runs": 22,
+  "runRate": 6,
+  "start": {
+    "overs": "0",
+    "runs": "0",
+    "wickets": "0"
+  },
+  "end": {
+    "overs": "3.4",
+    "runs": 22,
+    "wickets": 1
+  },
+  "batsmen": [
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/521637",
+      "balls": "10",
+      "runs": 12
+    },
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/665053",
+      "balls": "12",
+      "runs": 10
+    }
+  ]
+}

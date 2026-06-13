@@ -1,0 +1,158 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/events/1336043/competitions/1336043/details/42910432",
+  "id": "42910432",
+  "uid": "s:200~e:1336043~c:1336043~d:42910432",
+  "clock": "00:00",
+  "date": "2023-6-20 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "mediaId": 0,
+  "period": 3,
+  "periodText": "3rd innings",
+  "shortPeriodText": "3rd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "got him, that's a lovely delivery and a bit of leaden footwork from Stokes. Fullish, angling into the stumps and nipping in further, and Stokes plays this from the crease, a straight-bat defensive push down the wrong line. He's reviewed it, but he's not very confident at all. Struck on the knee roll, in line with middle stump, and ball-tracking returns an umpire's call verdict at the stumps, with the ball shown to be clipping the top of leg stump. England are effectively 217 for 7",
+  "postText": "",
+  "shortText": "Cummins to Stokes, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 304802,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/311158"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 1,
+    "balls": 92,
+    "wickets": 3,
+    "overs": 15.2,
+    "conceded": 58
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/272279"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 2,
+    "balls": 90,
+    "wickets": 3,
+    "overs": 15.0,
+    "conceded": 50
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/311158"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 43,
+    "faced": 66,
+    "fours": 5,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/8917"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 6,
+    "faced": 9,
+    "fours": 1,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251892",
+    "runRate": 4.34,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 3,
+    "balls": 290,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 7,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 2,
+    "day": 4,
+    "fallOfWickets": 7,
+    "trailBy": 0,
+    "leadBy": 217,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 210
+  },
+  "over": {
+    "ball": 2,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 49,
+    "runs": 1,
+    "wickets": 1,
+    "overs": 48.2,
+    "actual": 48.2,
+    "unique": 48.02
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "leg before wicket",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/489889"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/311158"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/0"
+      },
+      "isKeeper": false
+    },
+    "text": "BA Stokes lbw b Cummins 43 (115m 66b 5x4 0x6) SR: 65.15",
+    "minutes": 115,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687182893000
+}

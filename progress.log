@@ -1,0 +1,75 @@
+Loaded 6774 existing leagues from file.
+Checking for new leagues from page 1 to 7...
+No new leagues found.
+Loaded 113224 existing events from file.
+Fetching events for all leagues concurrently to find new matches...
+Processed 100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 1900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 2900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 3900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 4900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5700/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5800/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 5900/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6000/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6100/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6200/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6300/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6400/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6500/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6600/6774 leagues. Total matches: 113224 (0 new so far).
+Processed 6700/6774 leagues. Total matches: 113224 (0 new so far).
+Final total events (matches) in database: 113224
+Total NEW matches added this run: 0
+Finished! No new matches were found.

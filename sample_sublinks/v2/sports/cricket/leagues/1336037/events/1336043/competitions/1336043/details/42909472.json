@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42909472",
+  "id": "42909472",
+  "uid": "s:200~e:1336043~c:1336043~d:42909472",
+  "clock": "00:00",
+  "date": "2023-6-20 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "mediaId": 0,
+  "period": 3,
+  "periodText": "3rd innings",
+  "shortPeriodText": "3rd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "<b>oh my, Root has run past one!</b> He's Bazballed himself in the foot! Appreciable spin for Lyon, it turns inside the bat with Root looking to heave over the leg side, leaving Carey with simple stumping. Silence around the ground, as England's talisman throws back his head and walks from the field. Lyon has his first of the day - and a third stumping for the match. Again, on paper, it's total madness, but we're probably beyond that discussion",
+  "postText": "In walks Ben Stokes, el capo. The lead is 136",
+  "shortText": "Lyon to Root, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 302501,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/272279"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/303669"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/326434"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/272279"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 0,
+    "balls": 19,
+    "wickets": 1,
+    "overs": 3.1,
+    "conceded": 27
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/288284"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 0,
+    "balls": 18,
+    "wickets": 0,
+    "overs": 3.0,
+    "conceded": 18
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/303669"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 46,
+    "faced": 55,
+    "fours": 5,
+    "runs": 0,
+    "sixes": 1
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/911707"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 36,
+    "faced": 27,
+    "fours": 5,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251892",
+    "runRate": 5.12,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 3,
+    "balls": 151,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 4,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 4,
+    "fallOfWickets": 4,
+    "trailBy": 0,
+    "leadBy": 136,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 129
+  },
+  "over": {
+    "ball": 1,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 26,
+    "runs": 1,
+    "wickets": 1,
+    "overs": 25.1,
+    "actual": 25.1,
+    "unique": 25.01
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "stumped",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/272279"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/303669"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/326434"
+      },
+      "isKeeper": true
+    },
+    "text": "JE Root st &dagger;Carey b Lyon 46 (79m 55b 5x4 1x6) SR: 83.63",
+    "minutes": 79,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687173456000
+}

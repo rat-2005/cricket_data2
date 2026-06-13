@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42910920",
+  "id": "42910920",
+  "uid": "s:200~e:1336043~c:1336043~d:42910920",
+  "clock": "00:00",
+  "date": "2023-6-20 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 4,
+  "periodText": "4th innings",
+  "shortPeriodText": "4th innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "and out of nowhere, Robinson produces a ball of subtle, venomous beauty! Scrambled seam, pitches on a good length in the corridor, and straightens juuust a touch. Warner is a touch late getting forward to defend, on this occasion, and is landing on his heel when the ball kisses his outside edge through to Bairstow",
+  "postText": "<b>5.58pm</b> Drinks. They'll feel a lot more refreshing in England's throats after that wicket. Here's Alan to take you through to stumps.",
+  "shortText": "Robinson to Warner, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 401704,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/219889"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/297433"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 2,
+    "balls": 28,
+    "wickets": 1,
+    "overs": 4.4,
+    "conceded": 20
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/8917"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 1,
+    "balls": 24,
+    "wickets": 0,
+    "overs": 4.0,
+    "conceded": 10
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/219889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 36,
+    "faced": 57,
+    "fours": 4,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 22,
+    "faced": 52,
+    "fours": 5,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251931",
+    "runRate": 3.45,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 4,
+    "balls": 106,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 1,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 281,
+    "session": 3,
+    "day": 4,
+    "fallOfWickets": 1,
+    "trailBy": 219,
+    "leadBy": 0,
+    "remainingRuns": 220,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 61
+  },
+  "over": {
+    "ball": 4,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 18,
+    "runs": 4,
+    "wickets": 1,
+    "overs": 17.4,
+    "actual": 17.4,
+    "unique": 17.04
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/219889"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/297433"
+      },
+      "isKeeper": true
+    },
+    "text": "DA Warner c &dagger;Bairstow b Robinson 36 (75m 57b 4x4 0x6) SR: 63.15",
+    "minutes": 75,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687193900000
+}

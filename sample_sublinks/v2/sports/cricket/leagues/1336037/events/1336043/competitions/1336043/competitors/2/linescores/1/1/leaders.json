@@ -1,0 +1,121 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/leaders",
+  "id": "1",
+  "name": "Leaders",
+  "abbreviation": "Leaders",
+  "categories": [
+    {
+      "name": "wickets",
+      "displayName": "Wickets",
+      "shortDisplayName": "Wickets",
+      "abbreviation": "w",
+      "leaders": [
+        {
+          "rel": [
+            "athlete"
+          ],
+          "displayValue": "4",
+          "value": "4",
+          "athlete": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/272279"
+          },
+          "runs": "149",
+          "overs": "29.0",
+          "maidens": "1",
+          "order": "3",
+          "team": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+          },
+          "economyRate": "5.13",
+          "statistics": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/roster/272279/statistics/0"
+          }
+        },
+        {
+          "rel": [
+            "athlete"
+          ],
+          "displayValue": "2",
+          "value": "2",
+          "athlete": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/288284"
+          },
+          "runs": "61",
+          "overs": "15.0",
+          "maidens": "1",
+          "order": "8",
+          "team": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+          },
+          "economyRate": "4.06",
+          "statistics": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/roster/288284/statistics/0"
+          }
+        },
+        {
+          "rel": [
+            "athlete"
+          ],
+          "displayValue": "1",
+          "value": "1",
+          "athlete": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/1076713"
+          },
+          "runs": "32",
+          "overs": "6.0",
+          "maidens": "0",
+          "order": "11",
+          "team": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+          },
+          "economyRate": "5.33",
+          "statistics": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/roster/1076713/statistics/0"
+          }
+        },
+        {
+          "rel": [
+            "athlete"
+          ],
+          "displayValue": "1",
+          "value": "1",
+          "athlete": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/446548"
+          },
+          "runs": "86",
+          "overs": "14.0",
+          "maidens": "0",
+          "order": "18",
+          "team": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+          },
+          "economyRate": "6.14",
+          "statistics": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/roster/446548/statistics/0"
+          }
+        },
+        {
+          "rel": [
+            "athlete"
+          ],
+          "displayValue": "0",
+          "value": "0",
+          "athlete": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/athletes/489889"
+          },
+          "runs": "59",
+          "overs": "14.0",
+          "maidens": "0",
+          "order": "43",
+          "team": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+          },
+          "economyRate": "4.21",
+          "statistics": {
+            "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/roster/489889/statistics/0"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42904676",
+  "id": "42904676",
+  "uid": "s:200~e:1336043~c:1336043~d:42904676",
+  "clock": "00:00",
+  "date": "2023-6-19 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 2,
+  "periodText": "2nd innings",
+  "shortPeriodText": "2nd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "got him, straight to silly point. Excellent bouncer, getting up to shoulder height, and the hopping, fending Boland can only pop it gently to the waiting Pope",
+  "postText": "",
+  "shortText": "Broad to Boland, OUT",
+  "homeScore": "0",
+  "awayScore": "378/9",
+  "scoreValue": 0,
+  "sequence": 211503,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/446548"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/887207"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 4,
+    "balls": 135,
+    "wickets": 3,
+    "overs": 22.3,
+    "conceded": 60
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 5,
+    "balls": 132,
+    "wickets": 2,
+    "overs": 22.0,
+    "conceded": 55
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/446548"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 0,
+    "faced": 5,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 31,
+    "faced": 59,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 2
+  },
+  "innings": {
+    "id": "251829",
+    "runRate": 3.27,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 2,
+    "balls": 693,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 9,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 3,
+    "fallOfWickets": 9,
+    "trailBy": 15,
+    "leadBy": 0,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 378
+  },
+  "over": {
+    "ball": 3,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 116,
+    "runs": 9,
+    "wickets": 1,
+    "overs": 115.3,
+    "actual": 115.3,
+    "unique": 115.03
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/446548"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/887207"
+      },
+      "isKeeper": false
+    },
+    "text": "SM Boland c Pope b Broad 0 (5m 5b 0x4 0x6) SR: 0",
+    "minutes": 5,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687089190000
+}

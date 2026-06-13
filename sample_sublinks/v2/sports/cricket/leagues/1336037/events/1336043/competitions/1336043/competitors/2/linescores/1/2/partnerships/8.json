@@ -1,0 +1,31 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/2/linescores/1/2/partnerships/8",
+  "wicketNumber": 8,
+  "wicketName": "8th",
+  "fowType": "out",
+  "overs": 1.5,
+  "runs": 5,
+  "runRate": 2.72,
+  "start": {
+    "overs": "112.4",
+    "runs": 372,
+    "wickets": 7
+  },
+  "end": {
+    "overs": "114.3",
+    "runs": 377,
+    "wickets": 8
+  },
+  "batsmen": [
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/272279",
+      "balls": "6",
+      "runs": 1
+    },
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/489889",
+      "balls": "6",
+      "runs": 3
+    }
+  ]
+}

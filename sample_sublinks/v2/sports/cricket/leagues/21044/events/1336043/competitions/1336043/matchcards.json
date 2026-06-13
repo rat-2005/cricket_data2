@@ -1,0 +1,301 @@
+{
+  "count": 3,
+  "pageIndex": 1,
+  "pageSize": 25,
+  "pageCount": 1,
+  "items": [
+    {
+      "extras": "(lb 10, nb 8)",
+      "total": "(8 wkts; 92.3 ovs)",
+      "runs": "282",
+      "typeID": "11",
+      "inningsNumber": "4",
+      "teamName": "Australia",
+      "headline": "Batting",
+      "playerDetails": [
+        {
+          "playerID": "215155",
+          "playerName": "UT Khawaja",
+          "dismissal": "bowled",
+          "runs": "65",
+          "ballsFaced": "197",
+          "fours": "7",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/215155.html"
+        },
+        {
+          "playerID": "219889",
+          "playerName": "DA Warner",
+          "dismissal": "caught wk",
+          "runs": "36",
+          "ballsFaced": "57",
+          "fours": "4",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/219889.html"
+        },
+        {
+          "playerID": "787987",
+          "playerName": "M Labuschagne",
+          "dismissal": "caught wk",
+          "runs": "13",
+          "ballsFaced": "15",
+          "fours": "3",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/787987.html"
+        },
+        {
+          "playerID": "267192",
+          "playerName": "SPD Smith",
+          "dismissal": "caught wk",
+          "runs": "6",
+          "ballsFaced": "13",
+          "fours": "1",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/267192.html"
+        },
+        {
+          "playerID": "446548",
+          "playerName": "SM Boland",
+          "dismissal": "caught wk",
+          "runs": "20",
+          "ballsFaced": "40",
+          "fours": "2",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/446548.html"
+        },
+        {
+          "playerID": "530011",
+          "playerName": "TM Head",
+          "dismissal": "caught",
+          "runs": "16",
+          "ballsFaced": "24",
+          "fours": "3",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/530011.html"
+        },
+        {
+          "playerID": "1076713",
+          "playerName": "C Green",
+          "dismissal": "bowled",
+          "runs": "28",
+          "ballsFaced": "66",
+          "fours": "2",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/1076713.html"
+        },
+        {
+          "playerID": "326434",
+          "playerName": "AT Carey",
+          "dismissal": "caught",
+          "runs": "20",
+          "ballsFaced": "50",
+          "fours": "2",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/326434.html"
+        },
+        {
+          "playerID": "489889",
+          "playerName": "PJ Cummins",
+          "dismissal": "not out",
+          "runs": "44",
+          "ballsFaced": "73",
+          "fours": "4",
+          "sixes": "2",
+          "href": "http://www.espncricinfo.com/ci/content/player/489889.html"
+        },
+        {
+          "playerID": "272279",
+          "playerName": "NM Lyon",
+          "dismissal": "not out",
+          "runs": "16",
+          "ballsFaced": "28",
+          "fours": "2",
+          "sixes": "0",
+          "href": "http://www.espncricinfo.com/ci/content/player/272279.html"
+        },
+        {
+          "playerID": "288284",
+          "playerName": "JR Hazlewood",
+          "dismissal": "",
+          "runs": "",
+          "ballsFaced": "",
+          "fours": "",
+          "sixes": "",
+          "href": "http://www.espncricinfo.com/ci/content/player/288284.html"
+        }
+      ]
+    },
+    {
+      "headline": "Bowling",
+      "typeID": "12",
+      "inningsNumber": "4",
+      "teamName": "England",
+      "playerDetails": [
+        {
+          "playerID": "8608",
+          "playerName": "JM Anderson",
+          "overs": "17.0",
+          "maidens": "1",
+          "conceded": "56",
+          "wickets": "0",
+          "economyRate": "3.29",
+          "href": "http://www.espncricinfo.com/ci/content/player/8608.html",
+          "nbw": "(1nb)"
+        },
+        {
+          "playerID": "10617",
+          "playerName": "SCJ Broad",
+          "overs": "21.0",
+          "maidens": "3",
+          "conceded": "64",
+          "wickets": "3",
+          "economyRate": "3.04",
+          "href": "http://www.espncricinfo.com/ci/content/player/10617.html",
+          "nbw": "(4nb)"
+        },
+        {
+          "playerID": "527776",
+          "playerName": "OE Robinson",
+          "overs": "18.3",
+          "maidens": "7",
+          "conceded": "43",
+          "wickets": "2",
+          "economyRate": "2.32",
+          "href": "http://www.espncricinfo.com/ci/content/player/527776.html",
+          "nbw": "(3nb)"
+        },
+        {
+          "playerID": "8917",
+          "playerName": "MM Ali",
+          "overs": "14.0",
+          "maidens": "2",
+          "conceded": "57",
+          "wickets": "1",
+          "economyRate": "4.07",
+          "href": "http://www.espncricinfo.com/ci/content/player/8917.html",
+          "nbw": ""
+        },
+        {
+          "playerID": "303669",
+          "playerName": "JE Root",
+          "overs": "15.0",
+          "maidens": "2",
+          "conceded": "43",
+          "wickets": "1",
+          "economyRate": "2.86",
+          "href": "http://www.espncricinfo.com/ci/content/player/303669.html",
+          "nbw": ""
+        },
+        {
+          "playerID": "311158",
+          "playerName": "BA Stokes",
+          "overs": "7.0",
+          "maidens": "2",
+          "conceded": "9",
+          "wickets": "1",
+          "economyRate": "1.28",
+          "href": "http://www.espncricinfo.com/ci/content/player/311158.html",
+          "nbw": ""
+        }
+      ]
+    },
+    {
+      "headline": "Partnerships",
+      "typeID": "13",
+      "inningsNumber": "4",
+      "teamName": "Australia",
+      "playerDetails": [
+        {
+          "partnershipRuns": "61",
+          "partnershipOvers": "17.4",
+          "fowType": "",
+          "partnershipWicketName": "1st",
+          "player2Name": "DA Warner",
+          "player2Runs": "36",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "22"
+        },
+        {
+          "partnershipRuns": "17",
+          "partnershipOvers": "3.5",
+          "fowType": "",
+          "partnershipWicketName": "2nd",
+          "player2Name": "M Labuschagne",
+          "player2Runs": "13",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "3"
+        },
+        {
+          "partnershipRuns": "11",
+          "partnershipOvers": "4.0",
+          "fowType": "",
+          "partnershipWicketName": "3rd",
+          "player2Name": "SPD Smith",
+          "player2Runs": "6",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "4"
+        },
+        {
+          "partnershipRuns": "32",
+          "partnershipOvers": "11.5",
+          "fowType": "",
+          "partnershipWicketName": "4th",
+          "player2Name": "SM Boland",
+          "player2Runs": "20",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "8"
+        },
+        {
+          "partnershipRuns": "22",
+          "partnershipOvers": "7.3",
+          "fowType": "",
+          "partnershipWicketName": "5th",
+          "player2Name": "TM Head",
+          "player2Runs": "16",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "2"
+        },
+        {
+          "partnershipRuns": "49",
+          "partnershipOvers": "18.5",
+          "fowType": "",
+          "partnershipWicketName": "6th",
+          "player2Name": "C Green",
+          "player2Runs": "28",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "20"
+        },
+        {
+          "partnershipRuns": "17",
+          "partnershipOvers": "8.2",
+          "fowType": "",
+          "partnershipWicketName": "7th",
+          "player2Name": "AT Carey",
+          "player2Runs": "10",
+          "player1Name": "UT Khawaja",
+          "player1Runs": "6"
+        },
+        {
+          "partnershipRuns": "18",
+          "partnershipOvers": "8.3",
+          "fowType": "",
+          "partnershipWicketName": "8th",
+          "player2Name": "PJ Cummins",
+          "player2Runs": "7",
+          "player1Name": "AT Carey",
+          "player1Runs": "10"
+        },
+        {
+          "partnershipRuns": "55",
+          "partnershipOvers": "12.0",
+          "fowType": "*",
+          "partnershipWicketName": "9th",
+          "player2Name": "PJ Cummins",
+          "player2Runs": "37",
+          "player1Name": "NM Lyon",
+          "player1Runs": "16"
+        }
+      ]
+    }
+  ]
+}

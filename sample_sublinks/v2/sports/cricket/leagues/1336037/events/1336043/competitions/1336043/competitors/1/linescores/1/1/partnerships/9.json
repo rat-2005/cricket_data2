@@ -1,0 +1,31 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/competitors/1/linescores/1/1/partnerships/9",
+  "wicketNumber": 9,
+  "wicketName": "9th",
+  "fowType": "end of innings",
+  "overs": 7.2,
+  "runs": 43,
+  "runRate": 5.86,
+  "start": {
+    "overs": "70.4",
+    "runs": 350,
+    "wickets": 8
+  },
+  "end": {
+    "overs": "78.0",
+    "runs": 393,
+    "wickets": 8
+  },
+  "batsmen": [
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/303669",
+      "balls": "14",
+      "runs": 25
+    },
+    {
+      "athlete": "http://core.espnuk.org/v2/sports/cricket/athletes/527776",
+      "balls": "31",
+      "runs": 17
+    }
+  ]
+}

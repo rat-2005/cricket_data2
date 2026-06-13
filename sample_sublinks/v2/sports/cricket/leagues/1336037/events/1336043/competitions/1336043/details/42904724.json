@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42904724",
+  "id": "42904724",
+  "uid": "s:200~e:1336043~c:1336043~d:42904724",
+  "clock": "00:00",
+  "date": "2023-6-19 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 2,
+  "periodText": "2nd innings",
+  "shortPeriodText": "2nd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "The lead is now down to 7. Robinson continues. Sixth over of his spell. Broad has bowled seven.",
+  "text": "and that's that. Cummins keeps taking on the hook, and this time he's not in control of it. Robinson goes short again, and this one probably skids onto Cummins quicker and lower than he expected, cramping him for room. Ends up hitting it with his bat face pointing up, and deep square leg runs in off the rope to take a straightforward catch",
+  "postText": "<b>1.20pm:</b> Gnasher has this update from the ground: \"Clouds are building up and the radar suggests some of those forecast showers and storms are starting to lurk around Birmingham. Will be interesting to see if the atmospherics provide Australia any assistance with the new ball. The cover is also on standby near the pitch during the lunch break.\"\n\n\n<b>12.59pm</b> England have wrapped the innings up on the stroke of lunch. They bowled superbly through the second hour, with their tactics and unusual fields first slowing down Cummins and Khawaja, and then scything through the tail, after Robinson ended Khawaja's long vigil. This will be a second-innings shootout now, and England will have the advantage of bowling last. Australia have the attack for this slow pitch, though, with Nathan Lyon primed to exploit the turn that's been increasingly evident, and three tall fast bowlers to hit the deck and get the ball to misbehave. Alan will be here in 40 minutes or so to bring you the start of England's second innings.\n\nMoose: \"Honors even in the contest between an unstoppable force and an immovable object. Tantalisingly poised for some Bazball hi-jinks after lunch \"\n\nSid: \"The quick 50 runs that eng left behind in the 1st might finally haunt them\"\n\nPraveen: \"Yusuf, love short ball tactics. Remember a bloke called Neil Wagner bowling it day in and day out and his captain Kane Williamson? This is more Wagner than Stokes. Give credit where it's due.\" --- May I remind you that a certain Brendon McCullum captained Wagner before Williamson took over?",
+  "shortText": "Robinson to Cummins, OUT",
+  "homeScore": "0",
+  "awayScore": "386/10",
+  "scoreValue": 0,
+  "sequence": 211601,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/311158"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 5,
+    "balls": 133,
+    "wickets": 3,
+    "overs": 22.1,
+    "conceded": 55
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 4,
+    "balls": 138,
+    "wickets": 3,
+    "overs": 23.0,
+    "conceded": 68
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 38,
+    "faced": 62,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 3
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/288284"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 1,
+    "faced": 1,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251829",
+    "runRate": 3.32,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 2,
+    "balls": 697,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 10,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 3,
+    "fallOfWickets": 10,
+    "trailBy": 7,
+    "leadBy": 0,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 386
+  },
+  "over": {
+    "ball": 1,
+    "balls": 1,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 117,
+    "runs": 0,
+    "wickets": 1,
+    "overs": 116.1,
+    "actual": 116.1,
+    "unique": 116.01
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/527776"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/489889"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/311158"
+      },
+      "isKeeper": false
+    },
+    "text": "PJ Cummins c Stokes b Robinson 38 (91m 62b 0x4 3x6) SR: 61.29",
+    "minutes": 91,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687089567000
+}

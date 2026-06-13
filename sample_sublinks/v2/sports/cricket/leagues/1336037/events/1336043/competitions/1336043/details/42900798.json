@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/events/1336043/competitions/1336043/details/42900798",
+  "id": "42900798",
+  "uid": "s:200~e:1336043~c:1336043~d:42900798",
+  "clock": "00:00",
+  "date": "2023-6-18 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2"
+  },
+  "mediaId": 0,
+  "period": 2,
+  "periodText": "2nd innings",
+  "shortPeriodText": "2nd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "Marnus Labuschagne walks out. Three slips, a leg slip and a catching mid on for Labuschagne. Straight lines coming here",
+  "text": "<strong>nicked him off! The outswinger works! Broad forecast it!</strong> Bairstow takes a one hander low to his right. Full outswinger wide of off, some significant shape, Labuschagne has no need to play, he pokes at it and nicks it low to Bairstow's right and he takes a superb one hander low infront of Root's left ankle",
+  "postText": "",
+  "shortText": "Broad to Labuschagne, OUT",
+  "homeScore": "0",
+  "awayScore": "29/2",
+  "scoreValue": 0,
+  "sequence": 201002,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/297433"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/787987"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 2,
+    "balls": 32,
+    "wickets": 2,
+    "overs": 5.2,
+    "conceded": 14
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/8608"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "maidens": 1,
+    "balls": 18,
+    "wickets": 0,
+    "overs": 3.0,
+    "conceded": 10
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/787987"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 0,
+    "faced": 1,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/215155"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "totalRuns": 17,
+    "faced": 36,
+    "fours": 2,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251829",
+    "runRate": 2.8,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 2,
+    "balls": 62,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 2,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 2,
+    "fallOfWickets": 2,
+    "trailBy": 364,
+    "leadBy": 0,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 29
+  },
+  "over": {
+    "ball": 2,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 0,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 11,
+    "runs": 3,
+    "wickets": 2,
+    "overs": 10.2,
+    "actual": 10.2,
+    "unique": 10.02
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/10617"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/787987"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/1336037/athletes/297433"
+      },
+      "isKeeper": true
+    },
+    "text": "M Labuschagne c &dagger;Bairstow b Broad 0 (1m 1b 0x4 0x6) SR: 0",
+    "minutes": 1,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1686998282000
+}

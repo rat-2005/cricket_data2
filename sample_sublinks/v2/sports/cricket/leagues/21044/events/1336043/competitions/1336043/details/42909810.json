@@ -1,0 +1,161 @@
+{
+  "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/events/1336043/competitions/1336043/details/42909810",
+  "id": "42909810",
+  "uid": "s:200~e:1336043~c:1336043~d:42909810",
+  "clock": "00:00",
+  "date": "2023-6-20 11:00:00",
+  "playType": {
+    "id": "9",
+    "description": "out"
+  },
+  "team": {
+    "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1"
+  },
+  "mediaId": 0,
+  "period": 3,
+  "periodText": "3rd innings",
+  "shortPeriodText": "3rd innings",
+  "xCoordinate": null,
+  "yCoordinate": null,
+  "preText": "",
+  "text": "<b>dragged to midwicket, Lyon strikes again!</b> Australia have stifled Brook for the last few overs and it has succeeded, looking to manufacture a sweep and picking out the diving Labuschagne for a good, low catch. Brook departs just shy of a half-century, and again the game tilts back towards Australia",
+  "postText": "In comes Yorkshire's Jonny Bairstow. England's lead is 157",
+  "shortText": "Lyon to Brook, OUT",
+  "homeScore": "0",
+  "awayScore": "0",
+  "scoreValue": 0,
+  "sequence": 303304,
+  "athletesInvolved": [
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/272279"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/787987"
+    },
+    {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/911707"
+    }
+  ],
+  "hawkeyeId": null,
+  "boundary": false,
+  "speedKPH": null,
+  "speedMPH": null,
+  "bowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/272279"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 0,
+    "balls": 46,
+    "wickets": 2,
+    "overs": 7.4,
+    "conceded": 33
+  },
+  "otherBowler": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/288284"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/2/"
+    },
+    "maidens": 1,
+    "balls": 42,
+    "wickets": 0,
+    "overs": 7.0,
+    "conceded": 31
+  },
+  "batsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/911707"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 46,
+    "faced": 52,
+    "fours": 5,
+    "runs": 0,
+    "sixes": 0
+  },
+  "otherBatsman": {
+    "athlete": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/311158"
+    },
+    "team": {
+      "$ref": "http://core.espnuk.org/v2/sports/cricket/teams/1/"
+    },
+    "totalRuns": 9,
+    "faced": 26,
+    "fours": 0,
+    "runs": 0,
+    "sixes": 0
+  },
+  "innings": {
+    "id": "251892",
+    "runRate": 4.45,
+    "remainingBalls": 0,
+    "byes": 0,
+    "number": 3,
+    "balls": 202,
+    "noBalls": 0,
+    "requiredRunRate": null,
+    "wickets": 5,
+    "legByes": 0,
+    "ballLimit": 0,
+    "target": 0,
+    "session": 1,
+    "day": 4,
+    "fallOfWickets": 5,
+    "trailBy": 0,
+    "leadBy": 157,
+    "remainingRuns": null,
+    "remainingOvers": 0.0,
+    "totalRuns": 0,
+    "wides": 0,
+    "runs": 150
+  },
+  "over": {
+    "ball": 4,
+    "balls": 6,
+    "complete": false,
+    "limit": 0.0,
+    "maiden": 1,
+    "noBall": 0,
+    "wide": 0,
+    "legByes": 0,
+    "byes": 0,
+    "number": 34,
+    "runs": 0,
+    "wickets": 1,
+    "overs": 33.4,
+    "actual": 33.4,
+    "unique": 33.04
+  },
+  "dismissal": {
+    "dismissal": true,
+    "bowled": true,
+    "type": "caught",
+    "bowler": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/272279"
+      }
+    },
+    "batsman": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/911707"
+      }
+    },
+    "fielder": {
+      "athlete": {
+        "$ref": "http://core.espnuk.org/v2/sports/cricket/leagues/21044/athletes/787987"
+      },
+      "isKeeper": false
+    },
+    "text": "HC Brook c Labuschagne b Lyon 46 (81m 52b 5x4 0x6) SR: 88.46",
+    "minutes": 81,
+    "retiredText": ""
+  },
+  "bbbTimestamp": 1687176048000
+}
