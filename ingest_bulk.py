@@ -63,7 +63,7 @@ def extract_id_from_url(url):
 
 # ── HTTP fetch with retry ────────────────────────────────────────────────────
 
-http_semaphore = asyncio.Semaphore(500)
+http_semaphore = asyncio.Semaphore(50)
 
 async def fetch(session, url, retries=4):
     if not url: return None
@@ -828,7 +828,7 @@ async def main():
     if progress['total'] == 0: return
 
     db_url = os.getenv("DATABASE_URL")
-    pool = await asyncpg.create_pool(db_url, min_size=10, max_size=95)
+    pool = await asyncpg.create_pool(db_url, min_size=2, max_size=8)
     
     # ── Pre-warm caches ──
     log.info("Pre-warming caches from DB...")
@@ -842,10 +842,10 @@ async def main():
     log.info(f"  Cached: {len(cached_athletes)} athletes, {len(cached_teams)} teams, {len(cached_venues)} venues")
     
     progress_file = open('completed_events.txt', 'a', encoding='utf-8')
-    connector = aiohttp.TCPConnector(limit=1000, ttl_dns_cache=300, enable_cleanup_closed=True)
+    connector = aiohttp.TCPConnector(limit=100, ttl_dns_cache=300, enable_cleanup_closed=True)
     
     async with aiohttp.ClientSession(connector=connector) as session:
-        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(120)]
+        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(10)]
         await asyncio.gather(*workers)
         
     progress_file.close()
