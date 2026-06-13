@@ -369,20 +369,20 @@ async def process_match(pool, session, event_url, progress_file):
              comp.get('neutralSite'), comp.get('dayNight'), comp.get('limitedOvers'),
              safe_int(comp.get('attendance')), comp.get('playByPlayAvailable'))
 
-        # Officials
+        # Officials (batched)
         if officials_data and 'items' in officials_data:
-            # Check if officials already exist for this competition
             existing = await conn.fetchval(
                 "SELECT COUNT(*) FROM cricket.match_officials WHERE competition_id=$1", comp_id)
             if existing == 0:
-                for off in officials_data['items']:
-                    await conn.execute("""
-                        INSERT INTO cricket.match_officials (competition_id, display_name, first_name,
-                            last_name, country, role)
-                        VALUES ($1, $2, $3, $4, $5, $6)
-                    """, comp_id, off.get('displayName'), off.get('firstName'),
-                         off.get('lastName'), off.get('flag', {}).get('alt'),
-                         off.get('position', {}).get('displayName'))
+                off_tuples = [(comp_id, off.get('displayName'), off.get('firstName'),
+                              off.get('lastName'), off.get('flag', {}).get('alt'),
+                              off.get('position', {}).get('displayName'))
+                             for off in officials_data['items']]
+                await conn.executemany("""
+                    INSERT INTO cricket.match_officials (competition_id, display_name, first_name,
+                        last_name, country, role)
+                    VALUES ($1, $2, $3, $4, $5, $6)
+                """, off_tuples)
         
         # Competitors + Innings
         db_competitor_ids = {}
@@ -397,17 +397,15 @@ async def process_match(pool, session, event_url, progress_file):
             elif score_val is not None: score_val = str(score_val)
             if score_val: score_val = score_val[:95]
             
-            await conn.execute("""
+            row = await conn.fetchrow("""
                 INSERT INTO cricket.competitors (espn_competitor_id, competition_id, team_id,
                     home_away, winner, score_value)
                 VALUES ($1, $2, $3, $4, $5, $6)
-                ON CONFLICT (competition_id, espn_competitor_id) DO NOTHING
+                ON CONFLICT (competition_id, espn_competitor_id) DO UPDATE SET team_id=EXCLUDED.team_id
+                RETURNING id
             """, espn_comp_id, comp_id, ct['team_id'],
                  competitor.get('homeAway'), competitor.get('winner'), score_val)
-            
-            db_competitor_id = await conn.fetchval(
-                "SELECT id FROM cricket.competitors WHERE competition_id=$1 AND espn_competitor_id=$2",
-                comp_id, espn_comp_id)
+            db_competitor_id = row['id']
             db_competitor_ids[espn_comp_id] = db_competitor_id
             
             # Innings
@@ -417,12 +415,13 @@ async def process_match(pool, session, event_url, progress_file):
                     period = safe_int(item.get('period'))
                     if period is None: continue
                     
-                    await conn.execute("""
+                    inn_row = await conn.fetchrow("""
                         INSERT INTO cricket.innings (competitor_id, period, runs, wickets, overs,
                             fours, sixes, score, description, is_batting, is_current, target, follow_on)
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                         ON CONFLICT (competitor_id, period) DO UPDATE SET
                             runs=EXCLUDED.runs, wickets=EXCLUDED.wickets, score=EXCLUDED.score
+                        RETURNING id
                     """, db_competitor_id, period,
                          safe_int(item.get('runs')), safe_int(item.get('wickets')),
                          safe_float(item.get('overs')), safe_int(item.get('fours')),
@@ -430,58 +429,67 @@ async def process_match(pool, session, event_url, progress_file):
                          item.get('description'), item.get('isBatting', False),
                          bool(item.get('isCurrent')), safe_int(item.get('target')),
                          bool(item.get('followOn')))
-                    
-                    db_innings_id = await conn.fetchval(
-                        "SELECT id FROM cricket.innings WHERE competitor_id=$1 AND period=$2",
-                        db_competitor_id, period)
+                    db_innings_id = inn_row['id']
                     
                     # Collect partnership and FOW refs for concurrent fetching later
                     pending_partnerships.append((db_innings_id, item.get('partnerships', {}).get('$ref')))
                     pending_fows.append((db_innings_id, item.get('fow', {}).get('$ref')))
-        
-        # ── Fetch all partnerships and FOW concurrently ──
-        all_p_list_coros = [fetch(session, ref) for _, ref in pending_partnerships]
-        all_fow_list_coros = [fetch(session, ref) for _, ref in pending_fows]
-        all_p_lists = await asyncio.gather(*all_p_list_coros) if all_p_list_coros else []
-        all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_list_coros else []
-        
-        # Fetch individual partnership and FOW details concurrently
-        p_detail_coros = []
-        p_detail_map = []  # (innings_id, index_range)
-        for (db_innings_id, _), p_list_data in zip(pending_partnerships, all_p_lists):
-            if p_list_data and 'items' in p_list_data:
-                refs = [pi.get('$ref') for pi in p_list_data['items'] if pi.get('$ref')]
-                start_idx = len(p_detail_coros)
-                p_detail_coros.extend([fetch(session, r) for r in refs])
-                p_detail_map.append((db_innings_id, start_idx, len(p_detail_coros)))
-            else:
-                p_detail_map.append((db_innings_id, 0, 0))
-        
-        fow_detail_coros = []
-        fow_detail_map = []
-        for (db_innings_id, _), fow_list in zip(pending_fows, all_fow_lists):
-            if fow_list and 'items' in fow_list:
-                refs = [fi.get('$ref') for fi in fow_list['items'] if fi.get('$ref')]
-                start_idx = len(fow_detail_coros)
-                fow_detail_coros.extend([fetch(session, r) for r in refs])
-                fow_detail_map.append((db_innings_id, start_idx, len(fow_detail_coros)))
-            else:
-                fow_detail_map.append((db_innings_id, 0, 0))
-        
-        all_p_details = await asyncio.gather(*p_detail_coros) if p_detail_coros else []
-        all_fow_details = await asyncio.gather(*fow_detail_coros) if fow_detail_coros else []
-        
-        # Ensure partnership batsmen
-        p_athlete_ids = set()
-        for p in all_p_details:
-            if not p: continue
-            for b in p.get('batsmen', []):
-                aid = extract_id_from_url(b.get('athlete'))
-                if aid: p_athlete_ids.add(aid)
-        valid_p_athletes = await batch_ensure_athletes(pool, session, p_athlete_ids)
-        
-        # Insert partnerships
-        async with pool.acquire() as conn2:
+
+    # ── Partnership/FOW HTTP fetches (OUTSIDE pool.acquire — no DB connection held) ──
+    all_p_list_coros = [fetch(session, ref) for _, ref in pending_partnerships]
+    all_fow_list_coros = [fetch(session, ref) for _, ref in pending_fows]
+    all_p_lists = await asyncio.gather(*all_p_list_coros) if all_p_list_coros else []
+    all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_list_coros else []
+
+    # Fetch individual partnership and FOW details concurrently
+    p_detail_coros = []
+    p_detail_map = []  # (innings_id, index_range)
+    for (db_innings_id, _), p_list_data in zip(pending_partnerships, all_p_lists):
+        if p_list_data and 'items' in p_list_data:
+            refs = [pi.get('$ref') for pi in p_list_data['items'] if pi.get('$ref')]
+            start_idx = len(p_detail_coros)
+            p_detail_coros.extend([fetch(session, r) for r in refs])
+            p_detail_map.append((db_innings_id, start_idx, len(p_detail_coros)))
+        else:
+            p_detail_map.append((db_innings_id, 0, 0))
+
+    fow_detail_coros = []
+    fow_detail_map = []
+    for (db_innings_id, _), fow_list in zip(pending_fows, all_fow_lists):
+        if fow_list and 'items' in fow_list:
+            refs = [fi.get('$ref') for fi in fow_list['items'] if fi.get('$ref')]
+            start_idx = len(fow_detail_coros)
+            fow_detail_coros.extend([fetch(session, r) for r in refs])
+            fow_detail_map.append((db_innings_id, start_idx, len(fow_detail_coros)))
+        else:
+            fow_detail_map.append((db_innings_id, 0, 0))
+
+    all_p_details = await asyncio.gather(*p_detail_coros) if p_detail_coros else []
+    all_fow_details = await asyncio.gather(*fow_detail_coros) if fow_detail_coros else []
+
+    # Ensure partnership batsmen
+    p_athlete_ids = set()
+    for p in all_p_details:
+        if not p: continue
+        for b in p.get('batsmen', []):
+            aid = extract_id_from_url(b.get('athlete'))
+            if aid: p_athlete_ids.add(aid)
+
+    # Also collect ALL matchcard athlete IDs to batch-ensure once
+    mc_all_aids = set()
+    if mc_data and 'items' in mc_data:
+        for mc in mc_data['items']:
+            for pd_item in mc.get('playerDetails', []):
+                pid = extract_id_from_url(pd_item.get('href')) or pd_item.get('playerID')
+                if pid: mc_all_aids.add(pid)
+
+    # Single batch ensure for partnership + matchcard athletes
+    all_extra_aids = p_athlete_ids | mc_all_aids
+    valid_p_athletes = await batch_ensure_athletes(pool, session, all_extra_aids)
+
+    # ── Insert partnerships and FOW (new DB connection) ──
+    if pending_partnerships or pending_fows:
+      async with pool.acquire() as conn2:
             for db_innings_id, start_idx, end_idx in p_detail_map:
                 for p in all_p_details[start_idx:end_idx]:
                     if not p: continue
@@ -519,63 +527,58 @@ async def process_match(pool, session, event_url, progress_file):
                         ON CONFLICT (innings_id, wicket_number) DO NOTHING
                     """, db_innings_id, wn, safe_int(fw.get('runs')),
                          safe_float(fw.get('wicketOver')), fw.get('fowType'))
-        
-        # Match status
-        if status_data:
-            potm_id = None
-            for fa in status_data.get('featuredAthletes', []):
-                if fa.get('name') == 'playerOfTheMatch':
-                    potm_id = await ensure_single_athlete(pool, session, str(fa.get('playerId')))
-            
-            st = status_data.get('type', {})
-            async with pool.acquire() as conn2:
-                await conn2.execute("""
-                    INSERT INTO cricket.match_status (competition_id, state, detail, description, summary,
-                        long_summary, period, day_number, potm_athlete_id, start_date, end_date)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-                    ON CONFLICT (competition_id) DO UPDATE SET 
-                        state=EXCLUDED.state, summary=EXCLUDED.summary, long_summary=EXCLUDED.long_summary,
-                        start_date=EXCLUDED.start_date, end_date=EXCLUDED.end_date
-                """, comp_id, st.get('state'), st.get('detail'), st.get('description'),
-                     status_data.get('summary'), status_data.get('longSummary'),
-                     safe_int(status_data.get('period')), safe_int(status_data.get('dayNumber')),
-                     potm_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')))
 
-        # Matchcards
-        if mc_data and 'items' in mc_data:
-            # Check if matchcards already exist
-            existing_mc = await conn.fetchval(
+    # Match status
+    if status_data:
+        potm_id = None
+        for fa in status_data.get('featuredAthletes', []):
+            if fa.get('name') == 'playerOfTheMatch':
+                potm_id = await ensure_single_athlete(pool, session, str(fa.get('playerId')))
+
+        st = status_data.get('type', {})
+        async with pool.acquire() as conn3:
+            await conn3.execute("""
+                INSERT INTO cricket.match_status (competition_id, state, detail, description, summary,
+                    long_summary, period, day_number, potm_athlete_id, start_date, end_date)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                ON CONFLICT (competition_id) DO UPDATE SET 
+                    state=EXCLUDED.state, summary=EXCLUDED.summary, long_summary=EXCLUDED.long_summary,
+                    start_date=EXCLUDED.start_date, end_date=EXCLUDED.end_date
+            """, comp_id, st.get('state'), st.get('detail'), st.get('description'),
+                 status_data.get('summary'), status_data.get('longSummary'),
+                 safe_int(status_data.get('period')), safe_int(status_data.get('dayNumber')),
+                 potm_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')))
+
+    # Matchcards (athletes already batch-ensured above)
+    if mc_data and 'items' in mc_data:
+        async with pool.acquire() as conn4:
+            existing_mc = await conn4.fetchval(
                 "SELECT COUNT(*) FROM cricket.matchcard_batting WHERE competition_id=$1", comp_id)
             if existing_mc == 0:
                 for mc in mc_data['items']:
                     mc_headline = mc.get('headline')
                     inns = safe_int(mc.get('inningsNumber'))
                     team_name = mc.get('teamName')
-                    
-                    db_competitor_id = await conn.fetchval("""
+
+                    db_competitor_id = await conn4.fetchval("""
                         SELECT c.id FROM cricket.competitors c 
                         JOIN cricket.teams t ON c.team_id = t.id 
                         WHERE c.competition_id=$1 AND t.name=$2
                     """, comp_id, team_name)
-                    
+
                     if mc_headline == 'Batting':
-                        # Collect athlete IDs from matchcard
-                        mc_aids = set()
-                        for pd in mc.get('playerDetails', []):
-                            pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
-                            if pid: mc_aids.add(pid)
-                        valid_mc = await batch_ensure_athletes(pool, session, mc_aids)
+                        valid_mc = valid_p_athletes  # Already batch-ensured above
                         
                         for idx, pd in enumerate(mc.get('playerDetails', [])):
                             pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
                             pid = pid if pid in valid_mc else None
-                            
+
                             pname = pd.get('playerName')
                             dismissal = pd.get('dismissal')
                             is_captain = '(c)' in pname if pname else False
                             is_keeper = '(wk)' in pname if pname else False
-                            
-                            await conn.execute("""
+
+                            await conn4.execute("""
                                 INSERT INTO cricket.matchcard_batting (
                                     competition_id, innings_number, team_name, extras, total,
                                     player_id, player_name, dismissal, runs, balls_faced, fours, sixes, strike_rate
@@ -583,9 +586,9 @@ async def process_match(pool, session, event_url, progress_file):
                             """, comp_id, inns, team_name, mc.get('extras'), mc.get('total'), pid, pname, dismissal,
                                  safe_int(pd.get('runs')), safe_int(pd.get('ballsFaced')), safe_int(pd.get('fours')),
                                  safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')))
-                            
+
                             if db_competitor_id and pid:
-                                await conn.execute("""
+                                await conn4.execute("""
                                     INSERT INTO cricket.player_match_performances (
                                         competitor_id, innings_number, is_batting, batting_order,
                                         is_captain, is_keeper, runs, balls_faced, fours, sixes,
@@ -597,11 +600,7 @@ async def process_match(pool, session, event_url, progress_file):
                                      safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')), safe_int(pd.get('minutes')), pid, dismissal)
                                      
                     elif mc_headline == 'Bowling':
-                        mc_aids = set()
-                        for pd in mc.get('playerDetails', []):
-                            pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
-                            if pid: mc_aids.add(pid)
-                        valid_mc = await batch_ensure_athletes(pool, session, mc_aids)
+                        valid_mc = valid_p_athletes  # Already batch-ensured above
                         
                         for pd in mc.get('playerDetails', []):
                             pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
@@ -615,7 +614,7 @@ async def process_match(pool, session, event_url, progress_file):
                                 m_nb = re.search(r'(\d+)nb', nbw)
                                 if m_nb: no_balls = int(m_nb.group(1))
                                 
-                            await conn.execute("""
+                            await conn4.execute("""
                                 INSERT INTO cricket.matchcard_bowling (
                                     competition_id, innings_number, team_name,
                                     player_id, player_name, overs, maidens, runs_conceded, wickets,
@@ -624,9 +623,9 @@ async def process_match(pool, session, event_url, progress_file):
                             """, comp_id, inns, team_name, pid, pd.get('playerName'), safe_float(pd.get('overs')),
                                  safe_int(pd.get('maidens')), safe_int(pd.get('conceded')), safe_int(pd.get('wickets')),
                                  safe_float(pd.get('economyRate')), wides, no_balls)
-                            
+
                             if db_competitor_id and pid:
-                                await conn.execute("""
+                                await conn4.execute("""
                                     INSERT INTO cricket.player_match_performances (
                                         competitor_id, innings_number, is_batting, runs_conceded,
                                         overs_bowled, maidens, wickets, economy_rate, wides, no_balls,
@@ -693,8 +692,10 @@ async def process_match(pool, session, event_url, progress_file):
         
         # Batch-ensure all athletes and teams
         await batch_ensure_athletes(pool, session, delivery_athlete_ids)
-        for tid, tref in delivery_team_ids.items():
-            await ensure_team(pool, session, tid, tref)
+        await asyncio.gather(*[
+            ensure_team(pool, session, tid, tref)
+            for tid, tref in delivery_team_ids.items()
+        ])
         
         # Build tuples from cached data (no more HTTP calls)
         delivery_tuples = []
@@ -833,7 +834,7 @@ async def main():
     if progress['total'] == 0: return
 
     db_url = os.getenv("DATABASE_URL")
-    pool = await asyncpg.create_pool(db_url, min_size=2, max_size=8)
+    pool = await asyncpg.create_pool(db_url, min_size=5, max_size=15)
     
     # ── Pre-warm caches ──
     log.info("Pre-warming caches from DB...")
@@ -847,10 +848,10 @@ async def main():
     log.info(f"  Cached: {len(cached_athletes)} athletes, {len(cached_teams)} teams, {len(cached_venues)} venues")
     
     progress_file = open('completed_events.txt', 'a', encoding='utf-8')
-    connector = aiohttp.TCPConnector(limit=100, ttl_dns_cache=300, enable_cleanup_closed=True)
+    connector = aiohttp.TCPConnector(limit=300, ttl_dns_cache=300, enable_cleanup_closed=True)
     
     async with aiohttp.ClientSession(connector=connector) as session:
-        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(10)]
+        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(15)]
         await asyncio.gather(*workers)
         
     progress_file.close()
