@@ -63,7 +63,7 @@ def extract_id_from_url(url):
 
 # ── HTTP fetch with retry ────────────────────────────────────────────────────
 
-http_semaphore = asyncio.Semaphore(100)
+http_semaphore = asyncio.Semaphore(250)
 
 async def fetch(session, url, retries=4):
     if not url: return None
@@ -837,7 +837,7 @@ async def main():
     if progress['total'] == 0: return
 
     db_url = os.getenv("DATABASE_URL")
-    pool = await asyncpg.create_pool(db_url, min_size=5, max_size=25)
+    pool = await asyncpg.create_pool(db_url, min_size=20, max_size=50)
     
     # ── Pre-warm caches ──
     log.info("Pre-warming caches from DB...")
@@ -854,7 +854,7 @@ async def main():
     connector = aiohttp.TCPConnector(limit=300, ttl_dns_cache=300, enable_cleanup_closed=True)
     
     async with aiohttp.ClientSession(connector=connector) as session:
-        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(15)]
+        workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(40)]
         await asyncio.gather(*workers)
         
     progress_file.close()
