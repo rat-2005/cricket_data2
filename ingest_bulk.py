@@ -786,7 +786,10 @@ async def worker(pool, session, queue, progress_file, worker_id):
             break
         
         try:
-            await process_match(pool, session, event_url, progress_file)
+            await asyncio.wait_for(
+                process_match(pool, session, event_url, progress_file),
+                timeout=90  # Skip any match that takes longer than 90 seconds
+            )
             progress['done'] += 1
             elapsed = time.time() - progress['start']
             rate = progress['done'] / elapsed * 60 if elapsed > 0 else 0
@@ -795,6 +798,8 @@ async def worker(pool, session, queue, progress_file, worker_id):
             eta_h, eta_m = divmod(int(eta_min), 60)
             log.info(f"[W{worker_id:02d}] ✓ {progress['done']}/{progress['total']} "
                      f"| {rate:.0f}/min | ETA: {eta_h}h {eta_m}m | Q: {queue.qsize()}")
+        except asyncio.TimeoutError:
+            log.warning(f"[W{worker_id:02d}] ⏰ TIMEOUT (90s) - skipped: {event_url}")
         except Exception as e:
             log.error(f"[W{worker_id:02d}] ✗ {event_url}: {e}")
         finally:
