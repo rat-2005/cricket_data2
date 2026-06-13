@@ -29,31 +29,19 @@ def main():
         
         print(f"Found {len(tables)} tables in the 'cricket' schema.\n")
 
-        # Query and print 100 rows for each table
+        # Query and print row counts for each table
+        print(f"{'Table Name'.ljust(35)} | Row Count")
+        print("-" * 55)
+        
+        total_rows = 0
         for table in tables:
-            print(f"{'='*80}")
-            print(f"TABLE: cricket.{table} (LIMIT 100)")
-            print(f"{'='*80}")
+            cur.execute(f"SELECT COUNT(*) as count FROM cricket.{table};")
+            count = cur.fetchone()['count']
+            total_rows += count
+            print(f"cricket.{table.ljust(27)} | {count:,}")
             
-            cur.execute(f"SELECT * FROM cricket.{table} LIMIT 100;")
-            rows = cur.fetchall()
-            
-            if not rows:
-                print("(Table is empty)\n")
-                continue
-                
-            # Print column headers (truncated to 20 chars for formatting)
-            columns = list(rows[0].keys())
-            header = " | ".join(str(col).ljust(20)[:20] for col in columns)
-            print(header)
-            print("-" * len(header))
-            
-            # Print rows (truncated to 20 chars for formatting)
-            for row in rows:
-                row_str = " | ".join(str(row[col]).replace('\n', ' ').ljust(20)[:20] for col in columns)
-                print(row_str)
-                
-            print(f"\n[ Fetched {len(rows)} rows from cricket.{table} ]\n")
+        print("-" * 55)
+        print(f"{'TOTAL'.ljust(35)} | {total_rows:,}\n")
 
     except Exception as e:
         print(f"Database error: {e}")
