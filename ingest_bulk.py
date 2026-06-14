@@ -453,7 +453,7 @@ async def process_match(pool, session, event_url, progress_file):
     all_p_list_coros = [fetch(session, ref) for _, ref in pending_partnerships]
     all_fow_list_coros = [fetch(session, ref) for _, ref in pending_fows]
     all_p_lists = await asyncio.gather(*all_p_list_coros) if all_p_list_coros else []
-    all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_lists else []
+    all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_list_coros else []
 
     # Fetch individual partnership and FOW details concurrently
     p_detail_coros = []
