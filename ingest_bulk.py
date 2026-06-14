@@ -46,6 +46,11 @@ def safe_str(val):
     if isinstance(val, dict): return str(val.get('displayValue', val))
     return str(val)
 
+def safe_bool(val, default=False):
+    if val is None: return default
+    if isinstance(val, str): return val.lower() in ('true', '1', 't', 'y', 'yes')
+    return bool(val)
+
 def safe_date(val):
     if not val: return None
     for fmt in ('%Y-%m-%dT%H:%M%z', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%d %H:%M:%S'):
@@ -118,7 +123,7 @@ async def batch_ensure_athletes(pool, session, aids):
             aid, a_data.get('fullName'), a_data.get('shortName'), country,
             safe_date(a_data.get('dateOfBirth')), a_data.get('gender'),
             a_data.get('headshot', {}).get('href'),
-            bat_s, bowl_s, a_data.get('position', {}).get('name'), a_data.get('active')
+            bat_s, bowl_s, a_data.get('position', {}).get('name'), safe_bool(a_data.get('active'))
         ))
         newly_cached.add(aid)
     
@@ -161,7 +166,7 @@ async def ensure_venue(pool, session, venue_id, venue_ref):
                 """, str(v_data['id']), v_data.get('fullName'), v_data.get('shortName'),
                      v_data.get('address', {}).get('city'), v_data.get('address', {}).get('state'),
                      v_data.get('address', {}).get('country'),
-                     safe_int(v_data.get('capacity')), v_data.get('grass'), v_data.get('indoor'),
+                     safe_int(v_data.get('capacity')), safe_bool(v_data.get('grass')), safe_bool(v_data.get('indoor')),
                      v_data.get('address', {}).get('summary'))
             async with cache_lock:
                 cached_venues.add(venue_id)
@@ -187,10 +192,10 @@ async def ensure_team(pool, session, team_id, team_ref):
                         country_code=EXCLUDED.country_code, logo_url=EXCLUDED.logo_url
                 """, str(t_data['id']), t_data.get('name'),
                      t_data.get('shortDisplayName', t_data.get('shortName')),
-                     t_data.get('abbreviation'), t_data.get('isNational'),
+                     t_data.get('abbreviation'), safe_bool(t_data.get('isNational')),
                      t_data.get('displayName'), t_data.get('location'),
                      t_data.get('nickname'), t_data.get('color'),
-                     t_data.get('isActive'), t_data.get('slug'),
+                     safe_bool(t_data.get('isActive')), t_data.get('slug'),
                      t_data.get('countryCode'), logo_url)
             async with cache_lock:
                 cached_teams.add(team_id)
@@ -359,7 +364,7 @@ async def process_match(pool, session, event_url, progress_file):
                 INSERT INTO cricket.leagues (id, name, is_tournament, league_type)
                 VALUES ($1, $2, $3, $4)
                 ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name
-            """, lid, safe_str(league_data.get('name')), league_data.get('isTournament'),
+            """, lid, safe_str(league_data.get('name')), safe_bool(league_data.get('isTournament')),
                  safe_str(league_entry.get('leagueType')))
             await conn.execute("""
                 INSERT INTO cricket.event_leagues (event_id, league_id, league_type)
@@ -375,8 +380,8 @@ async def process_match(pool, session, event_url, progress_file):
             ON CONFLICT (id) DO NOTHING
         """, comp_id, event_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')),
              venue_id, safe_str(comp.get('class', {}).get('generalClassCard')),
-             comp.get('neutralSite'), comp.get('dayNight'), comp.get('limitedOvers'),
-             safe_int(comp.get('attendance')), comp.get('playByPlayAvailable'))
+             safe_bool(comp.get('neutralSite')), safe_bool(comp.get('dayNight')), safe_bool(comp.get('limitedOvers')),
+             safe_int(comp.get('attendance')), safe_bool(comp.get('playByPlayAvailable')))
 
         # Officials (batched)
         if officials_data and 'items' in officials_data:
@@ -435,9 +440,9 @@ async def process_match(pool, session, event_url, progress_file):
                          safe_int(item.get('runs')), safe_int(item.get('wickets')),
                          safe_float(item.get('overs')), safe_int(item.get('fours')),
                          safe_int(item.get('sixes')), safe_str(item.get('score')),
-                         safe_str(item.get('description')), item.get('isBatting', False),
-                         bool(item.get('isCurrent')), safe_int(item.get('target')),
-                         bool(item.get('followOn')))
+                         safe_str(item.get('description')), safe_bool(item.get('isBatting', False)),
+                         safe_bool(item.get('isCurrent')), safe_int(item.get('target')),
+                         safe_bool(item.get('followOn')))
                     db_innings_id = inn_row['id']
                     
                     # Collect partnership and FOW refs for concurrent fetching later
@@ -739,11 +744,11 @@ async def process_match(pool, session, event_url, progress_file):
                  safe_int(over.get('number')), safe_int(over.get('ball')),
                  safe_float(over.get('actual')),
                  bat_id, n_str_id, bowl_id, o_bowl_id, bat_team_id, bowl_team_id,
-                 safe_int(item.get('scoreValue')), bool(item.get('boundary')),
+                 safe_int(item.get('scoreValue')), safe_bool(item.get('boundary')),
                  safe_str(item.get('playType', {}).get('id')), safe_str(item.get('playType', {}).get('description')),
                  safe_str(item.get('text')), safe_str(item.get('shortText')),
-                 over.get('wide', 0) > 0, over.get('noBall', 0) > 0,
-                 over.get('byes', 0) > 0, over.get('legByes', 0) > 0,
+                 safe_bool(over.get('wide', 0) > 0), safe_bool(over.get('noBall', 0) > 0),
+                 safe_bool(over.get('byes', 0) > 0), safe_bool(over.get('legByes', 0) > 0),
                  safe_float(item.get('speedKPH')), safe_float(item.get('speedMPH')),
                  safe_float(item.get('xCoordinate')), safe_float(item.get('yCoordinate')),
                  safe_str(item.get('hawkeyeId')),
@@ -757,7 +762,7 @@ async def process_match(pool, session, event_url, progress_file):
                  safe_int(innings.get('target')), safe_int(innings.get('session')), safe_int(innings.get('day')),
                  safe_int(innings.get('leadBy')), safe_int(innings.get('trailBy')),
                  safe_int(over.get('runs')), safe_int(over.get('wickets')),
-                 bool(over.get('maiden')), bool(over.get('complete'))
+                 safe_bool(over.get('maiden')), safe_bool(over.get('complete'))
             ))
             
             dismissal = item.get('dismissal')
@@ -772,9 +777,9 @@ async def process_match(pool, session, event_url, progress_file):
                 
                 dismissal_tuples.append((
                      item_id, safe_str(dismissal.get('type')), d_bat_id, d_bowl_id, d_field_id,
-                     dismissal.get('fielder', {}).get('isKeeper'),
+                     safe_bool(dismissal.get('fielder', {}).get('isKeeper')),
                      safe_str(dismissal.get('text')), safe_int(dismissal.get('minutes')),
-                     dismissal.get('bowled'), safe_int(item.get('bbbTimestamp'))
+                     safe_bool(dismissal.get('bowled')), safe_int(item.get('bbbTimestamp'))
                 ))
         
         # Bulk insert via COPY
