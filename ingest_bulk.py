@@ -354,7 +354,7 @@ async def process_match(pool, session, event_url, progress_file):
         """, event_id, safe_str(event.get('uid', f's:200~e:{event_id}')),
              safe_str(event.get('name')), safe_str(event.get('shortName')),
              safe_date(event.get('date')), safe_date(event.get('endDate')),
-             safe_str(event.get('description')), event.get('timeValid'), safe_str(event.get('$ref')))
+             safe_str(event.get('description')), safe_bool(event.get('timeValid')), safe_str(event.get('$ref')))
         
         # Leagues
         for league_entry, league_data in zip(event.get('leagues', []), league_results):
@@ -418,7 +418,7 @@ async def process_match(pool, session, event_url, progress_file):
                 ON CONFLICT (competition_id, espn_competitor_id) DO UPDATE SET team_id=EXCLUDED.team_id
                 RETURNING id
             """, espn_comp_id, comp_id, ct['team_id'],
-                 safe_str(competitor.get('homeAway')), safe_str(competitor.get('winner')), safe_str(score_val))
+                 safe_str(competitor.get('homeAway')), safe_bool(competitor.get('winner')), safe_str(score_val))
             db_competitor_id = row['id']
             db_competitor_ids[espn_comp_id] = db_competitor_id
             
