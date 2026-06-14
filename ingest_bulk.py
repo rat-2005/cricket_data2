@@ -346,10 +346,10 @@ async def process_match(pool, session, event_url, progress_file):
             ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, short_name=EXCLUDED.short_name, 
                 date=EXCLUDED.date, end_date=EXCLUDED.end_date, description=EXCLUDED.description, 
                 time_valid=EXCLUDED.time_valid, api_ref=EXCLUDED.api_ref
-        """, event_id, event.get('uid', f's:200~e:{event_id}'),
+        """, event_id, safe_str(event.get('uid', f's:200~e:{event_id}')),
              safe_str(event.get('name')), safe_str(event.get('shortName')),
              safe_date(event.get('date')), safe_date(event.get('endDate')),
-             safe_str(event.get('description')), event.get('timeValid'), event.get('$ref'))
+             safe_str(event.get('description')), event.get('timeValid'), safe_str(event.get('$ref')))
         
         # Leagues
         for league_entry, league_data in zip(event.get('leagues', []), league_results):
@@ -383,9 +383,9 @@ async def process_match(pool, session, event_url, progress_file):
             existing = await conn.fetchval(
                 "SELECT COUNT(*) FROM cricket.match_officials WHERE competition_id=$1", comp_id)
             if existing == 0:
-                off_tuples = [(comp_id, off.get('displayName'), off.get('firstName'),
-                              off.get('lastName'), off.get('flag', {}).get('alt'),
-                              off.get('position', {}).get('displayName'))
+                off_tuples = [(comp_id, safe_str(off.get('displayName')), safe_str(off.get('firstName')),
+                              safe_str(off.get('lastName')), safe_str(off.get('flag', {}).get('alt')),
+                              safe_str(off.get('position', {}).get('displayName')))
                              for off in officials_data['items']]
                 await conn.executemany("""
                     INSERT INTO cricket.match_officials (competition_id, display_name, first_name,
@@ -413,7 +413,7 @@ async def process_match(pool, session, event_url, progress_file):
                 ON CONFLICT (competition_id, espn_competitor_id) DO UPDATE SET team_id=EXCLUDED.team_id
                 RETURNING id
             """, espn_comp_id, comp_id, ct['team_id'],
-                 competitor.get('homeAway'), competitor.get('winner'), score_val)
+                 safe_str(competitor.get('homeAway')), safe_str(competitor.get('winner')), safe_str(score_val))
             db_competitor_id = row['id']
             db_competitor_ids[espn_comp_id] = db_competitor_id
             
@@ -448,7 +448,7 @@ async def process_match(pool, session, event_url, progress_file):
     all_p_list_coros = [fetch(session, ref) for _, ref in pending_partnerships]
     all_fow_list_coros = [fetch(session, ref) for _, ref in pending_fows]
     all_p_lists = await asyncio.gather(*all_p_list_coros) if all_p_list_coros else []
-    all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_list_coros else []
+    all_fow_lists = await asyncio.gather(*all_fow_list_coros) if all_fow_lists else []
 
     # Fetch individual partnership and FOW details concurrently
     p_detail_coros = []
@@ -553,7 +553,7 @@ async def process_match(pool, session, event_url, progress_file):
                 ON CONFLICT (competition_id) DO UPDATE SET 
                     state=EXCLUDED.state, summary=EXCLUDED.summary, long_summary=EXCLUDED.long_summary,
                     start_date=EXCLUDED.start_date, end_date=EXCLUDED.end_date
-            """, comp_id, st.get('state'), st.get('detail'), safe_str(st.get('description')),
+            """, comp_id, safe_str(st.get('state')), safe_str(st.get('detail')), safe_str(st.get('description')),
                  safe_str(status_data.get('summary')), safe_str(status_data.get('longSummary')),
                  safe_int(status_data.get('period')), safe_int(status_data.get('dayNumber')),
                  potm_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')))
@@ -735,23 +735,23 @@ async def process_match(pool, session, event_url, progress_file):
             delivery_tuples.append((
                  item_id, comp_id, safe_int(item.get('sequence')),
                  safe_int(item.get('bbbTimestamp')), safe_date(item.get('date')),
-                 safe_int(item.get('period')), item.get('periodText'),
+                 safe_int(item.get('period')), safe_str(item.get('periodText')),
                  safe_int(over.get('number')), safe_int(over.get('ball')),
                  safe_float(over.get('actual')),
                  bat_id, n_str_id, bowl_id, o_bowl_id, bat_team_id, bowl_team_id,
                  safe_int(item.get('scoreValue')), bool(item.get('boundary')),
-                 item.get('playType', {}).get('id'), item.get('playType', {}).get('description'),
-                 item.get('text'), item.get('shortText'),
+                 safe_str(item.get('playType', {}).get('id')), safe_str(item.get('playType', {}).get('description')),
+                 safe_str(item.get('text')), safe_str(item.get('shortText')),
                  over.get('wide', 0) > 0, over.get('noBall', 0) > 0,
                  over.get('byes', 0) > 0, over.get('legByes', 0) > 0,
                  safe_float(item.get('speedKPH')), safe_float(item.get('speedMPH')),
                  safe_float(item.get('xCoordinate')), safe_float(item.get('yCoordinate')),
-                 item.get('hawkeyeId'),
+                 safe_str(item.get('hawkeyeId')),
                  safe_int(batsman.get('runs')), safe_int(batsman.get('faced')),
                  safe_int(batsman.get('fours')), safe_int(batsman.get('sixes')),
                  safe_float(bowler.get('overs')), safe_int(bowler.get('maidens')),
                  safe_int(bowler.get('wickets')), safe_int(bowler.get('conceded')),
-                 item.get('homeScore'),
+                 safe_str(item.get('homeScore')),
                  safe_int(innings.get('runs')), safe_int(innings.get('wickets')),
                  safe_float(innings.get('runRate')), safe_float(innings.get('requiredRunRate')),
                  safe_int(innings.get('target')), safe_int(innings.get('session')), safe_int(innings.get('day')),
@@ -771,9 +771,9 @@ async def process_match(pool, session, event_url, progress_file):
                 d_field_id = d_field_id if d_field_id in cached_athletes else None
                 
                 dismissal_tuples.append((
-                     item_id, dismissal.get('type'), d_bat_id, d_bowl_id, d_field_id,
+                     item_id, safe_str(dismissal.get('type')), d_bat_id, d_bowl_id, d_field_id,
                      dismissal.get('fielder', {}).get('isKeeper'),
-                     dismissal.get('text'), safe_int(dismissal.get('minutes')),
+                     safe_str(dismissal.get('text')), safe_int(dismissal.get('minutes')),
                      dismissal.get('bowled'), safe_int(item.get('bbbTimestamp'))
                 ))
         
