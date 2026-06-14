@@ -14,6 +14,7 @@ import os
 import json
 import logging
 import time
+import argparse
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -811,9 +812,27 @@ async def worker(pool, session, queue, progress_file, worker_id):
 
 
 async def main():
+    parser = argparse.ArgumentParser(description="Bulk Ingest Cricket Data")
+    parser.add_argument('--shard', type=int, default=1, help='Which shard this instance is processing (1-indexed)')
+    parser.add_argument('--total-shards', type=int, default=1, help='Total number of instances running')
+    args = parser.parse_args()
+
     try:
         with open('events.json', 'r', encoding='utf-8') as f:
             all_events = json.load(f)
+            
+        # Sharding logic: only keep events assigned to this VM
+        if args.total_shards > 1:
+            if args.shard < 1 or args.shard > args.total_shards:
+                log.error(f"Invalid shard number: {args.shard}. Must be between 1 and {args.total_shards}")
+                return
+            
+            # Use modulo arithmetic to evenly distribute events
+            # e.g., if total=4, shard 1 gets 0, 4, 8... shard 2 gets 1, 5, 9...
+            shard_index = args.shard - 1
+            all_events = [e for i, e in enumerate(all_events) if i % args.total_shards == shard_index]
+            log.info(f"Sharding enabled: Processing shard {args.shard} of {args.total_shards} ({len(all_events)} events assigned to this VM)")
+            
     except FileNotFoundError:
         log.error("events.json not found")
         return
