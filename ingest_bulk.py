@@ -41,6 +41,11 @@ def safe_float(val, default=None):
     try: return float(val)
     except (TypeError, ValueError): return default
 
+def safe_str(val):
+    if val is None: return None
+    if isinstance(val, dict): return str(val.get('displayValue', val))
+    return str(val)
+
 def safe_date(val):
     if not val: return None
     for fmt in ('%Y-%m-%dT%H:%M%z', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%d %H:%M:%S'):
@@ -277,9 +282,9 @@ async def process_match(pool, session, event_url, progress_file):
                     date=EXCLUDED.date, end_date=EXCLUDED.end_date, description=EXCLUDED.description, 
                     time_valid=EXCLUDED.time_valid, api_ref=EXCLUDED.api_ref
             """, event_id, event.get('uid', f's:200~e:{event_id}'),
-                 event.get('name'), event.get('shortName'),
+                 safe_str(event.get('name')), safe_str(event.get('shortName')),
                  safe_date(event.get('date')), safe_date(event.get('endDate')),
-                 event.get('description'), event.get('timeValid'), event.get('$ref'))
+                 safe_str(event.get('description')), event.get('timeValid'), event.get('$ref'))
         progress_file.write(event_url + '\n')
         progress_file.flush()
         return
@@ -342,9 +347,9 @@ async def process_match(pool, session, event_url, progress_file):
                 date=EXCLUDED.date, end_date=EXCLUDED.end_date, description=EXCLUDED.description, 
                 time_valid=EXCLUDED.time_valid, api_ref=EXCLUDED.api_ref
         """, event_id, event.get('uid', f's:200~e:{event_id}'),
-             event.get('name'), event.get('shortName'),
+             safe_str(event.get('name')), safe_str(event.get('shortName')),
              safe_date(event.get('date')), safe_date(event.get('endDate')),
-             event.get('description'), event.get('timeValid'), event.get('$ref'))
+             safe_str(event.get('description')), event.get('timeValid'), event.get('$ref'))
         
         # Leagues
         for league_entry, league_data in zip(event.get('leagues', []), league_results):
@@ -354,13 +359,13 @@ async def process_match(pool, session, event_url, progress_file):
                 INSERT INTO cricket.leagues (id, name, is_tournament, league_type)
                 VALUES ($1, $2, $3, $4)
                 ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name
-            """, lid, league_data.get('name'), league_data.get('isTournament'),
-                 league_entry.get('leagueType'))
+            """, lid, safe_str(league_data.get('name')), league_data.get('isTournament'),
+                 safe_str(league_entry.get('leagueType')))
             await conn.execute("""
                 INSERT INTO cricket.event_leagues (event_id, league_id, league_type)
                 VALUES ($1, $2, $3)
                 ON CONFLICT (event_id, league_id) DO NOTHING
-            """, event_id, lid, league_entry.get('leagueType'))
+            """, event_id, lid, safe_str(league_entry.get('leagueType')))
         
         # Competition
         await conn.execute("""
@@ -369,7 +374,7 @@ async def process_match(pool, session, event_url, progress_file):
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             ON CONFLICT (id) DO NOTHING
         """, comp_id, event_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')),
-             venue_id, comp.get('class', {}).get('generalClassCard'),
+             venue_id, safe_str(comp.get('class', {}).get('generalClassCard')),
              comp.get('neutralSite'), comp.get('dayNight'), comp.get('limitedOvers'),
              safe_int(comp.get('attendance')), comp.get('playByPlayAvailable'))
 
@@ -429,8 +434,8 @@ async def process_match(pool, session, event_url, progress_file):
                     """, db_competitor_id, period,
                          safe_int(item.get('runs')), safe_int(item.get('wickets')),
                          safe_float(item.get('overs')), safe_int(item.get('fours')),
-                         safe_int(item.get('sixes')), item.get('score'),
-                         item.get('description'), item.get('isBatting', False),
+                         safe_int(item.get('sixes')), safe_str(item.get('score')),
+                         safe_str(item.get('description')), item.get('isBatting', False),
                          bool(item.get('isCurrent')), safe_int(item.get('target')),
                          bool(item.get('followOn')))
                     db_innings_id = inn_row['id']
@@ -530,7 +535,7 @@ async def process_match(pool, session, event_url, progress_file):
                         VALUES ($1, $2, $3, $4, $5)
                         ON CONFLICT (innings_id, wicket_number) DO NOTHING
                     """, db_innings_id, wn, safe_int(fw.get('runs')),
-                         safe_float(fw.get('wicketOver')), fw.get('fowType'))
+                         safe_float(fw.get('wicketOver')), safe_str(fw.get('fowType')))
 
     # Match status
     if status_data:
@@ -548,8 +553,8 @@ async def process_match(pool, session, event_url, progress_file):
                 ON CONFLICT (competition_id) DO UPDATE SET 
                     state=EXCLUDED.state, summary=EXCLUDED.summary, long_summary=EXCLUDED.long_summary,
                     start_date=EXCLUDED.start_date, end_date=EXCLUDED.end_date
-            """, comp_id, st.get('state'), st.get('detail'), st.get('description'),
-                 status_data.get('summary'), status_data.get('longSummary'),
+            """, comp_id, st.get('state'), st.get('detail'), safe_str(st.get('description')),
+                 safe_str(status_data.get('summary')), safe_str(status_data.get('longSummary')),
                  safe_int(status_data.get('period')), safe_int(status_data.get('dayNumber')),
                  potm_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')))
 
