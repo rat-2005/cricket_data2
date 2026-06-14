@@ -274,7 +274,11 @@ async def bulk_insert_deliveries(pool, delivery_tuples, dismissal_tuples):
 async def process_match(pool, session, event_url, progress_file):
     # ── 1. Fetch event (no DB connection held) ──
     event = await fetch(session, event_url)
-    if not event: return
+    if not event:
+        # If ESPN returns 404 or dead link, mark as complete so we don't infinite-loop on restarts
+        progress_file.write(event_url + '\n')
+        progress_file.flush()
+        return
     event_id = str(event['id'])
     
     if not event.get('competitions'): 
@@ -803,7 +807,7 @@ async def worker(pool, session, queue, progress_file, worker_id):
         try:
             await asyncio.wait_for(
                 process_match(pool, session, event_url, progress_file),
-                timeout=300  # 5 minutes — enough for large matches with 700+ HTTP requests
+                timeout=900  # 15 minutes — enough for massive Test matches
             )
             progress['done'] += 1
             elapsed = time.time() - progress['start']
@@ -814,9 +818,15 @@ async def worker(pool, session, queue, progress_file, worker_id):
             log.info(f"[W{worker_id:02d}] ✓ {progress['done']}/{progress['total']} "
                      f"| {rate:.0f}/min | ETA: {eta_h}h {eta_m}m | Q: {queue.qsize()}")
         except asyncio.TimeoutError:
-            log.warning(f"[W{worker_id:02d}] ⏰ TIMEOUT (90s) - skipped: {event_url}")
+            log.warning(f"[W{worker_id:02d}] ⏰ TIMEOUT (15m) - skipped: {event_url}")
+            progress_file.write(event_url + '\n')
+            progress_file.flush()
+            with open('skipped_events.txt', 'a') as sf: sf.write(event_url + ' (TIMEOUT)\n')
         except Exception as e:
             log.error(f"[W{worker_id:02d}] ✗ {event_url}: {e}")
+            progress_file.write(event_url + '\n')
+            progress_file.flush()
+            with open('skipped_events.txt', 'a') as sf: sf.write(event_url + f' (ERROR: {e})\n')
         finally:
             queue.task_done()
 
