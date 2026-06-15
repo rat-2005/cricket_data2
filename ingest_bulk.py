@@ -840,7 +840,7 @@ async def worker(pool, session, queue, progress_file, worker_id):
 async def main():
     global cache_lock, http_semaphore
     cache_lock = asyncio.Lock()
-    http_semaphore = asyncio.Semaphore(50)
+    http_semaphore = asyncio.Semaphore(200)
 
     parser = argparse.ArgumentParser(description="Bulk Ingest Cricket Data")
     parser.add_argument('--shard', type=int, default=1, help='Which shard this instance is processing (1-indexed)')
@@ -912,7 +912,7 @@ async def main():
     log.info(f"  Cached: {len(cached_athletes)} athletes, {len(cached_teams)} teams, {len(cached_venues)} venues")
     
     progress_file = open('completed_events.txt', 'a', encoding='utf-8')
-    connector = aiohttp.TCPConnector(limit=300, ttl_dns_cache=300, enable_cleanup_closed=True)
+    connector = aiohttp.TCPConnector(limit=500, limit_per_host=100, ttl_dns_cache=300, enable_cleanup_closed=True)
     
     async with aiohttp.ClientSession(connector=connector) as session:
         workers = [asyncio.create_task(worker(pool, session, queue, progress_file, i)) for i in range(40)]
