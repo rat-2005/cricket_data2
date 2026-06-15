@@ -162,9 +162,7 @@ async def ensure_single_athlete(pool, session, aid):
 
 async def ensure_venue(pool, session, venue_id, venue_ref):
     if not venue_id: return None
-    async with cache_lock:
-        if venue_id in cached_venues: return venue_id
-        cached_venues.add(venue_id)
+    if venue_id in cached_venues: return venue_id
     try:
         v_data = await fetch(session, venue_ref)
         if v_data:
@@ -178,6 +176,8 @@ async def ensure_venue(pool, session, venue_id, venue_ref):
                      v_data.get('address', {}).get('country'),
                      safe_int(v_data.get('capacity')), safe_bool(v_data.get('grass')), safe_bool(v_data.get('indoor')),
                      v_data.get('address', {}).get('summary'))
+            async with cache_lock:
+                cached_venues.add(venue_id)
             return venue_id
     except Exception as e:
         log.error(f"Failed ensuring venue {venue_id}: {e}")
@@ -186,9 +186,7 @@ async def ensure_venue(pool, session, venue_id, venue_ref):
 
 async def ensure_team(pool, session, team_id, team_ref):
     if not team_id: return None
-    async with cache_lock:
-        if team_id in cached_teams: return team_id
-        cached_teams.add(team_id)
+    if team_id in cached_teams: return team_id
     try:
         t_data = await fetch(session, team_ref)
         if t_data:
@@ -207,6 +205,8 @@ async def ensure_team(pool, session, team_id, team_ref):
                      t_data.get('nickname'), t_data.get('color'),
                      safe_bool(t_data.get('isActive')), t_data.get('slug'),
                      t_data.get('countryCode'), logo_url)
+            async with cache_lock:
+                cached_teams.add(team_id)
             return team_id
     except Exception as e:
         log.error(f"Failed ensuring team {team_id}: {e}")
