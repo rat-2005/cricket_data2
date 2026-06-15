@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 cached_athletes = set()
 cached_teams = set()
 cached_venues = set()
-cache_lock = asyncio.Lock()
+cache_lock = None
 
 # ── Progress counters ────────────────────────────────────────────────────────
 progress = {'done': 0, 'total': 0, 'start': 0.0}
@@ -57,7 +57,7 @@ def safe_date(val):
         try: return datetime.strptime(val.replace('Z', '+0000'), fmt)
         except ValueError: pass
     try: return datetime.fromisoformat(val.replace('Z', '+00:00'))
-    except: return None
+    except Exception: return None
 
 def extract_id_from_ref(ref_dict):
     if not ref_dict: return None
@@ -74,7 +74,7 @@ def extract_id_from_url(url):
 
 # ── HTTP fetch with retry ────────────────────────────────────────────────────
 
-http_semaphore = asyncio.Semaphore(50)
+http_semaphore = None
 
 async def fetch(session, url, retries=8):
     if not url: return None
@@ -96,7 +96,7 @@ async def fetch(session, url, retries=8):
                 raise Exception(f"Max retries reached for {url}: {e}")
 
         # Sleep OUTSIDE the semaphore so other tasks can use it
-        if status in (429, 502, 503, 504) or status is None:
+        if status in (429, 500, 502, 503, 504) or status is None:
             delay = min(2 ** (attempt + 1), 60)
             await asyncio.sleep(delay)
             
@@ -112,17 +112,18 @@ async def fetch(session, url, retries=8):
 async def batch_ensure_athletes(pool, session, aids):
     """Fetch and insert any athlete IDs not already in cache. Returns set of valid IDs."""
     aids = {a for a in aids if a}
-    unknown = aids - cached_athletes
+    async with cache_lock:
+        unknown = aids - cached_athletes
+        cached_athletes.update(unknown)  # optimistic lock
     if not unknown:
         return aids & cached_athletes  # all known
 
     # Fetch all unknown athletes concurrently
-    tasks = {aid: fetch(session, f"http://core.espnuk.org/v2/sports/cricket/athletes/{aid}") for aid in unknown}
-    results = await asyncio.gather(*tasks.values())
+    tasks = [(aid, fetch(session, f"http://core.espnuk.org/v2/sports/cricket/athletes/{aid}")) for aid in unknown]
+    results = await asyncio.gather(*[t[1] for t in tasks])
     
     tuples = []
-    newly_cached = set()
-    for aid, a_data in zip(tasks.keys(), results):
+    for (aid, _), a_data in zip(tasks, results):
         if not a_data: continue
         bat_s = bowl_s = None
         for s in a_data.get('styles', []):
@@ -136,7 +137,6 @@ async def batch_ensure_athletes(pool, session, aids):
             a_data.get('headshot', {}).get('href'),
             bat_s, bowl_s, a_data.get('position', {}).get('name'), safe_bool(a_data.get('active'))
         ))
-        newly_cached.add(aid)
     
     if tuples:
         async with pool.acquire() as conn:
@@ -149,10 +149,7 @@ async def batch_ensure_athletes(pool, session, aids):
                     batting_style=EXCLUDED.batting_style, bowling_style=EXCLUDED.bowling_style
             """, tuples)
     
-    async with cache_lock:
-        cached_athletes.update(newly_cached)
-    
-    return (aids & cached_athletes) | newly_cached
+    return aids
 
 
 async def ensure_single_athlete(pool, session, aid):
@@ -165,7 +162,9 @@ async def ensure_single_athlete(pool, session, aid):
 
 async def ensure_venue(pool, session, venue_id, venue_ref):
     if not venue_id: return None
-    if venue_id in cached_venues: return venue_id
+    async with cache_lock:
+        if venue_id in cached_venues: return venue_id
+        cached_venues.add(venue_id)
     try:
         v_data = await fetch(session, venue_ref)
         if v_data:
@@ -179,8 +178,6 @@ async def ensure_venue(pool, session, venue_id, venue_ref):
                      v_data.get('address', {}).get('country'),
                      safe_int(v_data.get('capacity')), safe_bool(v_data.get('grass')), safe_bool(v_data.get('indoor')),
                      v_data.get('address', {}).get('summary'))
-            async with cache_lock:
-                cached_venues.add(venue_id)
             return venue_id
     except Exception as e:
         log.error(f"Failed ensuring venue {venue_id}: {e}")
@@ -189,7 +186,9 @@ async def ensure_venue(pool, session, venue_id, venue_ref):
 
 async def ensure_team(pool, session, team_id, team_ref):
     if not team_id: return None
-    if team_id in cached_teams: return team_id
+    async with cache_lock:
+        if team_id in cached_teams: return team_id
+        cached_teams.add(team_id)
     try:
         t_data = await fetch(session, team_ref)
         if t_data:
@@ -208,8 +207,6 @@ async def ensure_team(pool, session, team_id, team_ref):
                      t_data.get('nickname'), t_data.get('color'),
                      safe_bool(t_data.get('isActive')), t_data.get('slug'),
                      t_data.get('countryCode'), logo_url)
-            async with cache_lock:
-                cached_teams.add(team_id)
             return team_id
     except Exception as e:
         log.error(f"Failed ensuring team {team_id}: {e}")
@@ -286,9 +283,8 @@ async def process_match(pool, session, event_url, progress_file):
     # ── 1. Fetch event (no DB connection held) ──
     event = await fetch(session, event_url)
     if not event:
-        # If ESPN returns 404 or dead link, mark as complete so we don't infinite-loop on restarts
-        progress_file.write(event_url + '\n')
-        progress_file.flush()
+        with open('dead_links.txt', 'a') as df:
+            df.write(event_url + '\n')
         return
     event_id = str(event['id'])
     
@@ -392,7 +388,7 @@ async def process_match(pool, session, event_url, progress_file):
             INSERT INTO cricket.competitions (id, event_id, date, end_date, venue_id, class_name,
                 neutral_site, day_night, limited_overs, attendance, play_by_play_available)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-            ON CONFLICT (id) DO NOTHING
+            ON CONFLICT (id) DO UPDATE SET venue_id=EXCLUDED.venue_id
         """, comp_id, event_id, safe_date(comp.get('date')), safe_date(comp.get('endDate')),
              venue_id, safe_str(comp.get('class', {}).get('generalClassCard')),
              safe_bool(comp.get('neutralSite')), safe_bool(comp.get('dayNight')), safe_bool(comp.get('limitedOvers')),
@@ -400,18 +396,16 @@ async def process_match(pool, session, event_url, progress_file):
 
         # Officials (batched)
         if officials_data and 'items' in officials_data:
-            existing = await conn.fetchval(
-                "SELECT COUNT(*) FROM cricket.match_officials WHERE competition_id=$1", comp_id)
-            if existing == 0:
-                off_tuples = [(comp_id, safe_str(off.get('displayName')), safe_str(off.get('firstName')),
-                              safe_str(off.get('lastName')), safe_str(off.get('flag', {}).get('alt')),
-                              safe_str(off.get('position', {}).get('displayName')))
-                             for off in officials_data['items']]
-                await conn.executemany("""
-                    INSERT INTO cricket.match_officials (competition_id, display_name, first_name,
-                        last_name, country, role)
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                """, off_tuples)
+            off_tuples = [(comp_id, safe_str(off.get('displayName')), safe_str(off.get('firstName')),
+                          safe_str(off.get('lastName')), safe_str(off.get('flag', {}).get('alt')),
+                          safe_str(off.get('position', {}).get('displayName')))
+                         for off in officials_data['items']]
+            await conn.executemany("""
+                INSERT INTO cricket.match_officials (competition_id, display_name, first_name,
+                    last_name, country, role)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                ON CONFLICT (competition_id, display_name, role) DO NOTHING
+            """, off_tuples)
         
         # Competitors + Innings
         db_competitor_ids = {}
@@ -581,88 +575,87 @@ async def process_match(pool, session, event_url, progress_file):
     # Matchcards (athletes already batch-ensured above)
     if mc_data and 'items' in mc_data:
         async with pool.acquire() as conn4:
-            existing_mc = await conn4.fetchval(
-                "SELECT COUNT(*) FROM cricket.matchcard_batting WHERE competition_id=$1", comp_id)
-            if existing_mc == 0:
-                for mc in mc_data['items']:
-                    mc_headline = mc.get('headline')
-                    inns = safe_int(mc.get('inningsNumber'))
-                    team_name = mc.get('teamName')
+            for mc in mc_data['items']:
+                mc_headline = mc.get('headline')
+                inns = safe_int(mc.get('inningsNumber'))
+                team_name = mc.get('teamName')
 
-                    db_competitor_id = await conn4.fetchval("""
-                        SELECT c.id FROM cricket.competitors c 
-                        JOIN cricket.teams t ON c.team_id = t.id 
-                        WHERE c.competition_id=$1 AND t.name=$2
-                    """, comp_id, team_name)
+                db_competitor_id = await conn4.fetchval("""
+                    SELECT c.id FROM cricket.competitors c 
+                    JOIN cricket.teams t ON c.team_id = t.id 
+                    WHERE c.competition_id=$1 AND t.name=$2
+                """, comp_id, team_name)
 
-                    if mc_headline == 'Batting':
-                        valid_mc = valid_p_athletes  # Already batch-ensured above
-                        
-                        for idx, pd in enumerate(mc.get('playerDetails', [])):
-                            pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
-                            pid = pid if pid in valid_mc else None
+                if mc_headline == 'Batting':
+                    valid_mc = valid_p_athletes  # Already batch-ensured above
+                    
+                    for idx, pd in enumerate(mc.get('playerDetails', [])):
+                        pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
+                        pid = pid if pid in valid_mc else None
 
-                            pname = pd.get('playerName')
-                            dismissal = pd.get('dismissal')
-                            is_captain = '(c)' in pname if pname else False
-                            is_keeper = '(wk)' in pname if pname else False
+                        pname = pd.get('playerName')
+                        dismissal = pd.get('dismissal')
+                        is_captain = '(c)' in pname if pname else False
+                        is_keeper = '(wk)' in pname if pname else False
 
+                        await conn4.execute("""
+                            INSERT INTO cricket.matchcard_batting (
+                                competition_id, innings_number, team_name, extras, total,
+                                player_id, player_name, dismissal, runs, balls_faced, fours, sixes, strike_rate
+                            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                            ON CONFLICT (competition_id, innings_number, player_name) DO NOTHING
+                        """, comp_id, inns, team_name, mc.get('extras'), mc.get('total'), pid, pname, dismissal,
+                             safe_int(pd.get('runs')), safe_int(pd.get('ballsFaced')), safe_int(pd.get('fours')),
+                             safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')))
+
+                        if db_competitor_id and pid:
                             await conn4.execute("""
-                                INSERT INTO cricket.matchcard_batting (
-                                    competition_id, innings_number, team_name, extras, total,
-                                    player_id, player_name, dismissal, runs, balls_faced, fours, sixes, strike_rate
-                                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-                            """, comp_id, inns, team_name, mc.get('extras'), mc.get('total'), pid, pname, dismissal,
+                                INSERT INTO cricket.player_match_performances (
+                                    competitor_id, innings_number, is_batting, batting_order,
+                                    is_captain, is_keeper, runs, balls_faced, fours, sixes,
+                                    strike_rate, minutes, athlete_id, dismissal_type
+                                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                                ON CONFLICT DO NOTHING
+                            """, db_competitor_id, inns, True, idx + 1, is_captain, is_keeper,
                                  safe_int(pd.get('runs')), safe_int(pd.get('ballsFaced')), safe_int(pd.get('fours')),
-                                 safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')))
+                                 safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')), safe_int(pd.get('minutes')), pid, dismissal)
 
-                            if db_competitor_id and pid:
-                                await conn4.execute("""
-                                    INSERT INTO cricket.player_match_performances (
-                                        competitor_id, innings_number, is_batting, batting_order,
-                                        is_captain, is_keeper, runs, balls_faced, fours, sixes,
-                                        strike_rate, minutes, athlete_id, dismissal_type
-                                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-                                    ON CONFLICT DO NOTHING
-                                """, db_competitor_id, inns, True, idx + 1, is_captain, is_keeper,
-                                     safe_int(pd.get('runs')), safe_int(pd.get('ballsFaced')), safe_int(pd.get('fours')),
-                                     safe_int(pd.get('sixes')), safe_float(pd.get('strikeRate')), safe_int(pd.get('minutes')), pid, dismissal)
-                                     
-                    elif mc_headline == 'Bowling':
-                        valid_mc = valid_p_athletes  # Already batch-ensured above
+                elif mc_headline == 'Bowling':
+                    valid_mc = valid_p_athletes  # Already batch-ensured above
+                    
+                    for pd in mc.get('playerDetails', []):
+                        pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
+                        pid = pid if pid in valid_mc else None
                         
-                        for pd in mc.get('playerDetails', []):
-                            pid = extract_id_from_url(pd.get('href')) or pd.get('playerID')
-                            pid = pid if pid in valid_mc else None
+                        nbw = pd.get('nbw', '')
+                        wides = no_balls = 0
+                        if nbw:
+                            m_w = re.search(r'(\d+)w', nbw)
+                            if m_w: wides = int(m_w.group(1))
+                            m_nb = re.search(r'(\d+)nb', nbw)
+                            if m_nb: no_balls = int(m_nb.group(1))
                             
-                            nbw = pd.get('nbw', '')
-                            wides = no_balls = 0
-                            if nbw:
-                                m_w = re.search(r'(\d+)w', nbw)
-                                if m_w: wides = int(m_w.group(1))
-                                m_nb = re.search(r'(\d+)nb', nbw)
-                                if m_nb: no_balls = int(m_nb.group(1))
-                                
-                            await conn4.execute("""
-                                INSERT INTO cricket.matchcard_bowling (
-                                    competition_id, innings_number, team_name,
-                                    player_id, player_name, overs, maidens, runs_conceded, wickets,
-                                    economy, wides, no_balls
-                                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-                            """, comp_id, inns, team_name, pid, pd.get('playerName'), safe_float(pd.get('overs')),
-                                 safe_int(pd.get('maidens')), safe_int(pd.get('conceded')), safe_int(pd.get('wickets')),
-                                 safe_float(pd.get('economyRate')), wides, no_balls)
+                        await conn4.execute("""
+                            INSERT INTO cricket.matchcard_bowling (
+                                competition_id, innings_number, team_name,
+                                player_id, player_name, overs, maidens, runs_conceded, wickets,
+                                economy, wides, no_balls
+                            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                            ON CONFLICT (competition_id, innings_number, player_name) DO NOTHING
+                        """, comp_id, inns, team_name, pid, pd.get('playerName'), safe_float(pd.get('overs')),
+                             safe_int(pd.get('maidens')), safe_int(pd.get('conceded')), safe_int(pd.get('wickets')),
+                             safe_float(pd.get('economyRate')), wides, no_balls)
 
-                            if db_competitor_id and pid:
-                                await conn4.execute("""
-                                    INSERT INTO cricket.player_match_performances (
-                                        competitor_id, innings_number, is_batting, runs_conceded,
-                                        overs_bowled, maidens, wickets, economy_rate, wides, no_balls,
-                                        athlete_id
-                                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-                                    ON CONFLICT DO NOTHING
-                                """, db_competitor_id, inns, False, safe_int(pd.get('conceded')), safe_float(pd.get('overs')),
-                                     safe_int(pd.get('maidens')), safe_int(pd.get('wickets')), safe_float(pd.get('economyRate')), wides, no_balls, pid)
+                        if db_competitor_id and pid:
+                            await conn4.execute("""
+                                INSERT INTO cricket.player_match_performances (
+                                    competitor_id, innings_number, is_batting, runs_conceded,
+                                    overs_bowled, maidens, wickets, economy_rate, wides, no_balls,
+                                    athlete_id
+                                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                                ON CONFLICT DO NOTHING
+                            """, db_competitor_id, inns, False, safe_int(pd.get('conceded')), safe_float(pd.get('overs')),
+                                 safe_int(pd.get('maidens')), safe_int(pd.get('wickets')), safe_float(pd.get('economyRate')), wides, no_balls, pid)
 
     # ── 7. Deliveries + Dismissals (single-pass fetch, batch ensure, COPY insert) ──
     details_ref = comp.get('details', {}).get('$ref')
@@ -687,9 +680,7 @@ async def process_match(pool, session, event_url, progress_file):
             # Circuit Breaker: The longest test match in history was 5,308 deliveries.
             # If ESPN claims there are more than 10,000 (10 pages), their database is corrupted.
             if page >= 10:
-                log.warning(f"ESPN API corruption detected (>{page*1000} deliveries) for {event_url}. Skipping deliveries.")
-                all_refs = []
-                break
+                raise Exception(f"ESPN API corruption detected (>{page*1000} deliveries) for {event_url}. Abandoning match.")
                 
             page += 1
         
@@ -847,6 +838,10 @@ async def worker(pool, session, queue, progress_file, worker_id):
 
 
 async def main():
+    global cache_lock, http_semaphore
+    cache_lock = asyncio.Lock()
+    http_semaphore = asyncio.Semaphore(50)
+
     parser = argparse.ArgumentParser(description="Bulk Ingest Cricket Data")
     parser.add_argument('--shard', type=int, default=1, help='Which shard this instance is processing (1-indexed)')
     parser.add_argument('--total-shards', type=int, default=1, help='Total number of instances running')
@@ -855,6 +850,18 @@ async def main():
     try:
         with open('events.json', 'r', encoding='utf-8') as f:
             all_events = json.load(f)
+            
+        # Sweep up previous failures
+        all_events_set = set(all_events)
+        for fail_file in ['skipped_events.txt']:
+            if os.path.exists(fail_file):
+                with open(fail_file, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        url = line.split(' (')[0].strip()
+                        if url and url not in all_events_set:
+                            all_events.append(url)
+                            all_events_set.add(url)
+                open(fail_file, 'w').close() 
             
         # Sharding logic: only keep events assigned to this VM
         if args.total_shards > 1:
