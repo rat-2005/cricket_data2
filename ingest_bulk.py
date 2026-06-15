@@ -677,7 +677,7 @@ async def process_match(pool, session, event_url, progress_file):
             
             if d_data.get('pageIndex', 1) >= d_data.get('pageCount', 1): break
             
-            # Circuit Breaker: The longest test match in history was 5,308 deliveries.
+            # Circuit Breaker: The longest test match in history was 5,447 deliveries.
             # If ESPN claims there are more than 10,000 (10 pages), their database is corrupted.
             if page >= 10:
                 raise Exception(f"ESPN API corruption detected (>{page*1000} deliveries) for {event_url}. Abandoning match.")
