@@ -74,9 +74,9 @@ def extract_id_from_url(url):
 
 # ── HTTP fetch with retry ────────────────────────────────────────────────────
 
-http_semaphore = asyncio.Semaphore(250)
+http_semaphore = asyncio.Semaphore(50)
 
-async def fetch(session, url, retries=4):
+async def fetch(session, url, retries=8):
     if not url: return None
     for attempt in range(retries):
         status = None
@@ -86,13 +86,24 @@ async def fetch(session, url, retries=4):
                     status = resp.status
                     if status == 200:
                         return await resp.json()
+                    elif status == 404:
+                        return None  # Genuine dead link
         except Exception as e:
             if attempt == retries - 1:
                 log.warning(f"Fetch failed: {url} -> {e}")
+                with open('unreachable_urls.txt', 'a') as f:
+                    f.write(f"{url}\n")
+                raise Exception(f"Max retries reached for {url}: {e}")
 
         # Sleep OUTSIDE the semaphore so other tasks can use it
         if status in (429, 502, 503, 504) or status is None:
-            await asyncio.sleep(attempt + 1)
+            delay = min(2 ** (attempt + 1), 60)
+            await asyncio.sleep(delay)
+            
+        if attempt == retries - 1 and status not in (200, 404):
+            with open('unreachable_urls.txt', 'a') as f:
+                f.write(f"{url}\n")
+            raise Exception(f"Max retries reached for {url} with status {status}")
 
     return None
 
@@ -672,6 +683,14 @@ async def process_match(pool, session, event_url, progress_file):
                 if ref: all_refs.append(ref)
             
             if d_data.get('pageIndex', 1) >= d_data.get('pageCount', 1): break
+            
+            # Circuit Breaker: The longest test match in history was 5,308 deliveries.
+            # If ESPN claims there are more than 10,000 (10 pages), their database is corrupted.
+            if page >= 10:
+                log.warning(f"ESPN API corruption detected (>{page*1000} deliveries) for {event_url}. Skipping deliveries.")
+                all_refs = []
+                break
+                
             page += 1
         
         # Fire ALL delivery fetches at once (semaphore controls actual concurrency)
@@ -819,13 +838,9 @@ async def worker(pool, session, queue, progress_file, worker_id):
                      f"| {rate:.0f}/min | ETA: {eta_h}h {eta_m}m | Q: {queue.qsize()}")
         except asyncio.TimeoutError:
             log.warning(f"[W{worker_id:02d}] ⏰ TIMEOUT (15m) - skipped: {event_url}")
-            progress_file.write(event_url + '\n')
-            progress_file.flush()
             with open('skipped_events.txt', 'a') as sf: sf.write(event_url + ' (TIMEOUT)\n')
         except Exception as e:
             log.error(f"[W{worker_id:02d}] ✗ {event_url}: {e}")
-            progress_file.write(event_url + '\n')
-            progress_file.flush()
             with open('skipped_events.txt', 'a') as sf: sf.write(event_url + f' (ERROR: {e})\n')
         finally:
             queue.task_done()
