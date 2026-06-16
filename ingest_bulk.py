@@ -881,7 +881,7 @@ async def main():
     if progress['total'] == 0: return
 
     db_url = os.getenv("DATABASE_URL")
-    pool = await asyncpg.create_pool(db_url, min_size=20, max_size=50)
+    pool = await asyncpg.create_pool(db_url, min_size=20, max_size=120)
     
     # ── Pre-warm caches ──
     log.info("Pre-warming caches from DB...")
