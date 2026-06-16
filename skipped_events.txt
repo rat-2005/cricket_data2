@@ -1,0 +1,10 @@
+http://core.espnuk.org/v2/sports/cricket/leagues/1102113/events/1103235 (ERROR: insert or update on table "match_status" violates foreign key constraint "match_status_potm_athlete_id_fkey"
+DETAIL:  Key (potm_athlete_id)=(1103626) is not present in table "athletes".)
+http://core.espnuk.org/v2/sports/cricket/leagues/298314/events/298387 (ERROR: ESPN API corruption detected (>10000 deliveries) for http://core.espnuk.org/v2/sports/cricket/leagues/298314/events/298387. Abandoning match.)
+http://core.espnuk.org/v2/sports/cricket/leagues/1113426/events/1113533 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17935/events/1113533/competitions/1113533/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1102113/events/1103267 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17905/events/1103267/competitions/1103267/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1113426/events/1113542 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17935/events/1113542/competitions/1113542/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1102113/events/1103263 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17905/events/1103263/competitions/1103263/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1113213/events/1113376 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17934/events/1113376/competitions/1113376/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1107035/events/1107102 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17902/events/1107102/competitions/1107102/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1167337/events/1167344 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/8798/events/1167344/competitions/1167344/matchcards with status 500)
