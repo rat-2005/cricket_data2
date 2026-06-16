@@ -236,6 +236,82 @@
             font-family: 'Outfit', sans-serif;
             width: 30px;
         }
+
+        .search-container {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-container input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: background 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-item img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -244,6 +320,13 @@
             <div class="logo">
                 <h1>Cricket Analytics</h1>
             </div>
+            
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="playerSearch" placeholder="Search any player..." autocomplete="off">
+                <div id="searchResults" class="search-results"></div>
+            </div>
+
             <div class="format-tabs">
                 <a href="/?format=All" class="tab {% if current_format == 'All' %}active{% endif %}">Overall</a>
                 <a href="/?format=Test" class="tab {% if current_format == 'Test' %}active{% endif %}">Test</a>
@@ -338,5 +421,55 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const searchInput = document.getElementById('playerSearch');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.length > 0) {
+                        searchResults.innerHTML = data.map(player => `
+                            <a href="/player/${player.id}" class="search-item">
+                                <img src="${player.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff`}" 
+                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff'">
+                                <div>
+                                    <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>
+                                </div>
+                            </a>
+                        `).join('');
+                        searchResults.classList.add('active');
+                    } else {
+                        searchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                        searchResults.classList.add('active');
+                    }
+                } catch (err) {
+                    console.error('Search failed:', err);
+                }
+            }, 300);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
