@@ -1,0 +1,8 @@
+http://core.espnuk.org/v2/sports/cricket/leagues/1104994/events/1105264 (ERROR: insert or update on table "match_status" violates foreign key constraint "match_status_potm_athlete_id_fkey"
+DETAIL:  Key (potm_athlete_id)=(1106515) is not present in table "athletes".)
+Process 23550 waits for ShareLock on transaction 9164344; blocked by process 23161. (ERROR: Max retries reached for Process 23550 waits for ShareLock on transaction 9164344; blocked by process 23161.: Process%2023550%20waits%20for%20ShareLock%20on%20transaction%209164344;%20blocked%20by%20process%2023161.)
+http://core.espnuk.org/v2/sports/cricket/leagues/1113213/events/1113392 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17934/events/1113392/competitions/1113392/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1113426/events/1113520 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17935/events/1113520/competitions/1113520/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/1102113/events/1103262 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/17905/events/1103262/competitions/1103262/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/435130/events/435691 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/8053/events/435691/competitions/435691/matchcards with status 500)
+http://core.espnuk.org/v2/sports/cricket/leagues/474013/events/474052 (ERROR: Max retries reached for http://core.espnuk.org/v2/sports/cricket/leagues/8626/events/474052/competitions/474052/matchcards with status 500)
