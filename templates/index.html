@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .format-tabs {
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+            background: var(--accent-gradient);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tables-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .tables-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .table-wrapper {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .table-wrapper h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .table-wrapper h2 i {
+            color: var(--accent-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-variant-numeric: tabular-nums;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr {
+            transition: background 0.2s ease;
+        }
+
+        tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #1e293b;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .highlight-col {
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        .rank {
+            color: var(--text-secondary);
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            width: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>Cricket Analytics</h1>
+            </div>
+            <div class="format-tabs">
+                <a href="/?format=All" class="tab {% if current_format == 'All' %}active{% endif %}">Overall</a>
+                <a href="/?format=Test" class="tab {% if current_format == 'Test' %}active{% endif %}">Test</a>
+                <a href="/?format=ODI" class="tab {% if current_format == 'ODI' %}active{% endif %}">ODI</a>
+                <a href="/?format=T20" class="tab {% if current_format == 'T20' %}active{% endif %}">T20</a>
+                <a href="/?format=IPL" class="tab {% if current_format == 'IPL' %}active{% endif %}">IPL</a>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <h3>Matches Analyzed</h3>
+                <p>{{ "{:,}".format(stats.total_matches or 0) }}</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-baseball-bat-ball"></i>
+                <h3>Total Runs</h3>
+                <p>{{ "{:,}".format(stats.total_runs or 0) }}</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-bullseye"></i>
+                <h3>Total Wickets</h3>
+                <p>{{ "{:,}".format(stats.total_wickets or 0) }}</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-fire"></i>
+                <h3>Total Sixes</h3>
+                <p>{{ "{:,}".format(stats.total_sixes or 0) }}</p>
+            </div>
+        </div>
+
+        <div class="tables-container">
+            <!-- Top Batters -->
+            <div class="table-wrapper">
+                <h2><i class="fas fa-star"></i> Top Run Scorers</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Runs</th>
+                            <th>SR</th>
+                            <th>6s</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batter in batters %}
+                        <tr>
+                            <td class="player-cell">
+                                <span class="rank">#{{ loop.index }}</span>
+                                <img src="{{ batter.image_url or 'https://ui-avatars.com/api/?name=' + batter.full_name|urlencode + '&background=1e293b&color=fff' }}" alt="{{ batter.full_name }}" class="player-img" onerror="this.src='https://ui-avatars.com/api/?name={{ batter.full_name|urlencode }}&background=1e293b&color=fff'">
+                                <span class="player-name">{{ batter.full_name }}</span>
+                            </td>
+                            <td class="highlight-col">{{ "{:,}".format(batter.total_runs) }}</td>
+                            <td>{{ batter.strike_rate }}</td>
+                            <td>{{ batter.total_sixes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Top Bowlers -->
+            <div class="table-wrapper">
+                <h2><i class="fas fa-bolt"></i> Leading Wicket Takers</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Wickets</th>
+                            <th>Econ</th>
+                            <th>Runs/Overs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bowler in bowlers %}
+                        <tr>
+                            <td class="player-cell">
+                                <span class="rank">#{{ loop.index }}</span>
+                                <img src="{{ bowler.image_url or 'https://ui-avatars.com/api/?name=' + bowler.full_name|urlencode + '&background=1e293b&color=fff' }}" alt="{{ bowler.full_name }}" class="player-img" onerror="this.src='https://ui-avatars.com/api/?name={{ bowler.full_name|urlencode }}&background=1e293b&color=fff'">
+                                <span class="player-name">{{ bowler.full_name }}</span>
+                            </td>
+                            <td class="highlight-col">{{ "{:,}".format(bowler.total_wickets) }}</td>
+                            <td>{{ bowler.economy }}</td>
+                            <td style="color: var(--text-secondary); font-size: 0.9em;">
+                                {{ "{:,}".format(bowler.runs_conceded) }} / {{ bowler.overs_bowled }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -34,14 +34,38 @@ def extract_id(ref_dict):
         return val if val != '0' else None
     return None
 
-async def fetch_json(session, url):
+import asyncio
+
+http_semaphore = asyncio.Semaphore(50)
+
+async def fetch_json(session, url, retries=8):
     if not url: return None
-    try:
-        async with session.get(url, timeout=15) as response:
-            if response.status == 200:
-                return await response.json()
-    except Exception as e:
-        logging.warning(f"Error fetching {url}: {e}")
+    for attempt in range(retries):
+        status = None
+        try:
+            async with http_semaphore:
+                async with session.get(url, timeout=15) as response:
+                    status = response.status
+                    if status == 200:
+                        return await response.json()
+                    elif status == 404:
+                        return None # Legitimately not found, no need to retry
+        except Exception as e:
+            if attempt == retries - 1:
+                logging.warning(f"Fetch totally failed after {retries} retries: {url} -> {e}")
+
+        # Exponential backoff: 2s, 4s, 8s, 16s... up to 60s
+        if status in (429, 502, 503, 504) or status is None:
+            sleep_time = min(2 ** (attempt + 1), 60)
+            if attempt > 1:
+                logging.info(f"Rate limited or timeout on {url}. Retrying in {sleep_time}s (Attempt {attempt+1}/{retries})")
+            await asyncio.sleep(sleep_time)
+
+    # If all retries failed, log to unreachable file
+    logging.error(f"URL totally unreachable after {retries} retries: {url}")
+    with open("unreachable_urls.txt", "a") as f:
+        f.write(f"{url}\n")
+        
     return None
 
 class AsyncIngester:
