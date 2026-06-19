@@ -321,10 +321,11 @@
                 <h1>Cricket Analytics</h1>
             </div>
             
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="playerSearch" placeholder="Search any player..." autocomplete="off">
-                <div id="searchResults" class="search-results"></div>
+            <div class="nav-links" style="display: flex; gap: 1rem;">
+                <a href="/batter" class="tab active" style="text-decoration: none;"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
+                <a href="/bowler" class="tab active" style="text-decoration: none;"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+                <a href="/faceoff" class="tab active" style="background: var(--surface-hover); text-decoration: none;"><i class="fas fa-people-arrows"></i> Face-off</a>
+                <a href="/player" class="tab active" style="text-decoration: none;"><i class="fas fa-user"></i> Player Profile</a>
             </div>
 
             <div class="format-tabs">
@@ -422,54 +423,6 @@
         </div>
     </div>
 
-    <script>
-        const searchInput = document.getElementById('playerSearch');
-        const searchResults = document.getElementById('searchResults');
-        let searchTimeout;
 
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            
-            clearTimeout(searchTimeout);
-            
-            if (query.length < 2) {
-                searchResults.classList.remove('active');
-                return;
-            }
-
-            searchTimeout = setTimeout(async () => {
-                try {
-                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-                    const data = await response.json();
-                    
-                    if (data.length > 0) {
-                        searchResults.innerHTML = data.map(player => `
-                            <a href="/player/${player.id}" class="search-item">
-                                <img src="${player.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff`}" 
-                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff'">
-                                <div>
-                                    <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
-                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>
-                                </div>
-                            </a>
-                        `).join('');
-                        searchResults.classList.add('active');
-                    } else {
-                        searchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
-                        searchResults.classList.add('active');
-                    }
-                } catch (err) {
-                    console.error('Search failed:', err);
-                }
-            }, 300);
-        });
-
-        // Close search results when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.classList.remove('active');
-            }
-        });
-    </script>
 </body>
 </html>

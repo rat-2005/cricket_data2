@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ athlete.full_name }} - Profile | Cricket Analytics</title>
+    <title>{% if athlete %}{{ athlete.full_name }} - Profile{% else %}Player Profile{% endif %} | Cricket Analytics</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -66,6 +66,25 @@
 
         .logo a {
             text-decoration: none;
+        }
+
+        .nav-links a {
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+        
+        .nav-links a.active {
+            background: var(--accent-gradient);
         }
 
         /* Search Bar */
@@ -317,6 +336,13 @@
                 <a href="/"><h1>Cricket Analytics</h1></a>
             </div>
             
+            <div class="nav-links" style="display: flex; gap: 1rem;">
+                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+                <a href="/faceoff"><i class="fas fa-people-arrows"></i> Face-off</a>
+                <a href="/player" class="active"><i class="fas fa-user"></i> Player Profile</a>
+            </div>
+            
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" id="playerSearch" placeholder="Search another player..." autocomplete="off">
@@ -324,6 +350,59 @@
             </div>
         </header>
 
+        
+        {% if not athlete %}
+        <div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Find a Player</h2>
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
+                <input type="text" id="mainPlayerSearch" placeholder="Type a player name..." autocomplete="off" style="width: 100%; padding: 1.5rem 1.5rem 1.5rem 4rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 100px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 1.2rem; outline: none; transition: all 0.3s ease;">
+                <div id="mainSearchResults" class="search-results"></div>
+            </div>
+        </div>
+        
+        <script>
+            const mainSearchInput = document.getElementById('mainPlayerSearch');
+            const mainSearchResults = document.getElementById('mainSearchResults');
+            let mainSearchTimeout;
+
+            mainSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(mainSearchTimeout);
+                if (query.length < 2) {
+                    mainSearchResults.classList.remove('active');
+                    return;
+                }
+                mainSearchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                        const data = await response.json();
+                        if (data.length > 0) {
+                            mainSearchResults.innerHTML = data.map(player => `
+                                <a href="/player/${player.id}" class="search-item" style="padding: 1rem 1.5rem; text-align: left;">
+                                    <div>
+                                        <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>
+                                    </div>
+                                </a>
+                            `).join('');
+                            mainSearchResults.classList.add('active');
+                        } else {
+                            mainSearchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                            mainSearchResults.classList.add('active');
+                        }
+                    } catch (err) {
+                        console.error('Search failed:', err);
+                    }
+                }, 300);
+            });
+            document.addEventListener('click', (e) => {
+                if (!mainSearchInput.contains(e.target) && !mainSearchResults.contains(e.target)) {
+                    mainSearchResults.classList.remove('active');
+                }
+            });
+        </script>
+        {% else %}
         <div class="profile-header">
             <img src="{{ athlete.image_url or 'https://ui-avatars.com/api/?name=' + athlete.full_name|urlencode + '&background=1e293b&color=fff' }}" 
                  alt="{{ athlete.full_name }}" class="profile-img" 
@@ -419,6 +498,7 @@
         </div>
         {% endif %}
 
+        {% endif %}
     </div>
 
     <script>
@@ -444,8 +524,6 @@
                     if (data.length > 0) {
                         searchResults.innerHTML = data.map(player => `
                             <a href="/player/${player.id}" class="search-item">
-                                <img src="${player.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff`}" 
-                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(player.full_name)}&background=1e293b&color=fff'">
                                 <div>
                                     <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
                                     <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>

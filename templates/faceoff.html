@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batter vs Bowler Face-off</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .nav-links a {
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+        
+        .nav-links a.active {
+            background: var(--accent-gradient);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .filters-sidebar {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .filter-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+        }
+        
+        .filter-group input {
+            appearance: auto;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+
+        .search-results.active {
+            display: block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .search-item {
+            padding: 0.75rem 1rem;
+            display: block;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-card p {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+        }
+        
+        .faceoff-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .faceoff-header .player-box {
+            background: var(--surface-color);
+            padding: 1.5rem 3rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .faceoff-header h2 {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <a href="/" style="text-decoration: none;"><h1>Cricket Analytics</h1></a>
+            </div>
+            <div class="nav-links" style="display: flex; gap: 1rem;">
+                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+                <a href="/faceoff" class="active"><i class="fas fa-people-arrows"></i> Face-off</a>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <!-- Sidebar for Selection & Filters -->
+            <div class="filters-sidebar">
+                <h3><i class="fas fa-users"></i> Players</h3>
+                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                
+                <div class="filter-group">
+                    <label>Select Batter</label>
+                    <input type="text" id="batterSearch" placeholder="Search batter..." autocomplete="off">
+                    <div id="batterResults" class="search-results"></div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Select Bowler</label>
+                    <input type="text" id="bowlerSearch" placeholder="Search bowler..." autocomplete="off">
+                    <div id="bowlerResults" class="search-results"></div>
+                </div>
+
+                <h3 style="margin-top: 2rem;"><i class="fas fa-filter"></i> Match Filters</h3>
+                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                
+                <div class="filter-group">
+                    <label>Format</label>
+                    <select id="filterFormat"><option value="All">All Formats</option></select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>League / Competition</label>
+                    <select id="filterLeague"><option value="All">All Leagues</option></select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Match Phase</label>
+                    <select id="filterPhase">
+                        <option value="All">All Phases</option>
+                        <option value="Powerplay">Powerplay (1-6)</option>
+                        <option value="Middle">Middle Overs (7-15)</option>
+                        <option value="Death">Death Overs (16-20)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Venue</label>
+                    <select id="filterVenue"><option value="All">All Venues</option></select>
+                </div>
+                
+                <div class="filter-group" style="margin-top: 2rem;">
+                    <button onclick="fetchStats()" style="width: 100%; padding: 1rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer;">
+                        Compare
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Display -->
+            <div>
+                <div class="faceoff-header" id="faceoffHeader">
+                    <div class="player-box">
+                        <h3 style="color: var(--text-secondary); font-size: 1rem;">Batter</h3>
+                        <h2 id="batterName">?</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-bolt" style="font-size: 2rem; color: #fbbf24;"></i>
+                        <h3 style="margin-top: 0.5rem;">VS</h3>
+                    </div>
+                    <div class="player-box">
+                        <h3 style="color: var(--text-secondary); font-size: 1rem;">Bowler</h3>
+                        <h2 id="bowlerName">?</h2>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid">
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 3rem;">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>Search and select both a batter and a bowler to view their head-to-head records.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            let currentBatterId = "{{ batter_id or '' }}";
+            let currentBowlerId = "{{ bowler_id or '' }}";
+            
+            async function init() {
+                try {
+                    const filterRes = await fetch(`/api/filters`);
+                    if(filterRes.ok) {
+                        const filters = await filterRes.json();
+                        
+                        const formatSelect = document.getElementById('filterFormat');
+                        formatSelect.innerHTML += filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
+                        
+                        const leagueSelect = document.getElementById('filterLeague');
+                        leagueSelect.innerHTML += filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
+                        
+                        const venSelect = document.getElementById('filterVenue');
+                        venSelect.innerHTML += filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
+                    }
+                    
+                    if (currentBatterId && currentBowlerId) {
+                        // Pre-fetch names if IDs are in URL
+                        const bRes = await fetch(`/api/athlete/${currentBatterId}`);
+                        if (bRes.ok) document.getElementById('batterName').textContent = (await bRes.json()).full_name;
+                        
+                        const boRes = await fetch(`/api/athlete/${currentBowlerId}`);
+                        if (boRes.ok) document.getElementById('bowlerName').textContent = (await boRes.json()).full_name;
+                        
+                        fetchStats();
+                    }
+                } catch(e) {
+                    console.error("Init failed", e);
+                }
+            }
+            
+            async function fetchFaceoffFilters(sourceId = null) {
+                if (!currentBatterId || !currentBowlerId) return;
+                
+                const formatSelect = document.getElementById('filterFormat');
+                const leagueSelect = document.getElementById('filterLeague');
+                const venSelect = document.getElementById('filterVenue');
+                const phaseSelect = document.getElementById('filterPhase');
+                
+                const currentFormat = formatSelect.value || 'All';
+                const currentLeague = leagueSelect.value || 'All';
+                const currentVenue = venSelect.value || 'All';
+                const currentPhase = phaseSelect.value || 'All';
+                
+                try {
+                    const params = new URLSearchParams({
+                        batter_id: currentBatterId,
+                        bowler_id: currentBowlerId,
+                        format: currentFormat,
+                        league: currentLeague,
+                        venue: currentVenue,
+                        phase: currentPhase
+                    });
+                    
+                    const filterRes = await fetch(`/api/faceoff_filters?${params.toString()}`);
+                    if(filterRes.ok) {
+                        const filters = await filterRes.json();
+                        
+                        // Rebuild but preserve selected value if it exists in new list
+                        // Skip updating the dropdown that triggered the change so its options don't disappear
+                        if (sourceId !== 'filterFormat') {
+                            formatSelect.innerHTML = '<option value="All">All Formats</option>' + filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
+                            if (filters.formats.includes(currentFormat)) formatSelect.value = currentFormat;
+                        }
+                        
+                        if (sourceId !== 'filterLeague') {
+                            leagueSelect.innerHTML = '<option value="All">All Leagues</option>' + filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
+                            if (filters.leagues.includes(currentLeague)) leagueSelect.value = currentLeague;
+                        }
+                        
+                        if (sourceId !== 'filterVenue') {
+                            venSelect.innerHTML = '<option value="All">All Venues</option>' + filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
+                            if (filters.venues.includes(currentVenue)) venSelect.value = currentVenue;
+                        }
+                    }
+                } catch(e) {
+                    console.error("Failed to fetch dynamic faceoff filters", e);
+                }
+            }
+
+            // Listen for dropdown changes to cascade
+            document.getElementById('filterFormat').addEventListener('change', () => fetchFaceoffFilters('filterFormat'));
+            document.getElementById('filterLeague').addEventListener('change', () => fetchFaceoffFilters('filterLeague'));
+            document.getElementById('filterVenue').addEventListener('change', () => fetchFaceoffFilters('filterVenue'));
+            document.getElementById('filterPhase').addEventListener('change', () => fetchFaceoffFilters('filterPhase'));
+
+            function setupSearch(inputId, resultsId, isBatter) {
+                const input = document.getElementById(inputId);
+                const results = document.getElementById(resultsId);
+                let timeout;
+                
+                input.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    clearTimeout(timeout);
+                    
+                    if (query.length < 1) {
+                        results.classList.remove('active');
+                        return;
+                    }
+                    
+                    results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    results.classList.add('active');
+
+                    timeout = setTimeout(async () => {
+                        try {
+                            let url = `/api/search?q=${encodeURIComponent(query)}`;
+                            if (isBatter && currentBowlerId) {
+                                url += `&against_bowler=${currentBowlerId}`;
+                            } else if (!isBatter && currentBatterId) {
+                                url += `&against_batter=${currentBatterId}`;
+                            }
+                            
+                            const response = await fetch(url);
+                            const data = await response.json();
+                            
+                            if(data.length > 0) {
+                                results.innerHTML = data.map(p => {
+                                    const safeName = (p.full_name || '').replace(/'/g, "\\'");
+                                    return `
+                                    <div class="search-item" onclick="selectPlayer('${p.id}', '${safeName}', ${isBatter})">
+                                        <div>
+                                            <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${p.full_name}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.country_code || 'Unknown'}</div>
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('');
+                            } else {
+                                results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                            }
+                        } catch (err) {
+                            results.innerHTML = '<div style="padding: 1rem; color: #ef4444; text-align: center;">Error loading results</div>';
+                            console.error('Search failed:', err);
+                        }
+                    }, 300);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !results.contains(e.target)) {
+                        results.classList.remove('active');
+                    }
+                });
+            }
+            
+            function selectPlayer(id, name, isBatter) {
+                if (isBatter) {
+                    currentBatterId = id;
+                    document.getElementById('batterName').textContent = name;
+                    document.getElementById('batterSearch').value = name;
+                    document.getElementById('batterResults').classList.remove('active');
+                } else {
+                    currentBowlerId = id;
+                    document.getElementById('bowlerName').textContent = name;
+                    document.getElementById('bowlerSearch').value = name;
+                    document.getElementById('bowlerResults').classList.remove('active');
+                }
+                
+                if (currentBatterId && currentBowlerId) {
+                    fetchFaceoffFilters().then(() => fetchStats());
+                } else {
+                    const url = new URL(window.location);
+                    if (isBatter) url.searchParams.set('batter_id', id);
+                    else url.searchParams.set('bowler_id', id);
+                    window.history.pushState({}, '', url);
+                }
+            }
+            
+            async function fetchStats() {
+                if (!currentBatterId || !currentBowlerId) {
+                    alert("Please select both a batter and a bowler.");
+                    return;
+                }
+                
+                document.getElementById('statsGrid').innerHTML = '<div class="stat-card" style="grid-column: 1/-1;"><i class="fas fa-spinner fa-spin"></i><p>Calculating Head-to-Head...</p></div>';
+                
+                const params = new URLSearchParams({
+                    batter_id: currentBatterId,
+                    bowler_id: currentBowlerId,
+                    format: document.getElementById('filterFormat').value,
+                    league: document.getElementById('filterLeague').value,
+                    phase: document.getElementById('filterPhase').value,
+                    venue: document.getElementById('filterVenue').value
+                });
+                
+                try {
+                    const res = await fetch(`/api/stats/faceoff?${params.toString()}`);
+                    const data = await res.json();
+                    
+                    document.getElementById('statsGrid').innerHTML = `
+                        <div class="stat-card">
+                            <i class="fas fa-baseball-bat-ball"></i>
+                            <h3>Runs Scored</h3>
+                            <p>${data.runs}</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-hashtag"></i>
+                            <h3>Balls Faced</h3>
+                            <p>${data.balls}</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-bullseye"></i>
+                            <h3>Dismissals</h3>
+                            <p>${data.dismissals}</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-bolt"></i>
+                            <h3>Strike Rate</h3>
+                            <p>${data.sr}</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Batting Avg</h3>
+                            <p>${data.avg}</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-fire"></i>
+                            <h3>Boundaries (4s/6s)</h3>
+                            <p>${data.boundaries} / ${data.sixes}</p>
+                        </div>
+                    `;
+                } catch(e) {
+                    console.error("Fetch failed", e);
+                    document.getElementById('statsGrid').innerHTML = '<p style="grid-column: 1/-1; text-align:center;">No match data found for this head-to-head with the given filters.</p>';
+                }
+            }
+            
+            setupSearch('batterSearch', 'batterResults', true);
+            setupSearch('bowlerSearch', 'bowlerResults', false);
+            init();
+        </script>
+    </div>
+</body>
+</html>
