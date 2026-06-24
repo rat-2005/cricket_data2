@@ -34,7 +34,7 @@ def get_auth_token(path):
 
 def get_all_match_ids():
     """Load match IDs from events.json."""
-    match_ids = []
+    matches = []
     events_path = "events.json"
     if not os.path.exists(events_path):
         print("events.json not found!")
@@ -45,38 +45,27 @@ def get_all_match_ids():
         for url in urls:
             try:
                 # URL format: http://core.espnuk.org/v2/sports/cricket/leagues/1496564/events/1496582
-                match_id = url.split('/')[-1]
-                match_ids.append(match_id)
+                parts = url.split('/')
+                match_id = parts[-1]
+                series_id = parts[-3] if "leagues" in url else None
+                if match_id and series_id:
+                    matches.append((series_id, match_id))
             except Exception:
                 pass
-    return list(set(match_ids))
+    # Deduplicate based on match_id
+    seen = set()
+    unique_matches = []
+    for s_id, m_id in matches:
+        if m_id not in seen:
+            seen.add(m_id)
+            unique_matches.append((s_id, m_id))
+    return unique_matches
 
 def log_failed_match(match_id):
     with open("failed_matches.txt", "a") as f:
         f.write(f"{match_id}\n")
 
-async def resolve_series_id(session, match_id):
-    """Hits the redirect URL to find the series_id for a given match_id."""
-    url = f"https://www.espncricinfo.com/ci/engine/match/{match_id}.html"
-    try:
-        r = await session.get(url, allow_redirects=True)
-        final_url = r.url
-        # Format: https://www.espncricinfo.com/series/india-in-south-africa-2023-24-1387592/south-africa-vs-india-3rd-t20i-1387599/...
-        parts = final_url.split('/')
-        for part in parts:
-            if '-' in part and part.split('-')[-1].isdigit():
-                possible_id = part.split('-')[-1]
-                if "series" in final_url and possible_id != match_id:
-                    # Very basic heuristic: The series ID is usually the one before the match ID part.
-                    # A better way is using regex: /series/[^/]+-(\\d+)/
-                    import re
-                    match = re.search(r'/series/[^/]+-(\\d+)/', final_url)
-                    if match:
-                        return match.group(1)
-        return None
-    except Exception as e:
-        print(f"[{match_id}] Failed to resolve series ID: {e}")
-        return None
+
 
 async def fetch_page(session, series_id, match_id, inning_number=None, from_inning_over=None, retries=3):
     if from_inning_over is None and inning_number is None:
@@ -381,15 +370,10 @@ def extract_match_metadata(match_metadata, match_id):
     except Exception as e:
         print(f"[{match_id}] Failed to save metadata: {e}")
 
-async def process_match(session, match_id):
+async def process_match(session, series_id, match_id):
     final_file = os.path.join(OUTPUT_DIR, f"match_{match_id}_complete.parquet")
     if os.path.exists(final_file):
         return True # Skip
-        
-    series_id = await resolve_series_id(session, match_id)
-    if not series_id:
-        print(f"[{match_id}] Could not resolve series_id. Skipping.")
-        return False
         
     first_data = await fetch_page(session, series_id, match_id)
     if not first_data:
@@ -523,9 +507,9 @@ async def process_match(session, match_id):
 
 async def worker(name, queue, session):
     while True:
-        match_id = await queue.get()
+        series_id, match_id = await queue.get()
         try:
-            success = await process_match(session, match_id)
+            success = await process_match(session, series_id, match_id)
             if not success:
                 log_failed_match(match_id)
         except Exception as e:
@@ -536,8 +520,8 @@ async def worker(name, queue, session):
             await asyncio.sleep(0.1) # Base delay between matches
 
 async def main(limit=None):
-    match_ids = get_all_match_ids()
-    print(f"Found {len(match_ids)} total matches from events.json.")
+    matches = get_all_match_ids()
+    print(f"Found {len(matches)} total matches from events.json.")
     
     # Filter out already downloaded
     existing = set([f.split('_')[1] for f in os.listdir(OUTPUT_DIR) if f.endswith('.parquet')])
@@ -549,7 +533,7 @@ async def main(limit=None):
             failed_matches = set(line.strip() for line in f if line.strip())
             
     # Remove existing files unless they failed previously
-    pending = [m for m in match_ids if str(m) not in existing or str(m) in failed_matches]
+    pending = [(s_id, m_id) for s_id, m_id in matches if str(m_id) not in existing or str(m_id) in failed_matches]
     
     # Clear the failed_matches file since we are retrying them now
     if os.path.exists("failed_matches.txt"):
@@ -562,8 +546,8 @@ async def main(limit=None):
         print(f"Limiting to {limit} matches for this run.")
         
     queue = asyncio.Queue()
-    for m in pending:
-        queue.put_nowait(m)
+    for s_id, m_id in pending:
+        queue.put_nowait((s_id, m_id))
         
     # Start workers
     num_workers = 600 # Reduced to 100 to prevent Akamai 403 on AWS IPs
