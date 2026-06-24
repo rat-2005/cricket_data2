@@ -499,6 +499,62 @@
         {% endif %}
 
         {% endif %}
+
+        <h2 class="stats-section-title" style="margin-top: 3rem;"><i class="fas fa-star" style="color: #fbbf24;"></i> Player Favorites</h2>
+        {% if favorites %}
+        <div class="format-grid">
+            <div class="format-card" style="border-top: 4px solid #fbbf24;">
+                <h3 style="color: #fbbf24;">Batting Favorites</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Opponent</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.batting_opponent.name if favorites.batting_opponent else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Runs Against</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.batting_opponent.total) if favorites.batting_opponent else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Venue</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.batting_venue.name if favorites.batting_venue else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Runs At</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.batting_venue.total) if favorites.batting_venue else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Shot</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.favorite_shot.name if favorites.favorite_shot else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Times Played</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.favorite_shot.total) if favorites.favorite_shot else '0' }}</span>
+                </div>
+            </div>
+
+            <div class="format-card" style="border-top: 4px solid #38bdf8;">
+                <h3 style="color: #38bdf8;">Bowling Favorites</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Opponent</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.bowling_opponent.name if favorites.bowling_opponent else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Wickets Against</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.bowling_opponent.total) if favorites.bowling_opponent else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Venue</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.bowling_venue.name if favorites.bowling_venue else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Wickets At</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.bowling_venue.total) if favorites.bowling_venue else '0' }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <script>

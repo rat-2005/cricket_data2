@@ -3,278 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batter vs Bowler Face-off</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <title>Batter vs Bowler Face-off | Cricket Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --surface-color: rgba(255, 255, 255, 0.03);
-            --surface-hover: rgba(255, 255, 255, 0.08);
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --glass-border: rgba(255, 255, 255, 0.05);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
-            background-attachment: fixed;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .nav-links a {
-            padding: 0.75rem 1.5rem;
-            border-radius: 100px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--text-primary);
-            background: var(--surface-hover);
-        }
-        
-        .nav-links a.active {
-            background: var(--accent-gradient);
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 2rem;
-        }
-
-        .filters-sidebar {
-            background: var(--surface-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-            height: fit-content;
-        }
-
-        .filter-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .filter-group label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .filter-group select, .filter-group input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            appearance: none;
-        }
-        
-        .filter-group input {
-            appearance: auto;
-        }
-
-        .filter-group select:focus, .filter-group input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            overflow: hidden;
-            display: none;
-            z-index: 100;
-        }
-
-        .search-results.active {
-            display: block;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .search-item {
-            padding: 0.75rem 1rem;
-            display: block;
-            color: var(--text-primary);
-            text-decoration: none;
-            border-bottom: 1px solid var(--glass-border);
-            cursor: pointer;
-        }
-        .search-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--surface-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 1.5rem;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .stat-card h3 {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .stat-card p {
-            font-size: 2.5rem;
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-            margin: 0;
-        }
-        
-        .faceoff-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-        
-        .faceoff-header .player-box {
-            background: var(--surface-color);
-            padding: 1.5rem 3rem;
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-        }
-        
-        .faceoff-header h2 {
-            font-size: 2rem;
-            color: var(--accent-color);
-        }
-    </style>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container fade-in">
         <header>
             <div class="logo">
                 <a href="/" style="text-decoration: none;"><h1>Cricket Analytics</h1></a>
             </div>
-            <div class="nav-links" style="display: flex; gap: 1rem;">
-                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
-                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+            <div class="nav-links">
+                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler</a>
                 <a href="/faceoff" class="active"><i class="fas fa-people-arrows"></i> Face-off</a>
             </div>
         </header>
 
         <div class="dashboard">
-            <!-- Sidebar for Selection & Filters -->
-            <div class="filters-sidebar">
-                <h3><i class="fas fa-users"></i> Players</h3>
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
-                
-                <div class="filter-group">
-                    <label>Select Batter</label>
-                    <input type="text" id="batterSearch" placeholder="Search batter..." autocomplete="off">
+            <!-- Top Bar for Selection & Filters -->
+            <div class="glass-panel" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; position: relative; z-index: 50;">
+                <div style="flex: 2; min-width: 200px; position: relative;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Batter</label>
+                    <input type="text" id="batterSearch" placeholder="Search batter..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                     <div id="batterResults" class="search-results"></div>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Select Bowler</label>
-                    <input type="text" id="bowlerSearch" placeholder="Search bowler..." autocomplete="off">
+                <div style="flex: 2; min-width: 200px; position: relative;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Bowler</label>
+                    <input type="text" id="bowlerSearch" placeholder="Search bowler..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                     <div id="bowlerResults" class="search-results"></div>
                 </div>
 
-                <h3 style="margin-top: 2rem;"><i class="fas fa-filter"></i> Match Filters</h3>
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
-                
-                <div class="filter-group">
-                    <label>Format</label>
-                    <select id="filterFormat"><option value="All">All Formats</option></select>
+                <div style="flex: 1; min-width: 120px;">
+                    <label id="labelFormat" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Format</label>
+                    <select id="filterFormat" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Formats</option></select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>League / Competition</label>
-                    <select id="filterLeague"><option value="All">All Leagues</option></select>
+                <div style="flex: 1; min-width: 120px;">
+                    <label id="labelLeague" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">League</label>
+                    <select id="filterLeague" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Leagues</option></select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Match Phase</label>
-                    <select id="filterPhase">
+                <div style="flex: 1; min-width: 120px;">
+                    <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Phase</label>
+                    <select id="filterPhase" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                         <option value="All">All Phases</option>
                         <option value="Powerplay">Powerplay (1-6)</option>
                         <option value="Middle">Middle Overs (7-15)</option>
@@ -282,13 +57,16 @@
                     </select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Venue</label>
-                    <select id="filterVenue"><option value="All">All Venues</option></select>
+                <div style="flex: 1; min-width: 120px;">
+                    <label id="labelVenue" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Venue</label>
+                    <select id="filterVenue" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Venues</option></select>
                 </div>
                 
-                <div class="filter-group" style="margin-top: 2rem;">
-                    <button onclick="fetchStats()" style="width: 100%; padding: 1rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer;">
+                <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
+                        <input type="checkbox" id="splitByFormat" style="width: 16px; height: 16px; cursor: pointer;"> Split Formats
+                    </label>
+                    <button onclick="fetchStats()" style="width: 100%; padding: 0.8rem 2rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--neon-glow); transition: transform 0.2s;">
                         Compare
                     </button>
                 </div>
@@ -296,26 +74,82 @@
 
             <!-- Stats Display -->
             <div>
-                <div class="faceoff-header" id="faceoffHeader">
-                    <div class="player-box">
-                        <h3 style="color: var(--text-secondary); font-size: 1rem;">Batter</h3>
-                        <h2 id="batterName">?</h2>
-                    </div>
-                    <div>
-                        <i class="fas fa-bolt" style="font-size: 2rem; color: #fbbf24;"></i>
-                        <h3 style="margin-top: 0.5rem;">VS</h3>
-                    </div>
-                    <div class="player-box">
-                        <h3 style="color: var(--text-secondary); font-size: 1rem;">Bowler</h3>
-                        <h2 id="bowlerName">?</h2>
+                <div class="player-header">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                        <div class="glass-panel" style="flex: 1; min-width: 200px; position: relative;">
+                            <div class="stat-label">Batter</div>
+                            <a id="batterProfileLink" href="#" style="text-decoration: none; color: inherit; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                <h2 class="player-name" id="batterName" style="margin-bottom: 0;">?</h2>
+                                <div style="font-size: 0.85rem; color: var(--accent-blue); margin-bottom: 0.5rem;"><i class="fas fa-external-link-alt"></i> View Full Profile</div>
+                            </a>
+                        </div>
+                        <div class="vs-badge">VS</div>
+                        <div class="glass-panel" style="flex: 1; min-width: 200px; position: relative;">
+                            <div class="stat-label">Bowler</div>
+                            <a id="bowlerProfileLink" href="#" style="text-decoration: none; color: inherit; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                <h2 class="player-name" id="bowlerName" style="margin-bottom: 0;">?</h2>
+                                <div style="font-size: 0.85rem; color: var(--accent-blue); margin-bottom: 0.5rem;"><i class="fas fa-external-link-alt"></i> View Full Profile</div>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stats-grid" id="statsGrid">
-                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 3rem;">
-                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Search and select both a batter and a bowler to view their head-to-head records.</p>
+                <div id="loadingState">
+                    <span class="loader"></span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary); font-family: 'Outfit';">Simulating match up...</p>
+                </div>
+
+                <div id="mainContent" style="display: none;">
+                    <div class="bento-grid" id="statsGrid">
+                        <!-- Stat Cards Injected Here -->
                     </div>
+
+                    <div class="bento-grid" style="margin-top: 1.5rem;" id="chartsRow">
+                        <div class="glass-panel span-2 chart-container" style="min-height: 350px;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-bullseye" style="color: var(--accent-blue);"></i> Length Breakdown</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="lengthChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel span-2 chart-container" style="overflow-y: auto;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-history" style="color: var(--accent-purple);"></i> Recent Encounters</h3>
+                            </div>
+                            <table class="recent-matches" id="recentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Performance</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentMatchesList"></tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="glass-panel span-2 chart-container" style="min-height: 350px;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-life-ring" style="color: var(--accent-blue);"></i> Head-to-Head Wagon Wheel</h3>
+                            </div>
+                            <div class="chart-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <canvas id="wagonChart" width="400" height="400" style="width: 100%; max-width: 350px; aspect-ratio: 1/1;"></canvas>
+                                <div id="wagonLegend" style="display:none; justify-content:center; gap: 1rem; margin-top: 1rem; width: 100%; font-size: 0.85rem; color: white; font-family: 'Outfit';">
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#facc15;"></span> 1-3 Runs</div>
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#3b82f6;"></span> 4 Runs</div>
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#ef4444;"></span> 6 Runs</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="emptyState" style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+                    <i class="fas fa-search" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;"></i>
+                    <h3 style="font-family: 'Outfit'; color: white;">Awaiting Selection</h3>
+                    <p>Search and select both a batter and a bowler to view their head-to-head records.</p>
                 </div>
             </div>
         </div>
@@ -323,6 +157,12 @@
         <script>
             let currentBatterId = "{{ batter_id or '' }}";
             let currentBowlerId = "{{ bowler_id or '' }}";
+            let lengthChartInstance = null;
+            let wagonChartInstance = null;
+            
+            // Chart.js Default Config for Dark Theme
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Inter', sans-serif";
             
             async function init() {
                 try {
@@ -341,73 +181,116 @@
                     }
                     
                     if (currentBatterId && currentBowlerId) {
-                        // Pre-fetch names if IDs are in URL
                         const bRes = await fetch(`/api/athlete/${currentBatterId}`);
                         if (bRes.ok) document.getElementById('batterName').textContent = (await bRes.json()).full_name;
                         
                         const boRes = await fetch(`/api/athlete/${currentBowlerId}`);
                         if (boRes.ok) document.getElementById('bowlerName').textContent = (await boRes.json()).full_name;
                         
+                        await fetchFaceoffFilters();
                         fetchStats();
                     }
-                } catch(e) {
-                    console.error("Init failed", e);
-                }
+                } catch(e) { console.error("Init failed", e); }
             }
             
             async function fetchFaceoffFilters(sourceId = null) {
-                if (!currentBatterId || !currentBowlerId) return;
+                let currentId = '';
+                if ('Faceoff' === 'Faceoff') {
+                    if (!currentBatterId || !currentBowlerId) return;
+                } else {
+                    if (!currentAthleteId) return;
+                    currentId = currentAthleteId;
+                }
                 
                 const formatSelect = document.getElementById('filterFormat');
                 const leagueSelect = document.getElementById('filterLeague');
                 const venSelect = document.getElementById('filterVenue');
-                const phaseSelect = document.getElementById('filterPhase');
+                const oppSelect = document.getElementById('filterOpponent');
+                const bowlSelect = document.getElementById('filterBowlingType');
+                const yearSelect = document.getElementById('filterYear');
+                // phase, innings, result, recent are static or independent, but we send them
                 
-                const currentFormat = formatSelect.value || 'All';
-                const currentLeague = leagueSelect.value || 'All';
-                const currentVenue = venSelect.value || 'All';
-                const currentPhase = phaseSelect.value || 'All';
+                const currentFormat = formatSelect ? formatSelect.value || 'All' : 'All';
+                const currentLeague = leagueSelect ? leagueSelect.value || 'All' : 'All';
+                const currentVenue = venSelect ? venSelect.value || 'All' : 'All';
+                const currentOpp = oppSelect ? oppSelect.value || 'All' : 'All';
+                const currentBowl = bowlSelect ? bowlSelect.value || 'All' : 'All';
+                const currentYear = yearSelect ? yearSelect.value || 'All' : 'All';
+                const currentInnings = document.getElementById('filterInnings') ? document.getElementById('filterInnings').value || 'All' : 'All';
+                const currentResult = document.getElementById('filterResult') ? document.getElementById('filterResult').value || 'All' : 'All';
+                const currentPhase = document.getElementById('filterPhase') ? document.getElementById('filterPhase').value || 'All' : 'All';
+                const currentRecent = document.getElementById('filterRecent') ? document.getElementById('filterRecent').value || 'All' : 'All';
                 
                 try {
-                    const params = new URLSearchParams({
-                        batter_id: currentBatterId,
-                        bowler_id: currentBowlerId,
-                        format: currentFormat,
-                        league: currentLeague,
-                        venue: currentVenue,
-                        phase: currentPhase
-                    });
+                    let params;
+                    if ('Faceoff' === 'Faceoff') {
+                        params = new URLSearchParams({
+                            batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, league: currentLeague, venue: currentVenue,
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                        });
+                    } else {
+                        params = new URLSearchParams({
+                            id: currentId, format: currentFormat, league: currentLeague, venue: currentVenue,
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                        });
+                    }
                     
-                    const filterRes = await fetch(`/api/faceoff_filters?${params.toString()}`);
+                    const endpoint = 'Faceoff' === 'Batter' ? '/api/batter_filters' : ('Faceoff' === 'Bowler' ? '/api/bowler_filters' : '/api/faceoff_filters');
+                    const filterRes = await fetch(`${endpoint}?${params.toString()}`);
+                    
                     if(filterRes.ok) {
                         const filters = await filterRes.json();
                         
-                        // Rebuild but preserve selected value if it exists in new list
-                        // Skip updating the dropdown that triggered the change so its options don't disappear
-                        if (sourceId !== 'filterFormat') {
+                                                                        
+                        if (sourceId !== 'filterFormat' && formatSelect && filters.formats) {
                             formatSelect.innerHTML = '<option value="All">All Formats</option>' + filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
                             if (filters.formats.includes(currentFormat)) formatSelect.value = currentFormat;
                         }
-                        
-                        if (sourceId !== 'filterLeague') {
+                        if (sourceId !== 'filterLeague' && leagueSelect && filters.leagues) {
                             leagueSelect.innerHTML = '<option value="All">All Leagues</option>' + filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
                             if (filters.leagues.includes(currentLeague)) leagueSelect.value = currentLeague;
                         }
-                        
-                        if (sourceId !== 'filterVenue') {
+                        if (sourceId !== 'filterVenue' && venSelect && filters.venues) {
                             venSelect.innerHTML = '<option value="All">All Venues</option>' + filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
                             if (filters.venues.includes(currentVenue)) venSelect.value = currentVenue;
                         }
+                        if (sourceId !== 'filterOpponent' && oppSelect && filters.opponents) {
+                            oppSelect.innerHTML = '<option value="All">All Opponents</option>' + filters.opponents.map(o => `<option value="${o}">${o}</option>`).join('');
+                            if (filters.opponents.includes(currentOpp)) oppSelect.value = currentOpp;
+                        }
+                        if (sourceId !== 'filterBowlingType' && bowlSelect && filters.bowling_types) {
+                            bowlSelect.innerHTML = '<option value="All">All Types</option>' + filters.bowling_types.map(b => `<option value="${b}">${b}</option>`).join('');
+                            if (filters.bowling_types.includes(currentBowl)) bowlSelect.value = currentBowl;
+                        }
+                        if (sourceId !== 'filterYear' && yearSelect && filters.years) {
+                            yearSelect.innerHTML = '<option value="All">All Years</option>' + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
+                            if (filters.years.includes(parseInt(currentYear)) || filters.years.includes(currentYear)) yearSelect.value = currentYear;
+                        }
                     }
-                } catch(e) {
-                    console.error("Failed to fetch dynamic faceoff filters", e);
+                } catch(e) { 
+                    console.error(e); 
                 }
             }
 
-            // Listen for dropdown changes to cascade
             document.getElementById('filterFormat').addEventListener('change', () => fetchFaceoffFilters('filterFormat'));
             document.getElementById('filterLeague').addEventListener('change', () => fetchFaceoffFilters('filterLeague'));
             document.getElementById('filterVenue').addEventListener('change', () => fetchFaceoffFilters('filterVenue'));
+            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchFaceoffFilters('filterOpponent'));
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchFaceoffFilters('filterBowlingType'));
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchFaceoffFilters('filterYear'));
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchFaceoffFilters('filterInnings'));
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchFaceoffFilters('filterResult'));
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchFaceoffFilters('filterPhase'));
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchFaceoffFilters('filterRecent'));
+            
+
+                                                            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchFaceoffFilters('filterOpponent'));
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchFaceoffFilters('filterBowlingType'));
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchFaceoffFilters('filterYear'));
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchFaceoffFilters('filterInnings'));
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchFaceoffFilters('filterResult'));
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchFaceoffFilters('filterPhase'));
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchFaceoffFilters('filterRecent'));
             document.getElementById('filterPhase').addEventListener('change', () => fetchFaceoffFilters('filterPhase'));
 
             function setupSearch(inputId, resultsId, isBatter) {
@@ -418,23 +301,16 @@
                 input.addEventListener('input', (e) => {
                     const query = e.target.value.trim();
                     clearTimeout(timeout);
+                    if (query.length < 1) { results.classList.remove('active'); return; }
                     
-                    if (query.length < 1) {
-                        results.classList.remove('active');
-                        return;
-                    }
-                    
-                    results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;"><i class="fas fa-spinner fa-spin"></i></div>';
                     results.classList.add('active');
 
                     timeout = setTimeout(async () => {
                         try {
                             let url = `/api/search?q=${encodeURIComponent(query)}`;
-                            if (isBatter && currentBowlerId) {
-                                url += `&against_bowler=${currentBowlerId}`;
-                            } else if (!isBatter && currentBatterId) {
-                                url += `&against_batter=${currentBatterId}`;
-                            }
+                            if (isBatter && currentBowlerId) url += `&against_bowler=${currentBowlerId}`;
+                            else if (!isBatter && currentBatterId) url += `&against_batter=${currentBatterId}`;
                             
                             const response = await fetch(url);
                             const data = await response.json();
@@ -443,28 +319,19 @@
                                 results.innerHTML = data.map(p => {
                                     const safeName = (p.full_name || '').replace(/'/g, "\\'");
                                     return `
-                                    <div class="search-item" onclick="selectPlayer('${p.id}', '${safeName}', ${isBatter})">
-                                        <div>
-                                            <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${p.full_name}</div>
-                                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.country_code || 'Unknown'}</div>
-                                        </div>
-                                    </div>
-                                    `;
+                                    <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}', ${isBatter})">
+                                        <div style="font-weight: 600; font-family: 'Outfit'; color: white;">${p.full_name}</div>
+                                        <div style="font-size: 0.8rem;">${p.country_code || 'Unknown'}</div>
+                                    </div>`;
                                 }).join('');
                             } else {
-                                results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                                results.innerHTML = '<div style="padding: 1rem; text-align: center;">No players found</div>';
                             }
-                        } catch (err) {
-                            results.innerHTML = '<div style="padding: 1rem; color: #ef4444; text-align: center;">Error loading results</div>';
-                            console.error('Search failed:', err);
-                        }
+                        } catch (err) { results.innerHTML = '<div style="padding: 1rem; color: #ef4444; text-align: center;">Error</div>'; }
                     }, 300);
                 });
-
                 document.addEventListener('click', (e) => {
-                    if (!input.contains(e.target) && !results.contains(e.target)) {
-                        results.classList.remove('active');
-                    }
+                    if (!input.contains(e.target) && !results.contains(e.target)) results.classList.remove('active');
                 });
             }
             
@@ -472,17 +339,19 @@
                 if (isBatter) {
                     currentBatterId = id;
                     document.getElementById('batterName').textContent = name;
+                    document.getElementById('batterProfileLink').href = `/player/${id}`;
                     document.getElementById('batterSearch').value = name;
                     document.getElementById('batterResults').classList.remove('active');
                 } else {
                     currentBowlerId = id;
                     document.getElementById('bowlerName').textContent = name;
+                    document.getElementById('bowlerProfileLink').href = `/player/${id}`;
                     document.getElementById('bowlerSearch').value = name;
                     document.getElementById('bowlerResults').classList.remove('active');
                 }
                 
                 if (currentBatterId && currentBowlerId) {
-                    fetchFaceoffFilters().then(() => fetchStats());
+                    fetchFaceoffFilters();
                 } else {
                     const url = new URL(window.location);
                     if (isBatter) url.searchParams.set('batter_id', id);
@@ -491,62 +360,398 @@
                 }
             }
             
-            async function fetchStats() {
-                if (!currentBatterId || !currentBowlerId) {
-                    alert("Please select both a batter and a bowler.");
+            function initLengthChart(data) {
+                let canvas = document.getElementById('lengthChart');
+                const emptyMsg = document.getElementById('lengthEmpty');
+                if (emptyMsg) emptyMsg.remove();
+                canvas.style.display = 'block';
+                
+                const ctx = canvas.getContext('2d');
+                if (lengthChartInstance) lengthChartInstance.destroy();
+                
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+                
+                if(labels.length === 0) {
+                    canvas.style.display = 'none';
+                    canvas.parentElement.insertAdjacentHTML('afterbegin', '<div id="lengthEmpty" style="text-align:center; padding:2rem; color:var(--text-secondary);">No length data available</div>');
                     return;
                 }
                 
-                document.getElementById('statsGrid').innerHTML = '<div class="stat-card" style="grid-column: 1/-1;"><i class="fas fa-spinner fa-spin"></i><p>Calculating Head-to-Head...</p></div>';
+                lengthChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: [
+                                '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: '#f8fafc', font: { family: 'Inter' } } }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+
+            function initWagonChart(data) {
+                let canvas = document.getElementById('wagonChart');
                 
-                const params = new URLSearchParams({
-                    batter_id: currentBatterId,
-                    bowler_id: currentBowlerId,
-                    format: document.getElementById('filterFormat').value,
+                // Remove old listeners by cloning BEFORE drawing
+                const newCanvas = canvas.cloneNode(true);
+                canvas.parentNode.replaceChild(newCanvas, canvas);
+                canvas = newCanvas;
+                
+                // Make the canvas larger by updating its max-width dynamically
+                canvas.style.maxWidth = '500px';
+                canvas.width = 600;
+                canvas.height = 600;
+                
+                const emptyMsg = document.getElementById('wagonEmpty');
+                if (emptyMsg) emptyMsg.remove();
+                
+                let scatterData = [];
+                if (data.wagon_wheel) {
+                    scatterData = data.wagon_wheel;
+                }
+                
+                if (scatterData.length === 0) {
+                    canvas.style.display = 'none';
+                    document.getElementById('wagonLegend').style.display = 'none';
+                    canvas.parentElement.insertAdjacentHTML('afterbegin', '<div id="wagonEmpty" style="text-align:center; padding:2rem; color:var(--text-secondary);">No wagon wheel data available</div>');
+                } else {
+                    canvas.style.display = 'block';
+                    document.getElementById('wagonLegend').style.display = 'flex';
+                    
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    
+                    // Draw Grass
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.fillStyle = '#16a34a';
+                    for(let i=0; i<height; i+=40) {
+                        ctx.fillRect(0, i, width, 20);
+                    }
+                    
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(centerX, centerY) - 10;
+                    
+                    // Draw Boundary
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Draw 30 Yard Circle
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius * 0.55, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    
+                    // Draw Pitch
+                    const pitchW = 24;
+                    const pitchH = 70;
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(centerX - pitchW/2, centerY - pitchH/2, pitchW, pitchH);
+                    
+                    // Pitch Creases
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - pitchW/2, centerY - pitchH/2 + 12);
+                    ctx.lineTo(centerX + pitchW/2, centerY - pitchH/2 + 12);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - pitchW/2, centerY + pitchH/2 - 12);
+                    ctx.lineTo(centerX + pitchW/2, centerY + pitchH/2 - 12);
+                    ctx.stroke();
+                    // Field Position Labels
+                    ctx.font = '11px "Outfit", sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const labelR = radius + 1;
+                    const labels = [
+                        { name: 'Square Leg',      angle: 0   },
+                        { name: 'Fine Leg',        angle: 45  },
+                        { name: 'Third Man',       angle: 135 },
+                        { name: 'Backward Point',  angle: 155 },
+                        { name: 'Point',           angle: 180 },
+                        { name: 'Cover',           angle: 225 },
+                        { name: 'Mid Off',         angle: 250 },
+                        { name: 'Straight',        angle: 270 },
+                        { name: 'Mid On',          angle: 290 },
+                        { name: 'Mid Wicket',      angle: 325 },
+                    ];
+                    labels.forEach(l => {
+                        const a = l.angle * Math.PI / 180;
+                        const lx = centerX - Math.cos(a) * labelR;
+                        const ly = centerY + Math.sin(a) * labelR;
+                        ctx.fillText(l.name, lx, ly);
+                    });
+                    let drawnSpokes = [];
+                    
+                    const batOriginY = centerY + 25; // Bottom popping crease
+                    
+                    // Draw Spokes
+                    scatterData.forEach(w => {
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, batOriginY);
+                        
+                        const mappedX = centerX + w.x * radius;
+                        const mappedY = batOriginY - w.y * radius;
+                        ctx.lineTo(mappedX, mappedY);
+                        
+                        let color = '#facc15'; // 1-3
+                        if (w.runs === 4) color = '#3b82f6';
+                        if (w.runs === 6) color = '#ef4444';
+                        if (w.runs === 0) color = 'rgba(255,255,255,0.3)';
+                        
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = w.runs >= 4 ? 2.5 : 1.5;
+                        ctx.stroke();
+                        
+                        drawnSpokes.push({
+                            endX: mappedX,
+                            endY: mappedY,
+                            data: w
+                        });
+                    });
+                    
+                    // Interactivity
+                    let tooltip = document.getElementById('wagonTooltip');
+                    if (!tooltip) {
+                        tooltip = document.createElement('div');
+                        tooltip.id = 'wagonTooltip';
+                        tooltip.style.cssText = 'position:fixed; display:none; background:rgba(15,23,42,0.95); border:1px solid rgba(255,255,255,0.1); padding:1rem; border-radius:8px; pointer-events:none; z-index:1000; font-family:"Outfit", sans-serif; font-size:0.85rem; color:white; box-shadow: 0 8px 16px rgba(0,0,0,0.5); backdrop-filter: blur(4px); min-width: 150px;';
+                        document.body.appendChild(tooltip);
+                    }
+                    
+                    function pointToLineDistance(px, py, x1, y1, x2, y2) {
+                        const A = px - x1; const B = py - y1; const C = x2 - x1; const D = y2 - y1;
+                        const dot = A * C + B * D;
+                        const len_sq = C * C + D * D;
+                        let param = -1;
+                        if (len_sq != 0) param = dot / len_sq;
+                        let xx, yy;
+                        if (param < 0) { xx = x1; yy = y1; }
+                        else if (param > 1) { xx = x2; yy = y2; }
+                        else { xx = x1 + param * C; yy = y1 + param * D; }
+                        const dx = px - xx; const dy = py - yy;
+                        return Math.sqrt(dx * dx + dy * dy);
+                    }
+                    
+                    canvas.addEventListener('mousemove', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        const mx = (e.clientX - rect.left) * scaleX;
+                        const my = (e.clientY - rect.top) * scaleY;
+                        
+                        let closest = null;
+                        let minDist = 12; // hit radius in canvas pixels
+                        
+                        drawnSpokes.forEach(spoke => {
+                            const d = pointToLineDistance(mx, my, centerX, centerY, spoke.endX, spoke.endY);
+                            if (d < minDist) {
+                                minDist = d;
+                                closest = spoke;
+                            }
+                        });
+                        
+                        if (closest) {
+                            tooltip.style.display = 'block';
+                            tooltip.style.left = (e.clientX + 15) + 'px';
+                            tooltip.style.top = (e.clientY + 15) + 'px';
+                            
+                            let runColor = '#facc15';
+                            if (closest.data.runs === 4) runColor = '#3b82f6';
+                            if (closest.data.runs === 6) runColor = '#ef4444';
+                            if (closest.data.runs === 0) runColor = '#94a3b8';
+                            
+                            tooltip.innerHTML = `
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${runColor};"></span>
+                                    <span style="font-weight:600; font-size:1rem;">${closest.data.runs} Runs</span>
+                                </div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Shot: <span style="color:white; font-weight:500;">${closest.data.shot_type && closest.data.shot_type !== 'Unknown' ? closest.data.shot_type : 'Not Specified'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Over: <span style="color:white; font-weight:500;">${closest.data.over - 1}${closest.data.ball > 0 ? '.' + closest.data.ball : ''}</span></div>
+                                <div style="color:var(--text-secondary);">Date: <span style="color:white; font-weight:500;">${closest.data.date || 'Unknown'}</span></div>
+                            `;
+                            canvas.style.cursor = 'pointer';
+                        } else {
+                            tooltip.style.display = 'none';
+                            canvas.style.cursor = 'default';
+                        }
+                    });
+                    
+                    canvas.addEventListener('mouseleave', () => {
+                        tooltip.style.display = 'none';
+                    });
+                }
+            }
+
+            async function fetchStats() {
+                if (!currentBatterId || !currentBowlerId) {
+                    alert("Please select both a Batter and a Bowler before comparing.");
+                    return;
+                }
+                
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'flex';
+                
+                const splitMode = document.getElementById('splitByFormat').checked;
+                
+                const baseParams = new URLSearchParams({
+                    batter_id: currentBatterId, bowler_id: currentBowlerId,
                     league: document.getElementById('filterLeague').value,
                     phase: document.getElementById('filterPhase').value,
                     venue: document.getElementById('filterVenue').value
                 });
                 
                 try {
-                    const res = await fetch(`/api/stats/faceoff?${params.toString()}`);
-                    const data = await res.json();
+                    document.getElementById('mainContent').style.display = 'block';
                     
-                    document.getElementById('statsGrid').innerHTML = `
-                        <div class="stat-card">
-                            <i class="fas fa-baseball-bat-ball"></i>
-                            <h3>Runs Scored</h3>
-                            <p>${data.runs}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-hashtag"></i>
-                            <h3>Balls Faced</h3>
-                            <p>${data.balls}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-bullseye"></i>
-                            <h3>Dismissals</h3>
-                            <p>${data.dismissals}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-bolt"></i>
-                            <h3>Strike Rate</h3>
-                            <p>${data.sr}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-chart-line"></i>
-                            <h3>Batting Avg</h3>
-                            <p>${data.avg}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-fire"></i>
-                            <h3>Boundaries (4s/6s)</h3>
-                            <p>${data.boundaries} / ${data.sixes}</p>
-                        </div>
-                    `;
+                    if (splitMode) {
+                        document.getElementById('chartsRow').style.display = 'none';
+                        document.getElementById('statsGrid').className = '';
+                        
+                        const formats = ['Test', 'ODI', 'T20I', 'T20'];
+                        let html = '';
+                        
+                        for (let fmt of formats) {
+                            baseParams.set('format', fmt);
+                            const res = await fetch(`/api/stats/faceoff?${baseParams.toString()}`);
+                            const data = await res.json();
+                            
+                            if (data.balls > 0) {
+                                html += `
+                                <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--accent-blue); display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-trophy"></i> ${fmt} Breakdown</h3>
+                                <div class="bento-grid">
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Runs Scored</div>
+                                        <div class="stat-value">${data.runs}</div>
+                                        <div class="stat-subtext">Avg: ${data.avg}</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Strike Rate</div>
+                                        <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                                        <div class="stat-subtext">Off ${data.balls} balls</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Dismissals</div>
+                                        <div class="stat-value" style="color: var(--accent-red); background: none; -webkit-text-fill-color: var(--accent-red);">${data.dismissals}</div>
+                                        <div class="stat-subtext">${data.dot_pct}% Dot Balls</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Boundaries</div>
+                                        <div class="stat-value">${data.boundaries}<span style="font-size:1.5rem; color:var(--text-secondary);">/</span>${data.sixes}</div>
+                                        <div class="stat-subtext">Fours / Sixes</div>
+                                    </div>
+                                </div>
+                                `;
+                            }
+                        }
+                        
+                        if (html === '') {
+                            html = '<div style="text-align:center; padding: 3rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); border-radius: 12px;"><i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 1rem; display:block;"></i>No historical matchups found for the selected filters.</div>';
+                        }
+                        
+                        document.getElementById('statsGrid').innerHTML = html;
+                        document.getElementById('loadingState').style.display = 'none';
+                        
+                    } else {
+                        document.getElementById('chartsRow').style.display = 'grid';
+                        document.getElementById('statsGrid').className = 'bento-grid';
+                        baseParams.set('format', document.getElementById('filterFormat').value);
+                        
+                        const res = await fetch(`/api/stats/faceoff?${baseParams.toString()}`);
+                        const data = await res.json();
+                        
+                        document.getElementById('statsGrid').innerHTML = `
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Runs Scored</div>
+                                <div class="stat-value">${data.runs}</div>
+                                <div class="stat-subtext">Avg: ${data.avg}</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Strike Rate</div>
+                                <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                                <div class="stat-subtext">Off ${data.balls} balls</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Dismissals</div>
+                                <div class="stat-value" style="color: var(--accent-red); background: none; -webkit-text-fill-color: var(--accent-red);">${data.dismissals}</div>
+                                <div class="stat-subtext">${data.dot_pct}% Dot Balls</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Boundaries</div>
+                                <div class="stat-value">${data.boundaries}<span style="font-size:1.5rem; color:var(--text-secondary);">/</span>${data.sixes}</div>
+                                <div class="stat-subtext">Fours / Sixes</div>
+                            </div>
+                            <div class="glass-panel stat-box span-2">
+                                <div class="stat-label">Favorite Shot</div>
+                                <div class="stat-value small">${data.favorite_shot}</div>
+                            </div>
+                            <div class="glass-panel stat-box span-2">
+                                <div class="stat-label">Dangerous Shot</div>
+                                <div class="stat-value small">${data.dangerous_shot}</div>
+                            </div>
+                        `;
+                        
+                        // Render Chart
+                        if (data.length_data) {
+                            initLengthChart(data.length_data);
+                        }
+                        if (data.wagon_wheel) {
+                            initWagonChart(data);
+                        }
+                        
+                        // Recent Matches
+                        const recentList = document.getElementById('recentMatchesList');
+                        if (data.recent_matches && data.recent_matches.length > 0) {
+                            recentList.innerHTML = data.recent_matches.map(rm => `
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600; color: white;">${rm.date}</div>
+                                        <span class="badge ${rm.source.toLowerCase()}">${rm.source}</span>
+                                    </td>
+                                    <td>
+                                        <div style="font-family: 'Outfit'; font-size: 1.1rem; font-weight: 600;">${rm.runs} <span style="font-size:0.8rem; color:var(--text-secondary);">runs</span></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${rm.balls} balls</div>
+                                    </td>
+                                    <td>
+                                        ${rm.dismissals > 0 
+                                            ? `<span style="color: var(--accent-red); font-weight: 600;"><i class="fas fa-skull" style="margin-right:0.25rem;"></i> Out</span>` 
+                                            : `<span style="color: var(--accent-green); font-weight: 600;"><i class="fas fa-shield-alt" style="margin-right:0.25rem;"></i> Not Out</span>`}
+                                    </td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            recentList.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No recent match data available</td></tr>';
+                        }
+                        
+                        document.getElementById('loadingState').style.display = 'none';
+                    }
+                    
                 } catch(e) {
-                    console.error("Fetch failed", e);
-                    document.getElementById('statsGrid').innerHTML = '<p style="grid-column: 1/-1; text-align:center;">No match data found for this head-to-head with the given filters.</p>';
+                    console.error(e);
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('emptyState').innerHTML = '<p style="color:var(--accent-red);">Failed to load faceoff data.</p>';
                 }
             }
             

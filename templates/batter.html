@@ -3,372 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batter Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <title>Batter Analytics | Cricket Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --surface-color: rgba(255, 255, 255, 0.03);
-            --surface-hover: rgba(255, 255, 255, 0.08);
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --glass-border: rgba(255, 255, 255, 0.05);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
-            background-attachment: fixed;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .nav-links a {
-            padding: 0.75rem 1.5rem;
-            border-radius: 100px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--text-primary);
-            background: var(--surface-hover);
-        }
-        
-        .nav-links a.active {
-            background: var(--accent-gradient);
-        }
-
-        .search-container {
-            max-width: 600px;
-            margin: 4rem auto;
-            position: relative;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 1.5rem 1.5rem 1.5rem 4rem;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-container input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-            background: rgba(0, 0, 0, 0.6);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-        }
-
-        .search-results {
-            position: absolute;
-            top: calc(100% + 1rem);
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            overflow: hidden;
-            display: none;
-            z-index: 100;
-        }
-
-        .search-results.active {
-            display: block;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .search-item {
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: var(--text-primary);
-            text-decoration: none;
-            border-bottom: 1px solid var(--glass-border);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .search-item:last-child {
-            border-bottom: none;
-        }
-
-        .search-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 2rem;
-        }
-
-        .filters-sidebar {
-            background: var(--surface-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-            height: fit-content;
-        }
-
-        .filter-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .filter-group label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .filter-group select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            appearance: none;
-        }
-        
-        .filter-group select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--surface-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 1.5rem;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .stat-card h3 {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .stat-card p {
-            font-size: 2.5rem;
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-            margin: 0;
-        }
-        
-        .player-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .player-header h2 {
-            font-size: 2.5rem;
-        }
-    </style>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container fade-in">
         <header>
             <div class="logo">
                 <a href="/" style="text-decoration: none;"><h1>Cricket Analytics</h1></a>
             </div>
-            <div class="nav-links" style="display: flex; gap: 1rem;">
-                <a href="/batter" class="active"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
-                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+            <div class="nav-links">
+                <a href="/batter" class="active"><i class="fas fa-baseball-bat-ball"></i> Batter</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler</a>
                 <a href="/faceoff"><i class="fas fa-people-arrows"></i> Face-off</a>
-                <a href="/player"><i class="fas fa-user"></i> Player Profile</a>
             </div>
         </header>
 
-        {% if not athlete_id %}
-        <!-- Search State -->
-        <div class="search-container">
-            <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">Search for a Batter</h2>
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="playerSearch" placeholder="Type a player name..." autocomplete="off">
-            <div id="searchResults" class="search-results"></div>
-        </div>
-        
-        <script>
-            const searchInput = document.getElementById('playerSearch');
-            const searchResults = document.getElementById('searchResults');
-            let searchTimeout;
-
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.trim();
-                clearTimeout(searchTimeout);
-                
-                if (query.length < 1) {
-                    searchResults.classList.remove('active');
-                    return;
-                }
-                
-                searchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
-                searchResults.classList.add('active');
-
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-                        const data = await response.json();
-                        
-                        if (data.length > 0) {
-                            searchResults.innerHTML = data.map(p => {
-                                const safeName = (p.full_name || '').replace(/'/g, "\\'");
-                                return `
-                                <a href="/batter?id=${p.id}" class="search-item">
-                                    <div>
-                                        <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${p.full_name}</div>
-                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.country_code || 'Unknown'}</div>
-                                    </div>
-                                </a>
-                                `;
-                            }).join('');
-                        } else {
-                            searchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
-                        }
-                    } catch (err) {
-                        searchResults.innerHTML = '<div style="padding: 1rem; color: #ef4444; text-align: center;">Error loading results</div>';
-                        console.error('Search failed:', err);
-                    }
-                }, 300);
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.classList.remove('active');
-                }
-            });
-        </script>
-        
-        {% else %}
-        <!-- Analytics State -->
-        <div id="playerHeader" class="player-header">
-            <!-- Populated via JS -->
-        </div>
-
         <div class="dashboard">
-            <!-- Cascading Dropdowns -->
-            <div class="filters-sidebar">
-                <h3><i class="fas fa-filter"></i> Filters</h3>
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
-                
-                <div class="filter-group">
-                    <label>Format</label>
-                    <select id="filterFormat">
-                        <option value="All">All Formats</option>
-                    </select>
+            <!-- Top Bar for Selection & Filters -->
+            <div class="glass-panel" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; position: relative; z-index: 50;">
+                <div style="flex: 2; min-width: 250px; position: relative;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Select Batter</label>
+                    <input type="text" id="athleteSearch" placeholder="Search batter..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelFormat" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Format</label>
+                    <select id="filterFormat" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Formats</option></select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>League / Competition</label>
-                    <select id="filterLeague">
-                        <option value="All">All Leagues</option>
-                    </select>
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelLeague" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">League</label>
+                    <select id="filterLeague" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Leagues</option></select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Opponent Team</label>
-                    <select id="filterOpponent">
-                        <option value="All">All Opponents</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>Match Phase</label>
-                    <select id="filterPhase">
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Phase</label>
+                    <select id="filterPhase" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                         <option value="All">All Phases</option>
                         <option value="Powerplay">Powerplay (1-6)</option>
                         <option value="Middle">Middle Overs (7-15)</option>
@@ -376,169 +51,681 @@
                     </select>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Venue</label>
-                    <select id="filterVenue">
-                        <option value="All">All Venues</option>
-                    </select>
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelVenue" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Venue</label>
+                    <select id="filterVenue" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Venues</option></select>
                 </div>
                 
-                <div class="filter-group" style="margin-top: 2rem;">
-                    <button onclick="fetchStats()" style="width: 100%; padding: 1rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer;">
-                        Apply Filters
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelOpponent" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Opponent</label>
+                    <select id="filterOpponent" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Opponents</option></select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelBowlingType" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Bowling Type</label>
+                    <select id="filterBowlingType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Types</option></select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelInnings" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Innings</label>
+                    <select id="filterInnings" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                        <option value="All">All Innings</option>
+                        <option value="1">1st Innings</option>
+                        <option value="2">2nd Innings</option>
+                        <option value="3">3rd Innings</option>
+                        <option value="4">4th Innings</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelResult" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Match Result</label>
+                    <select id="filterResult" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                        <option value="All">All Results</option>
+                        <option value="Won">Won</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Year</label>
+                    <select id="filterYear" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Years</option></select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelRecent" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Recent Matches</label>
+                    <select id="filterRecent" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                        <option value="All">All Matches</option>
+                        <option value="5">Last 5 Matches</option>
+                        <option value="10">Last 10 Matches</option>
+                        <option value="20">Last 20 Matches</option>
+                    </select>
+                </div>
+
+                <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
+                        <input type="checkbox" id="splitByFormat" style="width: 16px; height: 16px; cursor: pointer;"> Split Formats
+                    </label>
+                    <button onclick="fetchStats()" style="padding: 0.8rem 2rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--neon-glow); transition: transform 0.2s;">
+                        Analyze
                     </button>
                 </div>
             </div>
 
             <!-- Stats Display -->
             <div>
-                <div class="stats-grid" id="statsGrid">
-                    <div class="stat-card"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>
+                <div class="player-header">
+                    <div class="glass-panel" style="display: inline-block; padding: 1.5rem 4rem;">
+                        <a id="athleteProfileLink" href="#" style="text-decoration: none; color: inherit; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                            <h2 class="player-name" id="athleteName" style="margin-bottom: 0;">?</h2>
+                            <div style="font-size: 0.85rem; color: var(--accent-blue); margin-bottom: 0.5rem;"><i class="fas fa-external-link-alt"></i> View Full Profile</div>
+                        </a>
+                        <div style="color: var(--text-secondary); font-family: 'Outfit';">Career Batting Overview</div>
+                    </div>
+                </div>
+                
+                <div id="loadingState">
+                    <span class="loader"></span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary); font-family: 'Outfit';">Fetching Analytics...</p>
+                </div>
+
+                <div id="mainContent" style="display: none;">
+                    <div class="bento-grid" id="statsGrid">
+                        <!-- Basic Stats Injected Here -->
+                    </div>
+
+                    <div class="bento-grid" style="margin-top: 1.5rem;" id="chartsRow">
+                        <div class="glass-panel span-2 chart-container" style="min-height: 350px;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-life-ring" style="color: var(--accent-blue);"></i> Wagon Wheel</h3>
+                            </div>
+                            <div class="chart-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <canvas id="wagonChart" width="400" height="400" style="width: 100%; max-width: 350px; aspect-ratio: 1/1;"></canvas>
+                                <div id="wagonLegend" style="display:none; justify-content:center; gap: 1rem; margin-top: 1rem; width: 100%; font-size: 0.85rem; color: white; font-family: 'Outfit';">
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#facc15;"></span> 1-3 Runs</div>
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#3b82f6;"></span> 4 Runs</div>
+                                    <div style="display:flex; align-items:center; gap: 0.5rem;"><span style="width: 16px; height: 8px; background:#ef4444;"></span> 6 Runs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shot Mastery -->
+                        <div class="glass-panel span-2 chart-container" style="min-height: 350px;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-medal" style="color: var(--accent-green);"></i> Shot Mastery</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="shotChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Vulnerability Matrix -->
+                        <div class="glass-panel span-4 chart-container" style="min-height: 300px;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-skull-crossbones" style="color: var(--accent-red);"></i> Vulnerability: Dismissals by Length</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="vulnChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="emptyState" style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+                    <i class="fas fa-search" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;"></i>
+                    <h3 style="font-family: 'Outfit'; color: white;">Awaiting Selection</h3>
+                    <p>Search and select a batter to view their deep analytics.</p>
                 </div>
             </div>
         </div>
         
         <script>
-            const athleteId = "{{ athlete_id }}";
+            let currentAthleteId = "{{ athlete_id or '' }}";
+            let wagonChartInstance = null;
+            let shotChartInstance = null;
+            let vulnChartInstance = null;
             
-            // Load filters and initial stats
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            
             async function init() {
                 try {
-                    // Fetch metadata
-                    const playerRes = await fetch(`/api/athlete/${athleteId}`);
-                    if(playerRes.ok) {
-                        const player = await playerRes.json();
-                        document.getElementById('playerHeader').innerHTML = `
-                            <h2>${player.full_name}</h2>
-                            <span style="background: var(--surface-color); padding: 0.5rem 1rem; border-radius: 100px; color: var(--text-secondary);">${player.country_code || 'Unknown'}</span>
-                        `;
+                    const filterRes = await fetch(`/api/filters`);
+                    if(filterRes.ok) {
+                        const filters = await filterRes.json();
+                        const formatSelect = document.getElementById('filterFormat');
+                        formatSelect.innerHTML += filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
+                        const leagueSelect = document.getElementById('filterLeague');
+                        leagueSelect.innerHTML += filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
+                        const venSelect = document.getElementById('filterVenue');
+                        venSelect.innerHTML += filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
                     }
                     
-                    // Initialize dynamic filters
-                    await fetchDynamicFilters();
-                    
-                    // Also fetch opponents globally (since opponent isn't dynamic in backend yet)
-                    const globalRes = await fetch('/api/filters');
-                    if (globalRes.ok) {
-                        const globalData = await globalRes.json();
-                        const oppSelect = document.getElementById('filterOpponent');
-                        oppSelect.innerHTML = '<option value="All">All Opponents</option>' + globalData.opponents.map(o => `<option value="${o}">${o}</option>`).join('');
+                    if (currentAthleteId) {
+                        const bRes = await fetch(`/api/athlete/${currentAthleteId}`);
+                        if (bRes.ok) document.getElementById('athleteName').textContent = (await bRes.json()).full_name;
+                        await fetchBatterFilters();
+                        fetchStats();
                     }
-        
-                    
-                    fetchStats();
-                } catch(e) {
-                    console.error("Initialization failed", e);
-                }
+                } catch(e) { console.error("Init failed", e); }
             }
             
-            
-            async function fetchDynamicFilters(sourceId = null) {
+            async function fetchBatterFilters(sourceId = null) {
+                let currentId = '';
+                if ('Batter' === 'Faceoff') {
+                    if (!currentBatterId || !currentBowlerId) return;
+                } else {
+                    if (!currentAthleteId) return;
+                    currentId = currentAthleteId;
+                }
+                
                 const formatSelect = document.getElementById('filterFormat');
                 const leagueSelect = document.getElementById('filterLeague');
                 const venSelect = document.getElementById('filterVenue');
-                const phaseSelect = document.getElementById('filterPhase');
+                const oppSelect = document.getElementById('filterOpponent');
+                const bowlSelect = document.getElementById('filterBowlingType');
+                const yearSelect = document.getElementById('filterYear');
+                // phase, innings, result, recent are static or independent, but we send them
                 
-                const currentFormat = formatSelect.value || 'All';
-                const currentLeague = leagueSelect.value || 'All';
-                const currentVenue = venSelect.value || 'All';
-                const currentPhase = phaseSelect.value || 'All';
+                const currentFormat = formatSelect ? formatSelect.value || 'All' : 'All';
+                const currentLeague = leagueSelect ? leagueSelect.value || 'All' : 'All';
+                const currentVenue = venSelect ? venSelect.value || 'All' : 'All';
+                const currentOpp = oppSelect ? oppSelect.value || 'All' : 'All';
+                const currentBowl = bowlSelect ? bowlSelect.value || 'All' : 'All';
+                const currentYear = yearSelect ? yearSelect.value || 'All' : 'All';
+                const currentInnings = document.getElementById('filterInnings') ? document.getElementById('filterInnings').value || 'All' : 'All';
+                const currentResult = document.getElementById('filterResult') ? document.getElementById('filterResult').value || 'All' : 'All';
+                const currentPhase = document.getElementById('filterPhase') ? document.getElementById('filterPhase').value || 'All' : 'All';
+                const currentRecent = document.getElementById('filterRecent') ? document.getElementById('filterRecent').value || 'All' : 'All';
                 
                 try {
-                    const params = new URLSearchParams({
-                        id: athleteId,
-                        format: currentFormat,
-                        league: currentLeague,
-                        venue: currentVenue,
-                        phase: currentPhase
-                    });
+                    let params;
+                    if ('Batter' === 'Faceoff') {
+                        params = new URLSearchParams({
+                            batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, league: currentLeague, venue: currentVenue,
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                        });
+                    } else {
+                        params = new URLSearchParams({
+                            id: currentId, format: currentFormat, league: currentLeague, venue: currentVenue,
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                        });
+                    }
                     
-                    const filterRes = await fetch(`/api/batter_filters?${params.toString()}`);
+                    const endpoint = 'Batter' === 'Batter' ? '/api/batter_filters' : ('Batter' === 'Bowler' ? '/api/bowler_filters' : '/api/faceoff_filters');
+                    const filterRes = await fetch(`${endpoint}?${params.toString()}`);
+                    
                     if(filterRes.ok) {
                         const filters = await filterRes.json();
                         
-                        if (sourceId !== 'filterFormat') {
+                                                                        
+                        if (sourceId !== 'filterFormat' && formatSelect && filters.formats) {
                             formatSelect.innerHTML = '<option value="All">All Formats</option>' + filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
                             if (filters.formats.includes(currentFormat)) formatSelect.value = currentFormat;
                         }
-                        
-                        if (sourceId !== 'filterLeague') {
+                        if (sourceId !== 'filterLeague' && leagueSelect && filters.leagues) {
                             leagueSelect.innerHTML = '<option value="All">All Leagues</option>' + filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
                             if (filters.leagues.includes(currentLeague)) leagueSelect.value = currentLeague;
                         }
-                        
-                        if (sourceId !== 'filterVenue') {
+                        if (sourceId !== 'filterVenue' && venSelect && filters.venues) {
                             venSelect.innerHTML = '<option value="All">All Venues</option>' + filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
                             if (filters.venues.includes(currentVenue)) venSelect.value = currentVenue;
                         }
+                        if (sourceId !== 'filterOpponent' && oppSelect && filters.opponents) {
+                            oppSelect.innerHTML = '<option value="All">All Opponents</option>' + filters.opponents.map(o => `<option value="${o}">${o}</option>`).join('');
+                            if (filters.opponents.includes(currentOpp)) oppSelect.value = currentOpp;
+                        }
+                        if (sourceId !== 'filterBowlingType' && bowlSelect && filters.bowling_types) {
+                            bowlSelect.innerHTML = '<option value="All">All Types</option>' + filters.bowling_types.map(b => `<option value="${b}">${b}</option>`).join('');
+                            if (filters.bowling_types.includes(currentBowl)) bowlSelect.value = currentBowl;
+                        }
+                        if (sourceId !== 'filterYear' && yearSelect && filters.years) {
+                            yearSelect.innerHTML = '<option value="All">All Years</option>' + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
+                            if (filters.years.includes(parseInt(currentYear)) || filters.years.includes(currentYear)) yearSelect.value = currentYear;
+                        }
                     }
-                } catch(e) {
-                    console.error("Failed to fetch dynamic filters", e);
+                } catch(e) { 
+                    console.error(e); 
                 }
             }
 
-            document.getElementById('filterFormat').addEventListener('change', () => fetchDynamicFilters('filterFormat'));
-            document.getElementById('filterLeague').addEventListener('change', () => fetchDynamicFilters('filterLeague'));
-            document.getElementById('filterVenue').addEventListener('change', () => fetchDynamicFilters('filterVenue'));
-            document.getElementById('filterPhase').addEventListener('change', () => fetchDynamicFilters('filterPhase'));
+            document.getElementById('filterFormat').addEventListener('change', () => fetchBatterFilters('filterFormat'));
+            document.getElementById('filterLeague').addEventListener('change', () => fetchBatterFilters('filterLeague'));
+            document.getElementById('filterVenue').addEventListener('change', () => fetchBatterFilters('filterVenue'));
+            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchBatterFilters('filterOpponent'));
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchBatterFilters('filterBowlingType'));
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchBatterFilters('filterYear'));
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchBatterFilters('filterInnings'));
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBatterFilters('filterResult'));
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBatterFilters('filterPhase'));
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBatterFilters('filterRecent'));
+            
+
+                                                            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchBatterFilters('filterOpponent'));
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchBatterFilters('filterBowlingType'));
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchBatterFilters('filterYear'));
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchBatterFilters('filterInnings'));
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBatterFilters('filterResult'));
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBatterFilters('filterPhase'));
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBatterFilters('filterRecent'));
+
+            function setupSearch() {
+                const input = document.getElementById('athleteSearch');
+                const results = document.getElementById('searchResults');
+                let timeout;
+                
+                input.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    clearTimeout(timeout);
+                    if (query.length < 1) { results.classList.remove('active'); return; }
+                    
+                    results.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;"><i class="fas fa-spinner fa-spin"></i></div>';
+                    results.classList.add('active');
+
+                    timeout = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                            const data = await response.json();
+                            
+                            if(data.length > 0) {
+                                results.innerHTML = data.map(p => {
+                                    const safeName = (p.full_name || '').replace(/'/g, "\\'");
+                                    return `
+                                    <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}')">
+                                        <div style="font-weight: 600; font-family: 'Outfit'; color: white;">${p.full_name}</div>
+                                        <div style="font-size: 0.8rem;">${p.country_code || 'Unknown'}</div>
+                                    </div>`;
+                                }).join('');
+                            } else {
+                                results.innerHTML = '<div style="padding: 1rem; text-align: center;">No players found</div>';
+                            }
+                        } catch (err) { results.innerHTML = '<div style="padding: 1rem; color: #ef4444; text-align: center;">Error</div>'; }
+                    }, 300);
+                });
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !results.contains(e.target)) results.classList.remove('active');
+                });
+            }
+            
+            function selectPlayer(id, name) {
+                currentAthleteId = id;
+                document.getElementById('athleteName').textContent = name;
+                document.getElementById('athleteProfileLink').href = `/player/${id}`;
+                document.getElementById('athleteSearch').value = name;
+                document.getElementById('searchResults').classList.remove('active');
+                
+                fetchBatterFilters();
+                
+                const url = new URL(window.location);
+                url.searchParams.set('id', id);
+                window.history.pushState({}, '', url);
+            }
+            
+            function initCharts(data) {
+                // Wagon Wheel Chart (Custom HTML5 Canvas)
+                let canvas = document.getElementById('wagonChart');
+                
+                // Remove old listeners by cloning BEFORE drawing
+                const newCanvas = canvas.cloneNode(true);
+                canvas.parentNode.replaceChild(newCanvas, canvas);
+                canvas = newCanvas;
+                
+                // Make the canvas larger by updating its max-width dynamically
+                canvas.style.maxWidth = '500px';
+                canvas.width = 600;
+                canvas.height = 600;
+                
+                const emptyMsg = document.getElementById('wagonEmpty');
+                if (emptyMsg) emptyMsg.remove();
+                
+                let scatterData = [];
+                if (data.wagon_wheel) {
+                    scatterData = data.wagon_wheel;
+                }
+                
+                if (scatterData.length === 0) {
+                    canvas.style.display = 'none';
+                    document.getElementById('wagonLegend').style.display = 'none';
+                    canvas.parentElement.insertAdjacentHTML('afterbegin', '<div id="wagonEmpty" style="text-align:center; padding:2rem; color:var(--text-secondary);">No wagon wheel data available</div>');
+                } else {
+                    canvas.style.display = 'block';
+                    document.getElementById('wagonLegend').style.display = 'flex';
+                    
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    
+                    // Draw Grass
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.fillStyle = '#16a34a';
+                    for(let i=0; i<height; i+=40) {
+                        ctx.fillRect(0, i, width, 20);
+                    }
+                    
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(centerX, centerY) - 10;
+                    
+                    // Draw Boundary
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Draw 30 Yard Circle
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius * 0.55, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    
+                    // Draw Pitch
+                    const pitchW = 24;
+                    const pitchH = 70;
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(centerX - pitchW/2, centerY - pitchH/2, pitchW, pitchH);
+                    
+                    // Pitch Creases
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - pitchW/2, centerY - pitchH/2 + 12);
+                    ctx.lineTo(centerX + pitchW/2, centerY - pitchH/2 + 12);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - pitchW/2, centerY + pitchH/2 - 12);
+                    ctx.lineTo(centerX + pitchW/2, centerY + pitchH/2 - 12);
+                    ctx.stroke();
+                    // Field Position Labels
+                    ctx.font = '11px "Outfit", sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const labelR = radius + 1;
+                    const labels = [
+                        { name: 'Square Leg',      angle: 0   },
+                        { name: 'Fine Leg',        angle: 45  },
+                        { name: 'Third Man',       angle: 135 },
+                        { name: 'Backward Point',  angle: 155 },
+                        { name: 'Point',           angle: 180 },
+                        { name: 'Cover',           angle: 225 },
+                        { name: 'Mid Off',         angle: 250 },
+                        { name: 'Straight',        angle: 270 },
+                        { name: 'Mid On',          angle: 290 },
+                        { name: 'Mid Wicket',      angle: 325 },
+                    ];
+                    labels.forEach(l => {
+                        const a = l.angle * Math.PI / 180;
+                        const lx = centerX - Math.cos(a) * labelR;
+                        const ly = centerY + Math.sin(a) * labelR;
+                        ctx.fillText(l.name, lx, ly);
+                    });
+                    
+                    let drawnSpokes = [];
+                    
+                    const batOriginY = centerY + 25; // Bottom popping crease
+                    
+                    // Draw Spokes
+                    scatterData.forEach(w => {
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, batOriginY);
+                        
+                        const mappedX = centerX + w.x * radius;
+                        const mappedY = batOriginY - w.y * radius;
+                        ctx.lineTo(mappedX, mappedY);
+                        
+                        let color = '#facc15'; // 1-3
+                        if (w.runs === 4) color = '#3b82f6';
+                        if (w.runs === 6) color = '#ef4444';
+                        if (w.runs === 0) color = 'rgba(255,255,255,0.3)';
+                        
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = w.runs >= 4 ? 2.5 : 1.5;
+                        ctx.stroke();
+                        
+                        drawnSpokes.push({
+                            endX: mappedX,
+                            endY: mappedY,
+                            data: w
+                        });
+                    });
+                    
+                    // Interactivity
+                    let tooltip = document.getElementById('wagonTooltip');
+                    if (!tooltip) {
+                        tooltip = document.createElement('div');
+                        tooltip.id = 'wagonTooltip';
+                        tooltip.style.cssText = 'position:fixed; display:none; background:rgba(15,23,42,0.95); border:1px solid rgba(255,255,255,0.1); padding:1rem; border-radius:8px; pointer-events:none; z-index:1000; font-family:"Outfit", sans-serif; font-size:0.85rem; color:white; box-shadow: 0 8px 16px rgba(0,0,0,0.5); backdrop-filter: blur(4px); min-width: 150px;';
+                        document.body.appendChild(tooltip);
+                    }
+                    
+                    function pointToLineDistance(px, py, x1, y1, x2, y2) {
+                        const A = px - x1; const B = py - y1; const C = x2 - x1; const D = y2 - y1;
+                        const dot = A * C + B * D;
+                        const len_sq = C * C + D * D;
+                        let param = -1;
+                        if (len_sq != 0) param = dot / len_sq;
+                        let xx, yy;
+                        if (param < 0) { xx = x1; yy = y1; }
+                        else if (param > 1) { xx = x2; yy = y2; }
+                        else { xx = x1 + param * C; yy = y1 + param * D; }
+                        const dx = px - xx; const dy = py - yy;
+                        return Math.sqrt(dx * dx + dy * dy);
+                    }
+                    
+                    canvas.addEventListener('mousemove', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        const mx = (e.clientX - rect.left) * scaleX;
+                        const my = (e.clientY - rect.top) * scaleY;
+                        
+                        let closest = null;
+                        let minDist = 12; // hit radius in canvas pixels
+                        
+                        drawnSpokes.forEach(spoke => {
+                            const d = pointToLineDistance(mx, my, centerX, centerY, spoke.endX, spoke.endY);
+                            if (d < minDist) {
+                                minDist = d;
+                                closest = spoke;
+                            }
+                        });
+                        
+                        if (closest) {
+                            tooltip.style.display = 'block';
+                            tooltip.style.left = (e.clientX + 15) + 'px';
+                            tooltip.style.top = (e.clientY + 15) + 'px';
+                            
+                            let runColor = '#facc15';
+                            if (closest.data.runs === 4) runColor = '#3b82f6';
+                            if (closest.data.runs === 6) runColor = '#ef4444';
+                            if (closest.data.runs === 0) runColor = '#94a3b8';
+                            
+                            tooltip.innerHTML = `
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${runColor};"></span>
+                                    <span style="font-weight:600; font-size:1rem;">${closest.data.runs} Runs</span>
+                                </div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Shot: <span style="color:white; font-weight:500;">${closest.data.shot_type && closest.data.shot_type !== 'Unknown' ? closest.data.shot_type : 'Not Specified'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Bowler: <span style="color:white; font-weight:500;">${closest.data.bowler || 'Unknown'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Over: <span style="color:white; font-weight:500;">${closest.data.over - 1}${closest.data.ball > 0 ? '.' + closest.data.ball : ''}</span></div>
+                                <div style="color:var(--text-secondary);">Date: <span style="color:white; font-weight:500;">${closest.data.date || 'Unknown'}</span></div>
+                            `;
+                            canvas.style.cursor = 'pointer';
+                        } else {
+                            tooltip.style.display = 'none';
+                            canvas.style.cursor = 'default';
+                        }
+                    });
+                    
+                    canvas.addEventListener('mouseleave', () => {
+                        tooltip.style.display = 'none';
+                    });
+                }
+
+                // Shot Mastery Chart (Bar)
+                const shotCtx = document.getElementById('shotChart').getContext('2d');
+                if (shotChartInstance) shotChartInstance.destroy();
+                
+                const sLabels = Object.keys(data.shot_data || {});
+                const sValues = Object.values(data.shot_data || {});
+                
+                shotChartInstance = new Chart(shotCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sLabels,
+                        datasets: [{
+                            label: 'Occurrences',
+                            data: sValues,
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                    }
+                });
+
+                // Vulnerability Matrix (Bar/Doughnut)
+                const vulnCtx = document.getElementById('vulnChart').getContext('2d');
+                if (vulnChartInstance) vulnChartInstance.destroy();
+                
+                const vLabels = Object.keys(data.vuln_data || {});
+                const vValues = Object.values(data.vuln_data || {});
+                
+                vulnChartInstance = new Chart(vulnCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: vLabels,
+                        datasets: [{
+                            label: 'Dismissals',
+                            data: vValues,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
 
             async function fetchStats() {
-                document.getElementById('statsGrid').innerHTML = '<div class="stat-card"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>';
+                if (!currentAthleteId) return;
                 
-                const params = new URLSearchParams({
-                    id: athleteId,
-                    format: document.getElementById('filterFormat').value,
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'flex';
+                
+                const splitMode = document.getElementById('splitByFormat').checked;
+                
+                const baseParams = new URLSearchParams({
+                    id: currentAthleteId,
                     league: document.getElementById('filterLeague').value,
-                    opponent: document.getElementById('filterOpponent').value,
                     phase: document.getElementById('filterPhase').value,
-                    venue: document.getElementById('filterVenue').value
+                    venue: document.getElementById('filterVenue').value,
+                    opponent: document.getElementById('filterOpponent').value,
+                    bowling_type: document.getElementById('filterBowlingType').value,
+                    innings: document.getElementById('filterInnings').value,
+                    result: document.getElementById('filterResult').value,
+                    year: document.getElementById('filterYear').value,
+                    recent: document.getElementById('filterRecent').value
                 });
                 
                 try {
-                    const res = await fetch(`/api/stats/batter?${params.toString()}`);
-                    const data = await res.json();
+                    document.getElementById('mainContent').style.display = 'block';
                     
-                    document.getElementById('statsGrid').innerHTML = `
-                        <div class="stat-card">
-                            <i class="fas fa-baseball-bat-ball"></i>
-                            <h3>Runs Scored</h3>
-                            <p>${data.runs}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-bolt"></i>
-                            <h3>Strike Rate</h3>
-                            <p>${data.sr}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-star"></i>
-                            <h3>Highest Score</h3>
-                            <p>${data.hs}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-fire"></i>
-                            <h3>Sixes</h3>
-                            <p>${data.sixes}</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-stop-circle"></i>
-                            <h3>Dot Ball %</h3>
-                            <p>${data.dot_pct}%</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-hashtag"></i>
-                            <h3>Balls Faced</h3>
-                            <p>${data.balls}</p>
-                        </div>
-                    `;
+                    if (splitMode) {
+                        document.getElementById('chartsRow').style.display = 'none';
+                        document.getElementById('statsGrid').className = '';
+                        
+                        const formats = ['Test', 'ODI', 'T20I', 'T20'];
+                        let html = '';
+                        
+                        for (let fmt of formats) {
+                            baseParams.set('format', fmt);
+                            const res = await fetch(`/api/stats/batter?${baseParams.toString()}`);
+                            const data = await res.json();
+                            
+                            if (data.runs > 0 || data.balls > 0) {
+                                html += `
+                                <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--accent-blue); display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-trophy"></i> ${fmt} Breakdown</h3>
+                                <div class="bento-grid">
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Runs Scored</div>
+                                        <div class="stat-value">${data.runs}</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Highest Score</div>
+                                        <div class="stat-value small">${data.hs}</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Strike Rate</div>
+                                        <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Sixes Hit</div>
+                                        <div class="stat-value">${data.sixes}</div>
+                                    </div>
+                                </div>
+                                `;
+                            }
+                        }
+                        
+                        if (html === '') {
+                            html = '<div style="text-align:center; padding: 3rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); border-radius: 12px;"><i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 1rem; display:block;"></i>No historical data found for the selected filters.</div>';
+                        }
+                        
+                        document.getElementById('statsGrid').innerHTML = html;
+                        document.getElementById('loadingState').style.display = 'none';
+                        
+                    } else {
+                        document.getElementById('chartsRow').style.display = 'grid';
+                        document.getElementById('statsGrid').className = 'bento-grid';
+                        baseParams.set('format', document.getElementById('filterFormat').value);
+                        
+                        const res = await fetch(`/api/stats/batter?${baseParams.toString()}`);
+                        const data = await res.json();
+                        
+                        document.getElementById('statsGrid').innerHTML = `
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Runs Scored</div>
+                                <div class="stat-value">${data.runs}</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Highest Score</div>
+                                <div class="stat-value small">${data.hs}</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Strike Rate</div>
+                                <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Sixes Hit</div>
+                                <div class="stat-value">${data.sixes}</div>
+                            </div>
+                        `;
+                        
+                        initCharts(data);
+                        document.getElementById('loadingState').style.display = 'none';
+                    }
+                    
                 } catch(e) {
-                    console.error("Failed to fetch stats", e);
-                    document.getElementById('statsGrid').innerHTML = '<p>Error loading stats.</p>';
+                    console.error(e);
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('emptyState').innerHTML = '<p style="color:var(--accent-red);">Failed to load batter data.</p>';
                 }
             }
             
+            setupSearch();
             init();
         </script>
-        {% endif %}
     </div>
 </body>
 </html>

@@ -688,6 +688,30 @@ def faceoff_filters():
         # Note: m.venue doesn't exist
         where_cricsheet.append("1=0")
         
+    
+    opponent_filter = request.args.get('opponent', 'All')
+    if opponent_filter != 'All':
+        where_d.append(f"d.bowling_team_id IN (SELECT id FROM cricket.teams WHERE name ILIKE '%%{opponent_filter}%%' OR abbreviation ILIKE '%%{opponent_filter}%%')")
+        where_cricsheet.append(f"(m.team1 ILIKE '%%{opponent_filter}%%' OR m.team2 ILIKE '%%{opponent_filter}%%')")
+        
+    bowling_type = request.args.get('bowling_type', 'All')
+    if bowling_type != 'All':
+        where_d.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        where_cricsheet.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        
+    year_filter = request.args.get('year', 'All')
+    if year_filter != 'All':
+        where_d.append("EXTRACT(YEAR FROM c.date::date) = %s")
+        params_d.append(year_filter)
+        where_cricsheet.append("EXTRACT(YEAR FROM m.match_date::date) = %s")
+        params_cricsheet.append(year_filter)
+        
+    innings_filter = request.args.get('innings', 'All')
+    if innings_filter != 'All':
+        if innings_filter in ['1', '2', '3', '4']:
+            where_d.append(f"d.period = {innings_filter}")
+            where_cricsheet.append(f"d.innings = {innings_filter}")
+            
     if phase_filter == 'Powerplay':
         where_d.append("d.over_number <= 6")
         where_cricsheet.append("d.over_number <= 5")
@@ -700,6 +724,14 @@ def faceoff_filters():
         
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
+    
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
     
     query = f"""
     WITH combined_faceoff AS (
@@ -775,6 +807,11 @@ def stats_batter():
     phase = request.args.get('phase', 'All')
     venue = request.args.get('venue', 'All')
     
+    
+    opponent = request.args.get('opponent', 'All')
+    bowling_type = request.args.get('bowling_type', 'All')
+    year = request.args.get('year', 'All')
+    innings = request.args.get('innings', 'All')
     # We will build the where clauses dynamically
     where_d = ["d.batsman_id = %s"]
     where_cricsheet = ["d.batsman_id = %s"]
@@ -807,8 +844,45 @@ def stats_batter():
     # For now we'll skip opponent team strict filtering in this optimized query
     # unless we join match_teams which slows it down.
         
+    
+    if opponent != 'All':
+        where_d.append(f"d.bowling_team_id IN (SELECT id FROM cricket.teams WHERE name ILIKE '%%{opponent}%%' OR abbreviation ILIKE '%%{opponent}%%')")
+        where_cricsheet.append(f"(m.team1 ILIKE '%%{opponent}%%' OR m.team2 ILIKE '%%{opponent}%%')")
+        
+    if bowling_type != 'All':
+        where_d.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        where_cricsheet.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        
+    if year != 'All':
+        where_d.append("EXTRACT(YEAR FROM c.date::date) = %s")
+        params_d.append(year)
+        where_cricsheet.append("EXTRACT(YEAR FROM m.match_date::date) = %s")
+        params_cricsheet.append(year)
+        
+    if innings != 'All':
+        if innings == '1':
+            where_d.append(f"d.period = 1")
+            where_cricsheet.append(f"d.innings = 1")
+        elif innings == '2':
+            where_d.append(f"d.period = 2")
+            where_cricsheet.append(f"d.innings = 2")
+        elif innings == '3':
+            where_d.append(f"d.period = 3")
+            where_cricsheet.append(f"d.innings = 3")
+        elif innings == '4':
+            where_d.append(f"d.period = 4")
+            where_cricsheet.append(f"d.innings = 4")
+            
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
+    
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
     
     query = f"""
     WITH combined_deliveries AS (
@@ -817,7 +891,8 @@ def stats_batter():
             d.batsman_runs,
             d.is_wide,
             d.is_bye,
-            d.is_leg_bye
+            d.is_leg_bye,
+            c.date::date as match_date
         FROM cricket.deliveries d
         JOIN cricket.competitions c ON c.id = d.competition_id
         LEFT JOIN cricket.event_leagues el ON c.event_id = el.event_id
@@ -832,7 +907,8 @@ def stats_batter():
             d.batsman_runs,
             d.is_wide,
             d.is_bye,
-            d.is_leg_bye
+            d.is_leg_bye,
+            m.match_date::date as match_date
         FROM cricket.cricsheet_deliveries d
         JOIN cricket.cricsheet_matches m ON m.id = d.match_id
         WHERE {where_clause_cricsheet}
@@ -840,6 +916,7 @@ def stats_batter():
     match_aggregates AS (
         SELECT 
             match_id,
+            MAX(match_date) as match_date,
             SUM(batsman_runs) as match_score,
             SUM(CASE WHEN batsman_runs = 0 AND is_wide = false AND is_bye = false AND is_leg_bye = false THEN 1 ELSE 0 END) as match_dots,
             SUM(CASE WHEN batsman_runs >= 6 THEN 1 ELSE 0 END) as match_sixes,
@@ -853,7 +930,7 @@ def stats_batter():
         SUM(match_balls_faced)::integer as balls_faced,
         MAX(match_score)::integer as highest_score,
         SUM(match_dots)::integer as dot_balls
-    FROM match_aggregates
+    FROM (SELECT * FROM match_aggregates {recent_limit}) as recent_match_aggregates
     """
     
     with get_db_connection() as conn:
@@ -863,6 +940,155 @@ def stats_batter():
             
             runs = res['total_runs'] or 0
             balls = res['balls_faced'] or 0
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            # --- NEW CHART LOGIC using unified_deliveries ---
+            cur.execute("SELECT full_name, short_name FROM cricket.athletes WHERE id = %s", (athlete_id,))
+            a_row = cur.fetchone()
+            a_names = []
+            if a_row:
+                if a_row['full_name']: a_names.append(a_row['full_name'].replace("'", "''"))
+                if a_row['short_name']: a_names.append(a_row['short_name'].replace("'", "''"))
+                if a_row['full_name']:
+                    parts = a_row['full_name'].split()
+                    if len(parts) > 1:
+                        a_names.append(f"{parts[0][0]} {parts[-1]}".replace("'", "''"))
+                        a_names.append(f"{parts[0][0]}. {parts[-1]}".replace("'", "''"))
+            if not a_names:
+                a_names = ['Unknown']
+            names_str = ", ".join([f"'{n}'" for n in a_names])
+            
+            where_u = [f"((u.source_database = 'ESPN' AND u.batsman_id = %s) OR (u.source_database = 'ICC' AND u.batsman_name IN ({names_str})))"]
+            params_u = [athlete_id]
+            
+            if fmt != 'All':
+                if fmt in ('T20', 'Twenty20'):
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('T20', 'Twenty20', 'T20I', 'IPL', 'Women T20', 'Women''s T20', 'Other T20', 'Youth T20I', 'ICCT'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format IN ('T20', 'Twenty20', 'IT20'))))")
+                elif fmt == 'ODI':
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('ODI', 'Women''s ODI', 'Youth ODI', 'List A', 'Other OD'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format = 'ODI')))")
+                elif fmt == 'Test':
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('Test', 'Women''s Test', 'Youth Test', 'First-class', 'MD'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format IN ('Test', 'MD'))))")
+                else:
+                    where_u.append(f"((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name = '{fmt}')) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format = '{fmt}')))")
+                
+            if league != 'All':
+                if league == 'Internationals':
+                    where_u.append("(u.tournament NOT ILIKE '%%world cup%%' AND u.tournament NOT ILIKE '%%world twenty20%%' AND u.tournament NOT ILIKE '%%t20 world cup%%' AND u.tournament NOT ILIKE '%%championship%%' AND u.tournament NOT ILIKE '%%asia cup%%' AND u.tournament NOT ILIKE '%%champions trophy%%' AND u.tournament NOT ILIKE '%%premier league%%' AND u.tournament NOT ILIKE '%%ipl%%' OR u.tournament IS NULL)")
+                elif league == 'World Cup':
+                    where_u.append("(u.tournament ILIKE '%%world cup%%' OR u.tournament ILIKE '%%world twenty20%%' OR u.tournament ILIKE '%%t20 world cup%%' OR u.tournament ILIKE '%%championship%%')")
+                elif league == 'Asia Cup':
+                    where_u.append("u.tournament ILIKE '%%asia cup%%'")
+                elif league == 'Champions Trophy':
+                    where_u.append("u.tournament ILIKE '%%champions trophy%%'")
+                elif league == 'IPL':
+                    where_u.append("(u.tournament ILIKE '%%premier league%%' OR u.tournament ILIKE '%%ipl%%')")
+                    
+            if venue != 'All':
+                where_u.append("u.venue = %s")
+                params_u.append(venue)
+                
+            if phase != 'All':
+                if phase == 'Powerplay':
+                    where_u.append("u.over_number <= 6")
+                elif phase == 'Middle':
+                    where_u.append("u.over_number > 6 AND u.over_number <= 15")
+                elif phase == 'Death':
+                    where_u.append("u.over_number > 15")
+                    
+            if opponent != 'All':
+                where_u.append(f"((u.source_database = 'ESPN' AND u.bowling_team_id IN (SELECT id FROM cricket.teams WHERE name ILIKE '%%{opponent}%%' OR abbreviation ILIKE '%%{opponent}%%')) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE team1 ILIKE '%%{opponent}%%' OR team2 ILIKE '%%{opponent}%%')))")
+                
+            if bowling_type != 'All':
+                where_u.append(f"((u.source_database = 'ESPN' AND u.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')) OR (u.source_database = 'ICC' AND u.bowler_name IN (SELECT full_name FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')))")
+                
+            if year != 'All':
+                where_u.append("EXTRACT(YEAR FROM u.match_date::date) = %s")
+                params_u.append(int(year))
+                
+            if innings != 'All':
+                where_u.append("u.period = %s")
+                if innings == '1st Innings': params_u.append(1)
+                elif innings == '2nd Innings': params_u.append(2)
+                elif innings == '3rd Innings': params_u.append(3)
+                elif innings == '4th Innings': params_u.append(4)
+                
+            recent_limit_u = ""
+            if recent == 'Last 5 Matches': recent_limit_u = 'ORDER BY match_date DESC LIMIT 5'
+            elif recent == 'Last 10 Matches': recent_limit_u = 'ORDER BY match_date DESC LIMIT 10'
+            elif recent == 'Last 20 Matches': recent_limit_u = 'ORDER BY match_date DESC LIMIT 20'
+            elif recent == 'Last 50 Matches': recent_limit_u = 'ORDER BY match_date DESC LIMIT 50'
+            
+            match_filter_u = ""
+            if recent_limit_u:
+                match_filter_u = f"AND u.match_id IN (SELECT match_id FROM (SELECT match_id, MAX(match_date) as match_date FROM cricket.unified_deliveries u2 WHERE {' AND '.join([w.replace('u.', 'u2.') for w in where_u])} GROUP BY match_id {recent_limit_u}) as sub)"
+            
+            where_clause_u = " AND ".join(where_u)
+            
+            chart_query = f"""
+                SELECT 
+                    u.x_coordinate, 
+                    u.y_coordinate, 
+                    u.zad, 
+                    u.batsman_runs,
+                    u.shot_type
+                FROM cricket.unified_deliveries u
+                WHERE {where_clause_u} {match_filter_u}
+            """
+            
+            cur.execute(chart_query, tuple(params_u * 2 if recent_limit_u else params_u))
+            chart_rows = cur.fetchall()
+            
+            import math
+            wagon_wheel = []
+            shot_data = {}
+            vuln_data = {}
+            
+            for r in chart_rows:
+                x_coord = r['x_coordinate']
+                y_coord = r['y_coordinate']
+                zad = r['zad']
+                b_runs = r['batsman_runs']
+                shot = r['shot_type']
+                
+                if x_coord is not None and y_coord is not None:
+                    wagon_wheel.append({"x": x_coord, "y": y_coord, "runs": b_runs})
+                elif zad and zad.strip():
+                    parts = zad.split(',')
+                    if len(parts) >= 2:
+                        try:
+                            angle = int(parts[1])
+                            dist = int(parts[2]) if len(parts) >= 3 else 3
+                            rad = math.radians(angle)
+                            r_norm = dist / 6.0
+                            x = -r_norm * math.sin(rad)
+                            y = -r_norm * math.cos(rad)
+                            wagon_wheel.append({"x": x, "y": y, "runs": b_runs})
+                        except:
+                            pass
+                            
+                if shot and shot.strip():
+                    shot_name = shot.title()
+                    shot_data[shot_name] = shot_data.get(shot_name, 0) + 1
+                    
+            # --- END NEW CHART LOGIC ---
+
             dots = res['dot_balls'] or 0
             
             return jsonify({
@@ -871,7 +1097,10 @@ def stats_batter():
                 "sr": round((runs / balls * 100), 2) if balls > 0 else 0,
                 "sixes": res['total_sixes'] or 0,
                 "hs": res['highest_score'] or 0,
-                "dot_pct": round((dots / balls * 100), 1) if balls > 0 else 0
+                "dot_pct": round((dots / balls * 100), 1) if balls > 0 else 0,
+                "wagon_wheel": wagon_wheel,
+                "shot_data": shot_data,
+                "vuln_data": vuln_data
             })
 
 @app.route("/api/stats/bowler")
@@ -916,6 +1145,14 @@ def stats_bowler():
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
     
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
+    
     query = f"""
     WITH combined_bowling AS (
         SELECT 
@@ -945,6 +1182,7 @@ def stats_bowler():
     match_aggregates AS (
         SELECT 
             match_id,
+            MAX(match_date) as match_date,
             SUM(is_wicket) as match_wickets,
             SUM(bowler_conceded) as match_runs_conceded,
             SUM(bowler_overs) as match_overs_bowled
@@ -961,7 +1199,7 @@ def stats_bowler():
             FROM match_aggregates m2 
             WHERE m2.match_wickets = MAX(match_aggregates.match_wickets)
         )::integer as best_runs
-    FROM match_aggregates
+    FROM (SELECT * FROM match_aggregates {recent_limit}) as recent_match_aggregates
     """
     
     with get_db_connection() as conn:
@@ -1032,6 +1270,14 @@ def stats_faceoff():
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
     
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
+    
     query = f"""
     WITH combined_faceoff AS (
         SELECT 
@@ -1039,7 +1285,8 @@ def stats_faceoff():
             CASE WHEN dis.delivery_id IS NOT NULL AND dis.type NOT IN ('run out', 'retired hurt', 'retired not out (hurt)', 'obstructing the field', 'retired out') THEN 1 ELSE 0 END as is_wicket,
             d.is_wide,
             d.is_bye,
-            d.is_leg_bye
+            d.is_leg_bye,
+            c.date::date as match_date
         FROM cricket.deliveries d
         JOIN cricket.competitions c ON c.id = d.competition_id
         LEFT JOIN cricket.event_leagues el ON c.event_id = el.event_id
@@ -1055,7 +1302,8 @@ def stats_faceoff():
             CASE WHEN d.dismissal_type IS NOT NULL AND d.dismissal_type NOT IN ('run out', 'retired hurt', 'retired not out (hurt)', 'obstructing the field', 'retired out') THEN 1 ELSE 0 END as is_wicket,
             d.is_wide,
             d.is_bye,
-            d.is_leg_bye
+            d.is_leg_bye,
+            m.match_date::date as match_date
         FROM cricket.cricsheet_deliveries d
         JOIN cricket.cricsheet_matches m ON m.id = d.match_id
         WHERE {where_clause_cricsheet}
@@ -1077,6 +1325,145 @@ def stats_faceoff():
             
             runs = res['total_runs'] or 0
             balls = res['balls_faced'] or 0
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            # --- NEW CHART LOGIC using unified_deliveries FOR FACEOFF ---
+            cur.execute("SELECT full_name, short_name FROM cricket.athletes WHERE id = %s", (batter_id,))
+            a_row = cur.fetchone()
+            a_names = []
+            if a_row:
+                if a_row['full_name']: a_names.append(a_row['full_name'].replace("'", "''"))
+                if a_row['short_name']: a_names.append(a_row['short_name'].replace("'", "''"))
+                if a_row['full_name']:
+                    parts = a_row['full_name'].split()
+                    if len(parts) > 1:
+                        a_names.append(f"{parts[0][0]} {parts[-1]}".replace("'", "''"))
+                        a_names.append(f"{parts[0][0]}. {parts[-1]}".replace("'", "''"))
+            if not a_names:
+                a_names = ['Unknown']
+            names_str = ", ".join([f"'{n}'" for n in a_names])
+
+            cur.execute("SELECT full_name, short_name FROM cricket.athletes WHERE id = %s", (bowler_id,))
+            b_row = cur.fetchone()
+            b_names = []
+            if b_row:
+                if b_row['full_name']: b_names.append(b_row['full_name'].replace("'", "''"))
+                if b_row['short_name']: b_names.append(b_row['short_name'].replace("'", "''"))
+                if b_row['full_name']:
+                    parts = b_row['full_name'].split()
+                    if len(parts) > 1:
+                        b_names.append(f"{parts[0][0]} {parts[-1]}".replace("'", "''"))
+                        b_names.append(f"{parts[0][0]}. {parts[-1]}".replace("'", "''"))
+            if not b_names:
+                b_names = ['Unknown']
+            b_names_str = ", ".join([f"'{n}'" for n in b_names])
+            
+            where_u = [f"((u.source_database = 'ESPN' AND u.batsman_id = %s AND u.bowler_id = %s) OR (u.source_database = 'ICC' AND u.batsman_name IN ({names_str}) AND u.bowler_name IN ({b_names_str})))"]
+            params_u = [batter_id, bowler_id]
+            
+            if fmt != 'All':
+                if fmt in ('T20', 'Twenty20'):
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('T20', 'Twenty20', 'T20I', 'IPL', 'Women T20', 'Women''s T20', 'Other T20', 'Youth T20I', 'ICCT'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format IN ('T20', 'Twenty20', 'IT20'))))")
+                elif fmt == 'ODI':
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('ODI', 'Women''s ODI', 'Youth ODI', 'List A', 'Other OD'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format = 'ODI')))")
+                elif fmt == 'Test':
+                    where_u.append("((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name IN ('Test', 'Women''s Test', 'Youth Test', 'First-class', 'MD'))) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format IN ('Test', 'MD'))))")
+                else:
+                    where_u.append(f"((u.source_database = 'ESPN' AND u.match_id IN (SELECT id FROM cricket.competitions WHERE class_name = '{fmt}')) OR (u.source_database = 'ICC' AND u.match_id IN (SELECT id::VARCHAR FROM cricket.cricsheet_matches WHERE format = '{fmt}')))")
+                
+            if league != 'All':
+                if league == 'Internationals':
+                    where_u.append("(u.tournament NOT ILIKE '%%world cup%%' AND u.tournament NOT ILIKE '%%world twenty20%%' AND u.tournament NOT ILIKE '%%t20 world cup%%' AND u.tournament NOT ILIKE '%%championship%%' AND u.tournament NOT ILIKE '%%asia cup%%' AND u.tournament NOT ILIKE '%%champions trophy%%' AND u.tournament NOT ILIKE '%%premier league%%' AND u.tournament NOT ILIKE '%%ipl%%' OR u.tournament IS NULL)")
+                elif league == 'World Cup':
+                    where_u.append("(u.tournament ILIKE '%%world cup%%' OR u.tournament ILIKE '%%world twenty20%%' OR u.tournament ILIKE '%%t20 world cup%%' OR u.tournament ILIKE '%%championship%%')")
+                elif league == 'Asia Cup':
+                    where_u.append("u.tournament ILIKE '%%asia cup%%'")
+                elif league == 'Champions Trophy':
+                    where_u.append("u.tournament ILIKE '%%champions trophy%%'")
+                elif league == 'IPL':
+                    where_u.append("(u.tournament ILIKE '%%premier league%%' OR u.tournament ILIKE '%%ipl%%')")
+                    
+            if venue != 'All':
+                where_u.append("u.venue = %s")
+                params_u.append(venue)
+                
+            if phase != 'All':
+                if phase == 'Powerplay':
+                    where_u.append("u.over_number <= 6")
+                elif phase == 'Middle':
+                    where_u.append("u.over_number > 6 AND u.over_number <= 15")
+                elif phase == 'Death':
+                    where_u.append("u.over_number > 15")
+                    
+            where_clause_u = " AND ".join(where_u)
+            
+            chart_query = f"""
+                SELECT 
+                    u.x_coordinate, 
+                    u.y_coordinate, 
+                    u.zad, 
+                    u.batsman_runs,
+                    u.shot_type
+                FROM cricket.unified_deliveries u
+                WHERE {where_clause_u}
+            """
+            
+            cur.execute(chart_query, tuple(params_u))
+            chart_rows = cur.fetchall()
+            
+            import math
+            wagon_wheel = []
+            shot_data = {}
+            vuln_data = {}
+            
+            for r in chart_rows:
+                x_coord = r['x_coordinate']
+                y_coord = r['y_coordinate']
+                zad = r['zad']
+                b_runs = r['batsman_runs']
+                shot = r['shot_type']
+                
+                if x_coord is not None and y_coord is not None:
+                    wagon_wheel.append({"x": x_coord, "y": y_coord, "runs": b_runs})
+                elif zad and zad.strip():
+                    parts = zad.split(',')
+                    if len(parts) >= 2:
+                        try:
+                            angle = int(parts[1])
+                            dist = int(parts[2]) if len(parts) >= 3 else 3
+                            rad = math.radians(angle)
+                            r_norm = dist / 6.0
+                            x = -r_norm * math.sin(rad)
+                            y = -r_norm * math.cos(rad)
+                            wagon_wheel.append({"x": x, "y": y, "runs": b_runs})
+                        except:
+                            pass
+                            
+                if shot and shot.strip():
+                    shot_name = shot.title()
+                    shot_data[shot_name] = shot_data.get(shot_name, 0) + 1
+                    
+            # --- END NEW CHART LOGIC FOR FACEOFF ---
+
             dots = res['dot_balls'] or 0
             dismissals = res['total_dismissals'] or 0
             
@@ -1088,7 +1475,10 @@ def stats_faceoff():
                 "avg": round((runs / dismissals), 2) if dismissals > 0 else (runs if runs > 0 else 0),
                 "boundaries": res['boundaries'] or 0,
                 "sixes": res['sixes'] or 0,
-                "dot_pct": round((dots / balls * 100), 1) if balls > 0 else 0
+                "dot_pct": round((dots / balls * 100), 1) if balls > 0 else 0,
+                "wagon_wheel": wagon_wheel,
+                "shot_data": shot_data,
+                "vuln_data": vuln_data
             })
 
 @app.route("/api/batter_filters")
@@ -1110,15 +1500,54 @@ def batter_filters():
     get_format_where_clause(format_filter, where_d, params_d, where_cricsheet, params_cricsheet)
         
     if league_filter != 'All':
-        where_d.append("l.name = %s")
-        params_d.append(league_filter)
-        where_cricsheet.append("1=0") 
-        
+        if league_filter == 'Series':
+            where_d.append("(l.name NOT ILIKE '%%world cup%%' AND l.name NOT ILIKE '%%world twenty20%%' AND l.name NOT ILIKE '%%t20 world cup%%' AND l.name NOT ILIKE '%%championship%%' AND l.name NOT ILIKE '%%asia cup%%' AND l.name NOT ILIKE '%%champions trophy%%' AND l.name NOT ILIKE '%%premier league%%' AND l.name NOT ILIKE '%%ipl%%' OR l.name IS NULL)")
+            where_cricsheet.append("(1=1)")
+        elif league_filter == 'World Cup':
+            where_d.append("(l.name ILIKE '%%world cup%%' OR l.name ILIKE '%%world twenty20%%' OR l.name ILIKE '%%t20 world cup%%' OR l.name ILIKE '%%championship%%')")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Asia Cup':
+            where_d.append("l.name ILIKE '%%asia cup%%'")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Champions Trophy':
+            where_d.append("l.name ILIKE '%%champions trophy%%'")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Indian Premier League':
+            where_d.append("(l.name ILIKE '%%premier league%%' OR l.name ILIKE '%%ipl%%')")
+            where_cricsheet.append("1=0")
+        else:
+            where_d.append("1=0")
+            where_cricsheet.append("1=0")
+
     if venue_filter != 'All':
         where_d.append("v.full_name = %s")
         params_d.append(venue_filter)
         where_cricsheet.append("1=0")
         
+    
+    opponent_filter = request.args.get('opponent', 'All')
+    if opponent_filter != 'All':
+        where_d.append(f"d.bowling_team_id IN (SELECT id FROM cricket.teams WHERE name ILIKE '%%{opponent_filter}%%' OR abbreviation ILIKE '%%{opponent_filter}%%')")
+        where_cricsheet.append(f"(m.team1 ILIKE '%%{opponent_filter}%%' OR m.team2 ILIKE '%%{opponent_filter}%%')")
+        
+    bowling_type = request.args.get('bowling_type', 'All')
+    if bowling_type != 'All':
+        where_d.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        where_cricsheet.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        
+    year_filter = request.args.get('year', 'All')
+    if year_filter != 'All':
+        where_d.append("EXTRACT(YEAR FROM c.date::date) = %s")
+        params_d.append(year_filter)
+        where_cricsheet.append("EXTRACT(YEAR FROM m.match_date::date) = %s")
+        params_cricsheet.append(year_filter)
+        
+    innings_filter = request.args.get('innings', 'All')
+    if innings_filter != 'All':
+        if innings_filter in ['1', '2', '3', '4']:
+            where_d.append(f"d.period = {innings_filter}")
+            where_cricsheet.append(f"d.innings = {innings_filter}")
+            
     if phase_filter == 'Powerplay':
         where_d.append("d.over_number <= 6")
         where_cricsheet.append("d.over_number <= 5")
@@ -1131,6 +1560,14 @@ def batter_filters():
         
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
+    
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
     
     query = f"""
     WITH combined AS (
@@ -1203,15 +1640,54 @@ def bowler_filters():
     get_format_where_clause(format_filter, where_d, params_d, where_cricsheet, params_cricsheet)
         
     if league_filter != 'All':
-        where_d.append("l.name = %s")
-        params_d.append(league_filter)
-        where_cricsheet.append("1=0") 
-        
+        if league_filter == 'Series':
+            where_d.append("(l.name NOT ILIKE '%%world cup%%' AND l.name NOT ILIKE '%%world twenty20%%' AND l.name NOT ILIKE '%%t20 world cup%%' AND l.name NOT ILIKE '%%championship%%' AND l.name NOT ILIKE '%%asia cup%%' AND l.name NOT ILIKE '%%champions trophy%%' AND l.name NOT ILIKE '%%premier league%%' AND l.name NOT ILIKE '%%ipl%%' OR l.name IS NULL)")
+            where_cricsheet.append("(1=1)")
+        elif league_filter == 'World Cup':
+            where_d.append("(l.name ILIKE '%%world cup%%' OR l.name ILIKE '%%world twenty20%%' OR l.name ILIKE '%%t20 world cup%%' OR l.name ILIKE '%%championship%%')")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Asia Cup':
+            where_d.append("l.name ILIKE '%%asia cup%%'")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Champions Trophy':
+            where_d.append("l.name ILIKE '%%champions trophy%%'")
+            where_cricsheet.append("1=0")
+        elif league_filter == 'Indian Premier League':
+            where_d.append("(l.name ILIKE '%%premier league%%' OR l.name ILIKE '%%ipl%%')")
+            where_cricsheet.append("1=0")
+        else:
+            where_d.append("1=0")
+            where_cricsheet.append("1=0")
+
     if venue_filter != 'All':
         where_d.append("v.full_name = %s")
         params_d.append(venue_filter)
         where_cricsheet.append("1=0")
         
+    
+    opponent_filter = request.args.get('opponent', 'All')
+    if opponent_filter != 'All':
+        where_d.append(f"d.bowling_team_id IN (SELECT id FROM cricket.teams WHERE name ILIKE '%%{opponent_filter}%%' OR abbreviation ILIKE '%%{opponent_filter}%%')")
+        where_cricsheet.append(f"(m.team1 ILIKE '%%{opponent_filter}%%' OR m.team2 ILIKE '%%{opponent_filter}%%')")
+        
+    bowling_type = request.args.get('bowling_type', 'All')
+    if bowling_type != 'All':
+        where_d.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        where_cricsheet.append(f"d.bowler_id IN (SELECT id FROM cricket.athletes WHERE bowling_style ILIKE '%%{bowling_type}%%')")
+        
+    year_filter = request.args.get('year', 'All')
+    if year_filter != 'All':
+        where_d.append("EXTRACT(YEAR FROM c.date::date) = %s")
+        params_d.append(year_filter)
+        where_cricsheet.append("EXTRACT(YEAR FROM m.match_date::date) = %s")
+        params_cricsheet.append(year_filter)
+        
+    innings_filter = request.args.get('innings', 'All')
+    if innings_filter != 'All':
+        if innings_filter in ['1', '2', '3', '4']:
+            where_d.append(f"d.period = {innings_filter}")
+            where_cricsheet.append(f"d.innings = {innings_filter}")
+            
     if phase_filter == 'Powerplay':
         where_d.append("d.over_number <= 6")
         where_cricsheet.append("d.over_number <= 5")
@@ -1224,6 +1700,14 @@ def bowler_filters():
         
     where_clause_d = " AND ".join(where_d)
     where_clause_cricsheet = " AND ".join(where_cricsheet)
+    
+    
+    recent = request.args.get('recent', 'All')
+    recent_limit = ''
+    if recent == 'Last 5 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 5'
+    elif recent == 'Last 10 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 10'
+    elif recent == 'Last 20 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 20'
+    elif recent == 'Last 50 Matches': recent_limit = 'ORDER BY match_date DESC LIMIT 50'
     
     query = f"""
     WITH combined AS (

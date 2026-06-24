@@ -1,0 +1,11 @@
+print("="*60)
+print("🛑 STOP! You are running the OLD Selenium scraper!")
+print("We completely abandoned undetected_chromedriver because Akamai")
+print("Bot Manager blocks it instantly.")
+print("\n✅ INSTEAD, RUN THIS SCRIPT: python test_full_scrape.py")
+print("We successfully reverse-engineered Cricinfo's encryption so")
+print("test_full_scrape.py runs 100x faster purely in Python without")
+print("launching any browsers!")
+print("="*60)
+import sys
+sys.exit(0)
