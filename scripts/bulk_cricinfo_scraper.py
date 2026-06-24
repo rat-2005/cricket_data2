@@ -14,8 +14,18 @@ load_dotenv()
 
 KEY = "9ced54a89687e1173e91c1f225fc02abf275a119fda8a41d731d2b04dac95ff5"
 BASE_URL = "https://hs-consumer-api.cricinfo.com"
-OUTPUT_DIR = os.path.join("data", "cricinfo_parquet")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Output directories for each data layer
+OUTPUT_DIR = os.path.join("data", "cricinfo_parquet")          # Ball-by-ball telemetry
+METADATA_DIR = os.path.join("data", "cricinfo_metadata")       # Match info (stadium, date, result, umpires)
+BATTING_DIR = os.path.join("data", "cricinfo_batting")         # Batting scorecards
+BOWLING_DIR = os.path.join("data", "cricinfo_bowling")         # Bowling scorecards
+PARTNERSHIPS_DIR = os.path.join("data", "cricinfo_partnerships") # Batting partnerships
+FOW_DIR = os.path.join("data", "cricinfo_fow")                # Fall of wickets
+INNINGS_DIR = os.path.join("data", "cricinfo_innings")         # Innings summaries
+
+for d in [OUTPUT_DIR, METADATA_DIR, BATTING_DIR, BOWLING_DIR, PARTNERSHIPS_DIR, FOW_DIR, INNINGS_DIR]:
+    os.makedirs(d, exist_ok=True)
 
 def get_auth_token(path):
     t = f"exp={int(time.time()) + 60}~acl={path}"
@@ -58,9 +68,9 @@ async def resolve_series_id(session, match_id):
                 possible_id = part.split('-')[-1]
                 if "series" in final_url and possible_id != match_id:
                     # Very basic heuristic: The series ID is usually the one before the match ID part.
-                    # A better way is using regex: /series/[^/]+-(\d+)/
+                    # A better way is using regex: /series/[^/]+-(\\d+)/
                     import re
-                    match = re.search(r'/series/[^/]+-(\d+)/', final_url)
+                    match = re.search(r'/series/[^/]+-(\\d+)/', final_url)
                     if match:
                         return match.group(1)
         return None
@@ -100,6 +110,277 @@ async def fetch_page(session, series_id, match_id, inning_number=None, from_inni
             
     return None
 
+def safe_flatten(data, match_id):
+    """Flatten a dict/list using json_normalize and convert complex columns to strings."""
+    if isinstance(data, dict):
+        data = [data]
+    if not data:
+        return None
+    try:
+        df = pd.json_normalize(data)
+        for col in df.columns:
+            if df[col].apply(lambda x: isinstance(x, (dict, list))).any():
+                df[col] = df[col].astype(str)
+        df["match_id"] = match_id
+        return df
+    except Exception as e:
+        print(f"[{match_id}] Flatten error: {e}")
+        return None
+
+def extract_batting_scorecard(innings_list, match_id):
+    """Extract batting stats from all innings into a single Parquet file."""
+    all_rows = []
+    for inning in innings_list:
+        inning_num = inning.get("inningNumber", 0)
+        team_name = inning.get("team", {}).get("longName", "Unknown")
+        team_id = inning.get("team", {}).get("id", None)
+        
+        for b in inning.get("inningBatsmen", []):
+            row = {
+                "match_id": match_id,
+                "inningNumber": inning_num,
+                "teamName": team_name,
+                "teamId": team_id,
+                "playerId": b.get("player", {}).get("id"),
+                "playerName": b.get("player", {}).get("longName"),
+                "playerRole": b.get("playerRoleType"),
+                "battingStyle": ", ".join(b.get("player", {}).get("longBattingStyles", [])),
+                "battedType": b.get("battedType"),
+                "runs": b.get("runs"),
+                "balls": b.get("balls"),
+                "minutes": b.get("minutes"),
+                "fours": b.get("fours"),
+                "sixes": b.get("sixes"),
+                "strikeRate": b.get("strikerate"),
+                "isOut": b.get("isOut"),
+                "dismissalType": b.get("dismissalType"),
+                "dismissalText": b.get("dismissalText", ""),
+                "dismissalBowlerId": b.get("dismissalBowler", {}).get("id") if b.get("dismissalBowler") else None,
+                "dismissalBowlerName": b.get("dismissalBowler", {}).get("longName") if b.get("dismissalBowler") else None,
+                "fowOrder": b.get("fowOrder"),
+                "fowWicketNum": b.get("fowWicketNum"),
+                "fowRuns": b.get("fowRuns"),
+                "fowOvers": b.get("fowOvers"),
+            }
+            all_rows.append(row)
+    
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        df.to_parquet(os.path.join(BATTING_DIR, f"match_{match_id}_batting.parquet"), index=False)
+
+def extract_bowling_scorecard(innings_list, match_id):
+    """Extract bowling stats from all innings into a single Parquet file."""
+    all_rows = []
+    for inning in innings_list:
+        inning_num = inning.get("inningNumber", 0)
+        team_name = inning.get("team", {}).get("longName", "Unknown")
+        team_id = inning.get("team", {}).get("id", None)
+        
+        for bw in inning.get("inningBowlers", []):
+            row = {
+                "match_id": match_id,
+                "inningNumber": inning_num,
+                "battingTeamName": team_name,  # The team that was BATTING (bowler is from the other team)
+                "battingTeamId": team_id,
+                "playerId": bw.get("player", {}).get("id"),
+                "playerName": bw.get("player", {}).get("longName"),
+                "bowlingStyle": ", ".join(bw.get("player", {}).get("longBowlingStyles", [])),
+                "bowledType": bw.get("bowledType"),
+                "overs": bw.get("overs"),
+                "balls": bw.get("balls"),
+                "maidens": bw.get("maidens"),
+                "conceded": bw.get("conceded"),
+                "wickets": bw.get("wickets"),
+                "economy": bw.get("economy"),
+                "runsPerBall": bw.get("runsPerBall"),
+                "dots": bw.get("dots"),
+                "fours": bw.get("fours"),
+                "sixes": bw.get("sixes"),
+                "wides": bw.get("wides"),
+                "noballs": bw.get("noballs"),
+            }
+            all_rows.append(row)
+    
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        df.to_parquet(os.path.join(BOWLING_DIR, f"match_{match_id}_bowling.parquet"), index=False)
+
+def extract_partnerships(innings_list, match_id):
+    """Extract batting partnerships from all innings."""
+    all_rows = []
+    for inning in innings_list:
+        inning_num = inning.get("inningNumber", 0)
+        team_name = inning.get("team", {}).get("longName", "Unknown")
+        
+        for p in inning.get("inningPartnerships", []):
+            row = {
+                "match_id": match_id,
+                "inningNumber": inning_num,
+                "teamName": team_name,
+                "player1Id": p.get("player1", {}).get("id"),
+                "player1Name": p.get("player1", {}).get("longName"),
+                "player2Id": p.get("player2", {}).get("id"),
+                "player2Name": p.get("player2", {}).get("longName"),
+                "runs": p.get("runs"),
+                "balls": p.get("balls"),
+                "player1Runs": p.get("player1Runs"),
+                "player1Balls": p.get("player1Balls"),
+                "player2Runs": p.get("player2Runs"),
+                "player2Balls": p.get("player2Balls"),
+                "isLive": p.get("isLive"),
+                "outPlayerId": p.get("outPlayer", {}).get("id") if p.get("outPlayer") else None,
+            }
+            all_rows.append(row)
+    
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        df.to_parquet(os.path.join(PARTNERSHIPS_DIR, f"match_{match_id}_partnerships.parquet"), index=False)
+
+def extract_fall_of_wickets(innings_list, match_id):
+    """Extract fall of wickets timeline from all innings."""
+    all_rows = []
+    for inning in innings_list:
+        inning_num = inning.get("inningNumber", 0)
+        team_name = inning.get("team", {}).get("longName", "Unknown")
+        
+        for fow in inning.get("inningFallOfWickets", []):
+            row = {
+                "match_id": match_id,
+                "inningNumber": inning_num,
+                "teamName": team_name,
+                "dismissedPlayerId": fow.get("dismissalBatsman", {}).get("id") if fow.get("dismissalBatsman") else None,
+                "dismissedPlayerName": fow.get("dismissalBatsman", {}).get("longName") if fow.get("dismissalBatsman") else None,
+                "fowType": fow.get("fowType"),
+                "fowOrder": fow.get("fowOrder"),
+                "fowWicketNum": fow.get("fowWicketNum"),
+                "fowRuns": fow.get("fowRuns"),
+                "fowOvers": fow.get("fowOvers"),
+                "fowBalls": fow.get("fowBalls"),
+            }
+            all_rows.append(row)
+    
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        df.to_parquet(os.path.join(FOW_DIR, f"match_{match_id}_fow.parquet"), index=False)
+
+def extract_innings_summary(innings_list, match_id):
+    """Extract innings-level aggregate stats."""
+    all_rows = []
+    for inning in innings_list:
+        row = {
+            "match_id": match_id,
+            "inningNumber": inning.get("inningNumber"),
+            "teamId": inning.get("team", {}).get("id"),
+            "teamName": inning.get("team", {}).get("longName"),
+            "teamAbbreviation": inning.get("team", {}).get("abbreviation"),
+            "isBatted": inning.get("isBatted"),
+            "runs": inning.get("runs"),
+            "wickets": inning.get("wickets"),
+            "overs": inning.get("overs"),
+            "balls": inning.get("balls"),
+            "totalOvers": inning.get("totalOvers"),
+            "totalBalls": inning.get("totalBalls"),
+            "minutes": inning.get("minutes"),
+            "extras": inning.get("extras"),
+            "byes": inning.get("byes"),
+            "legbyes": inning.get("legbyes"),
+            "wides": inning.get("wides"),
+            "noballs": inning.get("noballs"),
+            "penalties": inning.get("penalties"),
+            "fours": inning.get("fours"),
+            "sixes": inning.get("sixes"),
+            "target": inning.get("target"),
+            "lead": inning.get("lead"),
+            "runsSaved": inning.get("runsSaved"),
+            "catches": inning.get("catches"),
+            "catchesDropped": inning.get("catchesDropped"),
+            "ballsPerOver": inning.get("ballsPerOver"),
+        }
+        all_rows.append(row)
+    
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        df.to_parquet(os.path.join(INNINGS_DIR, f"match_{match_id}_innings.parquet"), index=False)
+
+def extract_match_metadata(match_metadata, match_id):
+    """Extract match-level metadata: stadium, teams, result, umpires, toss, dates."""
+    metadata_file = os.path.join(METADATA_DIR, f"match_{match_id}_metadata.parquet")
+    if not match_metadata:
+        return
+    try:
+        # Extract key fields into a clean, flat row
+        ground = match_metadata.get("ground", {})
+        series = match_metadata.get("series", {})
+        teams_raw = match_metadata.get("teams", [])
+        
+        # Build team info
+        team1 = teams_raw[0] if len(teams_raw) > 0 else {}
+        team2 = teams_raw[1] if len(teams_raw) > 1 else {}
+        
+        # Extract umpires
+        umpires = match_metadata.get("umpires", [])
+        tv_umpires = match_metadata.get("tvUmpires", [])
+        match_referees = match_metadata.get("matchReferees", [])
+        
+        row = {
+            "match_id": match_id,
+            # Match basics
+            "title": match_metadata.get("title"),
+            "slug": match_metadata.get("slug"),
+            "state": match_metadata.get("state"),
+            "stage": match_metadata.get("stage"),
+            "season": match_metadata.get("season"),
+            "format": match_metadata.get("format"),
+            "statusText": match_metadata.get("statusText"),
+            "floodlit": match_metadata.get("floodlit"),
+            "ballsPerOver": match_metadata.get("ballsPerOver"),
+            # Dates
+            "startDate": match_metadata.get("startDate"),
+            "endDate": match_metadata.get("endDate"),
+            "startTime": match_metadata.get("startTime"),
+            # Stadium / Ground
+            "groundId": ground.get("id"),
+            "groundName": ground.get("longName") or ground.get("name"),
+            "groundCity": ground.get("town", {}).get("name") if isinstance(ground.get("town"), dict) else None,
+            "groundCountry": ground.get("country", {}).get("name") if isinstance(ground.get("country"), dict) else None,
+            # Series
+            "seriesId": series.get("id"),
+            "seriesName": series.get("longName") or series.get("name"),
+            # Teams
+            "team1Id": team1.get("team", {}).get("id"),
+            "team1Name": team1.get("team", {}).get("longName"),
+            "team1Abbreviation": team1.get("team", {}).get("abbreviation"),
+            "team1IsHome": team1.get("isHome"),
+            "team2Id": team2.get("team", {}).get("id"),
+            "team2Name": team2.get("team", {}).get("longName"),
+            "team2Abbreviation": team2.get("team", {}).get("abbreviation"),
+            "team2IsHome": team2.get("isHome"),
+            # Result
+            "winnerTeamId": match_metadata.get("winnerTeamId"),
+            "resultStatus": match_metadata.get("resultStatus"),
+            # Toss
+            "tossWinnerTeamId": match_metadata.get("tossWinnerTeamId"),
+            "tossWinnerChoice": match_metadata.get("tossWinnerChoice"),
+            # Classification
+            "internationalClassId": match_metadata.get("internationalClassId"),
+            "generalClassId": match_metadata.get("generalClassId"),
+            "internationalNumber": match_metadata.get("internationalNumber"),
+            # Umpires
+            "umpire1Id": umpires[0].get("id") if len(umpires) > 0 else None,
+            "umpire1Name": umpires[0].get("longName") if len(umpires) > 0 else None,
+            "umpire2Id": umpires[1].get("id") if len(umpires) > 1 else None,
+            "umpire2Name": umpires[1].get("longName") if len(umpires) > 1 else None,
+            "tvUmpireId": tv_umpires[0].get("id") if len(tv_umpires) > 0 else None,
+            "tvUmpireName": tv_umpires[0].get("longName") if len(tv_umpires) > 0 else None,
+            "matchRefereeId": match_referees[0].get("id") if len(match_referees) > 0 else None,
+            "matchRefereeName": match_referees[0].get("longName") if len(match_referees) > 0 else None,
+        }
+        
+        df = pd.DataFrame([row])
+        df.to_parquet(metadata_file, index=False)
+    except Exception as e:
+        print(f"[{match_id}] Failed to save metadata: {e}")
+
 async def process_match(session, match_id):
     final_file = os.path.join(OUTPUT_DIR, f"match_{match_id}_complete.parquet")
     if os.path.exists(final_file):
@@ -124,6 +405,29 @@ async def process_match(session, match_id):
         print(f"[{match_id}] Match not completed yet (state: {state}, stage: {stage}). Skipping safely.")
         return True # Safe skip, don't mark as failed
         
+    # === NEW FILTER: Only keep Internationals & Major T20 Leagues ===
+    int_class = match_metadata.get("internationalClassId")
+    series_name = str(match_metadata.get("series", {}).get("longName", "")).lower()
+    
+    # If intClass has a value, it's an International (Men/Women/U19)
+    is_international = int_class is not None
+    
+    major_t20_leagues = [
+        "indian premier league", "ipl", "big bash", "bbl", "pakistan super", "psl",
+        "caribbean premier", "cpl", "sa20", "bangladesh premier", "bpl",
+        "lanka premier", "lpl", "major league cricket", "mlc", "the hundred",
+        "vitality blast", "t20 blast", "super smash", "ilt20", "super league"
+    ]
+    is_major_league = any(league in series_name for league in major_t20_leagues)
+    
+    if not is_international and not is_major_league:
+        print(f"[{match_id}] Minor match ({series_name[:30]}...). Skipping.")
+        # Create a tiny marker file so we don't try to fetch this again
+        df = pd.DataFrame([{"match_id": match_id, "skipped": True, "reason": "minor_match"}])
+        df.to_parquet(final_file, index=False)
+        return True
+    # ================================================================
+
     content_info = first_data.get("content", {})
     innings_list = content_info.get("innings", [])
     
@@ -132,8 +436,46 @@ async def process_match(session, match_id):
         # Create an empty dataframe with match_id just to mark as done
         df = pd.DataFrame([{"match_id": match_id, "empty": True}])
         df.to_parquet(final_file, index=False)
+        extract_match_metadata(match_metadata, match_id)
         return True
-        
+    
+    # ====== EXTRACT ALL DATA LAYERS ======
+    
+    # 1. Match Metadata (Stadium, Teams, Toss, Date, Umpires, Result)
+    extract_match_metadata(match_metadata, match_id)
+    
+    # 2. Batting Scorecards
+    try:
+        extract_batting_scorecard(innings_list, match_id)
+    except Exception as e:
+        print(f"[{match_id}] Batting extraction error: {e}")
+    
+    # 3. Bowling Scorecards
+    try:
+        extract_bowling_scorecard(innings_list, match_id)
+    except Exception as e:
+        print(f"[{match_id}] Bowling extraction error: {e}")
+    
+    # 4. Partnerships
+    try:
+        extract_partnerships(innings_list, match_id)
+    except Exception as e:
+        print(f"[{match_id}] Partnership extraction error: {e}")
+    
+    # 5. Fall of Wickets
+    try:
+        extract_fall_of_wickets(innings_list, match_id)
+    except Exception as e:
+        print(f"[{match_id}] FOW extraction error: {e}")
+    
+    # 6. Innings Summaries
+    try:
+        extract_innings_summary(innings_list, match_id)
+    except Exception as e:
+        print(f"[{match_id}] Innings summary extraction error: {e}")
+    
+    # ====== EXTRACT BALL-BY-BALL TELEMETRY ======
+    
     all_comments = []
     
     for inning_num in range(1, len(innings_list) + 1):

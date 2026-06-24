@@ -6,3 +6,5 @@ requests
 duckdb
 pyarrow
 flask
+curl_cffi
+pandas
