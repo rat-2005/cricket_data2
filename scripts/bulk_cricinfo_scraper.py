@@ -298,18 +298,18 @@ def extract_match_metadata(match_metadata, match_id):
         return
     try:
         # Extract key fields into a clean, flat row
-        ground = match_metadata.get("ground", {})
-        series = match_metadata.get("series", {})
-        teams_raw = match_metadata.get("teams", [])
+        ground = match_metadata.get("ground") or {}
+        series = match_metadata.get("series") or {}
+        teams_raw = match_metadata.get("teams") or []
         
         # Build team info
         team1 = teams_raw[0] if len(teams_raw) > 0 else {}
         team2 = teams_raw[1] if len(teams_raw) > 1 else {}
         
         # Extract umpires
-        umpires = match_metadata.get("umpires", [])
-        tv_umpires = match_metadata.get("tvUmpires", [])
-        match_referees = match_metadata.get("matchReferees", [])
+        umpires = match_metadata.get("umpires") or []
+        tv_umpires = match_metadata.get("tvUmpires") or []
+        match_referees = match_metadata.get("matchReferees") or []
         
         row = {
             "match_id": match_id,
