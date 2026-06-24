@@ -224,7 +224,7 @@ async def main(limit=None):
         queue.put_nowait(m)
         
     # Start workers
-    num_workers = 300 # Reduced to 100 to prevent Akamai 403 on AWS IPs
+    num_workers = 600 # Reduced to 100 to prevent Akamai 403 on AWS IPs
     async with requests.AsyncSession(impersonate="chrome") as session:
         workers = []
         for i in range(num_workers):
