@@ -2,6 +2,8 @@ import os
 import json
 import zipfile
 import pandas as pd
+import requests
+import gc
 
 # Define Cricsheet zip files in the current directory
 ZIPS = ["all_json.zip"]
@@ -12,8 +14,6 @@ PEOPLE_DIR = os.path.join("data", "cricsheet_people")
 os.makedirs(MATCHES_DIR, exist_ok=True)
 os.makedirs(DELIVERIES_DIR, exist_ok=True)
 os.makedirs(PEOPLE_DIR, exist_ok=True)
-
-import requests
 
 def download_if_missing(filename, url):
     if not os.path.exists(filename):
@@ -132,7 +132,6 @@ def process_cricsheet_match(json_data, filename, global_mapping):
                     row["is_wicket"] = True
                     row["dismissal_kind"] = d["wickets"][0].get("kind")
                     row["player_out"] = d["wickets"][0].get("player_out")
-                    # Extract fielders involved (catch, runout)
                     fielders = d["wickets"][0].get("fielders", [])
                     row["fielders"] = ", ".join([str(f.get("name")) for f in fielders if f.get("name")])
                 else:
@@ -157,32 +156,51 @@ def convert_zips_to_parquet(global_mapping):
         all_matches = []
         all_deliveries = []
         
+        chunk_index = 1
+        base_name = zip_name.replace('_json.zip', '')
+        
         with zipfile.ZipFile(zip_name, 'r') as z:
             for filename in z.namelist():
                 if not filename.endswith('.json'):
                     continue
                     
-                # Read the JSON directly out of the ZIP without extracting to disk
                 with z.open(filename) as f:
                     try:
                         data = json.load(f)
                         match_row, delivery_rows = process_cricsheet_match(data, filename, global_mapping)
                         all_matches.append(match_row)
                         all_deliveries.extend(delivery_rows)
+                        
+                        # --- THE FIX: Micro-Batching at 100,000 rows ---
+                        if len(all_deliveries) >= 100000:
+                            deliv_df = pd.DataFrame(all_deliveries)
+                            out_name = os.path.join(DELIVERIES_DIR, f"{base_name}_part_{chunk_index}.parquet")
+                            deliv_df.to_parquet(out_name, index=False)
+                            print(f"Saved chunk {chunk_index} ({len(all_deliveries)} deliveries) to {out_name}")
+                            
+                            # Aggressive Memory Clearing
+                            del deliv_df 
+                            all_deliveries.clear() 
+                            gc.collect() # Force garbage collection
+                            
+                            chunk_index += 1
+                            
                     except Exception as e:
                         print(f"Failed to process {filename}: {e}")
                         
+        # Save any remaining match metadata
         if all_matches:
             matches_df = pd.DataFrame(all_matches)
-            out_name = os.path.join(MATCHES_DIR, zip_name.replace('_json.zip', '.parquet'))
+            out_name = os.path.join(MATCHES_DIR, f"{base_name}_matches.parquet")
             matches_df.to_parquet(out_name, index=False)
             print(f"Saved {len(all_matches)} matches metadata to {out_name}")
             
+        # Save whatever deliveries are left over in the final chunk
         if all_deliveries:
             deliv_df = pd.DataFrame(all_deliveries)
-            out_name = os.path.join(DELIVERIES_DIR, zip_name.replace('_json.zip', '.parquet'))
+            out_name = os.path.join(DELIVERIES_DIR, f"{base_name}_part_{chunk_index}.parquet")
             deliv_df.to_parquet(out_name, index=False)
-            print(f"Saved {len(all_deliveries)} deliveries to {out_name}")
+            print(f"Saved final chunk {chunk_index} ({len(all_deliveries)} deliveries) to {out_name}")
 
 def main():
     print("Starting Cricsheet JSON -> Parquet conversion...")
