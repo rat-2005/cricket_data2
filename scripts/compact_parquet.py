@@ -51,7 +51,7 @@ def main():
         
         # Step 1: Count rows in the source files to guarantee zero data loss
         try:
-            source_count_query = f"SELECT COUNT(*) FROM '{source_dir}/*.parquet'"
+            source_count_query = f"SELECT COUNT(*) FROM read_parquet('{source_dir}/*.parquet', union_by_name=True)"
             source_rows = conn.execute(source_count_query).fetchone()[0]
         except Exception as e:
             print(f"[{folder}] Error reading source files: {e}")
@@ -65,7 +65,7 @@ def main():
             conn.execute("DROP TABLE IF EXISTS temp_compaction")
             
             # Use COPY to write directly to disk without holding everything in memory
-            copy_query = f"COPY (SELECT * FROM '{source_dir}/*.parquet') TO '{target_file}' (FORMAT PARQUET)"
+            copy_query = f"COPY (SELECT * FROM read_parquet('{source_dir}/*.parquet', union_by_name=True)) TO '{target_file}' (FORMAT PARQUET)"
             conn.execute(copy_query)
         except Exception as e:
             print(f"[{folder}] Error compacting files: {e}")
