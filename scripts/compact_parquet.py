@@ -4,9 +4,9 @@ import duckdb
 import time
 
 def main():
-    # S3 bucket base paths
-    source_base = "s3://cricket-telemetry-lake-thej"
-    target_base = "s3://cricket-telemetry-lake-thej/data_merged"
+    # The source and target base directories
+    source_base = "data"
+    target_base = "data_merged"
     
     # List of all directories we want to compact
     directories = [
@@ -22,24 +22,32 @@ def main():
         "cricsheet_people"
     ]
     
-    # Initialize an in-memory DuckDB connection and configure S3
+    # Initialize an in-memory DuckDB connection
     conn = duckdb.connect()
     
-    print("Loading AWS credentials into DuckDB...")
-    conn.execute("INSTALL httpfs;")
-    conn.execute("LOAD httpfs;")
-    conn.execute("CALL load_aws_credentials();")
-    
-    print(f"Starting highly optimized compaction directly on S3: '{source_base}' -> '{target_base}'...\n")
+    print(f"Starting highly optimized compaction into '{target_base}' directory...\n")
     
     for folder in directories:
-        source_dir = f"{source_base}/{folder}"
-        target_dir = f"{target_base}/{folder}"
+        source_dir = os.path.join(source_base, folder)
+        target_dir = os.path.join(target_base, folder)
         
-        print(f"[{folder}] Compacting files directly from S3...")
+        # Check if source directory exists and has parquet files
+        if not os.path.exists(source_dir):
+            print(f"[{folder}] Skipping: Directory does not exist.")
+            continue
+            
+        parquet_files = glob.glob(os.path.join(source_dir, "*.parquet"))
+        if not parquet_files:
+            print(f"[{folder}] Skipping: No parquet files found.")
+            continue
+            
+        print(f"[{folder}] Compacting {len(parquet_files)} files...")
+        
+        # Ensure target directory exists
+        os.makedirs(target_dir, exist_ok=True)
         
         # We will output exactly one file per folder: data.parquet
-        target_file = f"{target_dir}/data.parquet"
+        target_file = os.path.join(target_dir, "data.parquet")
         
         # Step 1: Count rows in the source files to guarantee zero data loss
         try:
