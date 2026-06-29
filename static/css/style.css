@@ -1,5 +1,6 @@
 :root {
-    --bg-color: #050510; /* Deep Space Black */
+    --bg-color: #050510;
+    /* Deep Space Black */
     --surface-color: rgba(20, 20, 35, 0.4);
     --surface-hover: rgba(40, 40, 70, 0.5);
     --text-primary: #f8fafc;
@@ -14,21 +15,29 @@
     --neon-glow: 0 0 15px rgba(59, 130, 246, 0.5);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
     min-height: 100vh;
-    background-image: 
+    background-image:
         radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
     background-attachment: fixed;
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4, .stat-value {
+h1,
+h2,
+h3,
+h4,
+.stat-value {
     font-family: 'Outfit', sans-serif;
 }
 
@@ -77,7 +86,7 @@ header {
     color: var(--text-primary);
     background: var(--surface-hover);
 }
-        
+
 .nav-links a.active {
     background: var(--surface-color);
     border-color: var(--glass-border);
@@ -124,7 +133,8 @@ header {
     letter-spacing: 1px;
 }
 
-.filter-group select, .filter-group input {
+.filter-group select,
+.filter-group input {
     width: 100%;
     padding: 0.8rem 1rem;
     background: rgba(0, 0, 0, 0.4);
@@ -136,7 +146,8 @@ header {
     transition: all 0.3s ease;
 }
 
-.filter-group select:focus, .filter-group input:focus {
+.filter-group select:focus,
+.filter-group input:focus {
     outline: none;
     border-color: var(--accent-blue);
     box-shadow: var(--neon-glow);
@@ -155,11 +166,13 @@ header {
     max-height: 400px;
     display: none;
     z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     margin-top: 0.5rem;
 }
 
-.search-results.active { display: block; }
+.search-results.active {
+    display: block;
+}
 
 .search-result-item {
     padding: 0.75rem 1rem;
@@ -168,7 +181,9 @@ header {
     font-size: 0.9rem;
 }
 
-.search-result-item:hover { background: var(--surface-hover); }
+.search-result-item:hover {
+    background: var(--surface-hover);
+}
 
 /* Bento Grid System */
 .bento-grid {
@@ -183,11 +198,25 @@ header {
     flex-direction: column;
 }
 
-.span-1 { grid-column: span 1; }
-.span-2 { grid-column: span 2; }
-.span-3 { grid-column: span 3; }
-.span-4 { grid-column: span 4; }
-.row-span-2 { grid-row: span 2; }
+.span-1 {
+    grid-column: span 1;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+.span-3 {
+    grid-column: span 3;
+}
+
+.span-4 {
+    grid-column: span 4;
+}
+
+.row-span-2 {
+    grid-row: span 2;
+}
 
 /* Stat Cards */
 .stat-box {
@@ -218,7 +247,10 @@ header {
     line-height: 1.2;
 }
 
-.stat-value.small { font-size: 1.8rem; }
+.stat-value.small {
+    font-size: 1.8rem;
+}
+
 .stat-subtext {
     font-size: 0.85rem;
     color: var(--text-secondary);
@@ -278,8 +310,15 @@ header {
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {
@@ -293,7 +332,8 @@ header {
     margin-top: 1rem;
 }
 
-.recent-matches th, .recent-matches td {
+.recent-matches th,
+.recent-matches td {
     padding: 0.75rem;
     text-align: left;
     border-bottom: 1px solid var(--glass-border);
@@ -317,8 +357,15 @@ header {
     color: #60a5fa;
 }
 
-.badge.icc { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-.badge.cricsheet { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.badge.icc {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+}
+
+.badge.cricsheet {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
 
 /* Loaders */
 .loader {
@@ -331,8 +378,9 @@ header {
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
 }
+
 .loader::after {
-    content: '';  
+    content: '';
     box-sizing: border-box;
     position: absolute;
     left: 50%;
@@ -344,33 +392,98 @@ header {
     border: 3px solid transparent;
     border-bottom-color: var(--accent-blue);
 }
+
 @keyframes rotation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 #loadingState {
     display: none;
-    width: 100%;
-    min-height: 400px;
-    background: rgba(10, 15, 30, 0.4);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 15, 30, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: 1.5rem;
+    margin: 0;
+    border: none;
+    border-radius: 0;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .dashboard { grid-template-columns: 1fr; }
-    .bento-grid { grid-template-columns: repeat(2, 1fr); }
-    .span-3, .span-4 { grid-column: span 2; }
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .span-3,
+    .span-4 {
+        grid-column: span 2;
+    }
 }
 
 @media (max-width: 640px) {
-    .bento-grid { grid-template-columns: 1fr; }
-    .span-2, .span-3, .span-4 { grid-column: span 1; }
-    header { flex-direction: column; gap: 1rem; }
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .span-2,
+    .span-3,
+    .span-4 {
+        grid-column: span 1;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* 1. Base dark theme for all options to replace the harsh default white */
+select option {
+    background-color: #1e293b;
+    /* A nice dark slate */
+    color: #f8fafc;
+    font-weight: 500;
+    padding: 8px;
+    /* Note: padding only works in some browsers */
+}
+
+/* 2. Colorful text for Format options */
+#filterFormat option {
+    color: #60a5fa;
+    /* Blue */
+}
+
+/* 3. Colorful text for League options */
+#filterLeague option {
+    color: #a78bfa;
+    /* Purple */
+}
+
+/* 4. Colorful text for Phase options */
+#filterPhase option {
+    color: #fb923c;
+    /* Orange */
+}
+
+/* 5. Colorful text for Venue options */
+#filterVenue option {
+    color: #34d399;
+    /* Emerald Green */
 }

@@ -42,6 +42,11 @@
                 </div>
                 
                 <div style="flex: 1; min-width: 150px;">
+                    <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Year</label>
+                    <select id="filterYear" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Years</option></select>
+                </div>
+                
+                <div style="flex: 1; min-width: 150px;">
                     <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Phase</label>
                     <select id="filterPhase" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                         <option value="All">All Phases</option>
@@ -88,11 +93,6 @@
                 </div>
 
                 <div style="flex: 1; min-width: 150px;">
-                    <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Year</label>
-                    <select id="filterYear" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Years</option></select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
                     <label id="labelRecent" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Recent Matches</label>
                     <select id="filterRecent" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                         <option value="All">All Matches</option>
@@ -100,6 +100,23 @@
                         <option value="10">Last 10 Matches</option>
                         <option value="20">Last 20 Matches</option>
                     </select>
+                </div>
+                
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelWicketType" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Wicket Type</label>
+                    <select id="filterWicketType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Types</option></select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelPitchLength" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Pitch Length</label>
+                    <select id="filterPitchLength" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Lengths</option></select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelPitchLine" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Pitch Line</label>
+                    <select id="filterPitchLine" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Lines</option></select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label id="labelShotType" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;">Shot Type</label>
+                    <select id="filterShotType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Shots</option></select>
                 </div>
 
                 <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
@@ -166,6 +183,72 @@
                             </div>
                             <div class="chart-wrapper">
                                 <canvas id="vulnChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Pitch Heatmap -->
+                        <div class="glass-panel span-4 chart-container" style="min-height: 400px; padding: 1.5rem;">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-fire" style="color: #f97316;"></i> Pitch Heatmap</h3>
+                            </div>
+                            <div class="chart-wrapper" style="display:flex; justify-content:center; padding: 1rem 0; overflow-x: auto;">
+                                <style>
+                                .pitch-grid {
+                                    display: grid;
+                                    grid-template-columns: 140px repeat(5, 50px);
+                                    grid-template-rows: 40px repeat(6, 40px);
+                                    gap: 2px;
+                                    background: transparent;
+                                }
+                                .pitch-header-cell {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: flex-end;
+                                    font-size: 0.8rem;
+                                    color: #94a3b8;
+                                    padding-bottom: 5px;
+                                }
+                                .pitch-header-stumps {
+                                    font-size: 1.2rem;
+                                    font-weight: bold;
+                                    letter-spacing: -2px;
+                                    color: #cbd5e1;
+                                }
+                                .pitch-label {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: flex-end;
+                                    padding-right: 12px;
+                                    font-size: 0.85rem;
+                                    color: #94a3b8;
+                                    border-bottom: 1px dashed rgba(255,255,255,0.1);
+                                }
+                                .pitch-cell {
+                                    background: rgba(255,255,255,0.02);
+                                    border: 1px solid rgba(255,255,255,0.05);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 0.8rem;
+                                    font-weight: 600;
+                                    color: #f8fafc;
+                                    transition: all 0.2s;
+                                    cursor: default;
+                                    border-radius: 4px;
+                                }
+                                .pitch-cell:hover {
+                                    transform: scale(1.05);
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                                    z-index: 10;
+                                }
+                                </style>
+                                <div class="pitch-grid" id="pitchHeatmapGrid">
+                                    <!-- Headers -->
+                                    <div></div>
+                                    <div class="pitch-header-cell" style="grid-column: 2 / span 2; border-bottom: 1px dashed rgba(255,255,255,0.1);">OFF</div>
+                                    <div class="pitch-header-cell" style="border-bottom: 1px dashed rgba(255,255,255,0.1);"><span class="pitch-header-stumps">|||</span></div>
+                                    <div class="pitch-header-cell" style="grid-column: 5 / span 2; border-bottom: 1px dashed rgba(255,255,255,0.1);">LEG</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -237,18 +320,25 @@
                 const currentResult = document.getElementById('filterResult') ? document.getElementById('filterResult').value || 'All' : 'All';
                 const currentPhase = document.getElementById('filterPhase') ? document.getElementById('filterPhase').value || 'All' : 'All';
                 const currentRecent = document.getElementById('filterRecent') ? document.getElementById('filterRecent').value || 'All' : 'All';
+                const currentWicket = document.getElementById('filterWicketType') ? document.getElementById('filterWicketType').value || 'All' : 'All';
+                const currentPitchLength = document.getElementById('filterPitchLength') ? document.getElementById('filterPitchLength').value || 'All' : 'All';
+                const currentPitchLine = document.getElementById('filterPitchLine') ? document.getElementById('filterPitchLine').value || 'All' : 'All';
+                const currentShotType = document.getElementById('filterShotType') ? document.getElementById('filterShotType').value || 'All' : 'All';
                 
                 try {
+                    document.getElementById('loadingState').style.display = 'flex';
                     let params;
                     if ('Batter' === 'Faceoff') {
                         params = new URLSearchParams({
                             batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, league: currentLeague, venue: currentVenue,
-                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent,
+                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType
                         });
                     } else {
                         params = new URLSearchParams({
                             id: currentId, format: currentFormat, league: currentLeague, venue: currentVenue,
-                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent
+                            opponent: currentOpp, bowling_type: currentBowl, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent,
+                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType
                         });
                     }
                     
@@ -280,12 +370,60 @@
                             if (filters.bowling_types.includes(currentBowl)) bowlSelect.value = currentBowl;
                         }
                         if (sourceId !== 'filterYear' && yearSelect && filters.years) {
-                            yearSelect.innerHTML = '<option value="All">All Years</option>' + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
+                            let labelEl = document.getElementById('labelYear');
+                            let isLeague = (currentLeague && currentLeague !== 'All');
+                            if (labelEl) labelEl.innerText = isLeague ? 'Season' : 'Year';
+                            let defaultTxt = isLeague ? 'All Seasons' : 'All Years';
+                            yearSelect.innerHTML = `<option value="All">${defaultTxt}</option>` + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
                             if (filters.years.includes(parseInt(currentYear)) || filters.years.includes(currentYear)) yearSelect.value = currentYear;
+                        }
+                        
+                        const inningsSelect = document.getElementById('filterInnings');
+                        if (sourceId !== 'filterInnings' && inningsSelect && filters.innings) {
+                            inningsSelect.innerHTML = '<option value="All">All Innings</option>' + filters.innings.map(i => `<option value="${i}">Innings ${i}</option>`).join('');
+                            if (filters.innings.includes(currentInnings)) inningsSelect.value = currentInnings;
+                        }
+
+                        const resultSelect = document.getElementById('filterResult');
+                        if (sourceId !== 'filterResult' && resultSelect && filters.results) {
+                            resultSelect.innerHTML = '<option value="All">All Results</option>' + filters.results.map(r => `<option value="${r}">${r}</option>`).join('');
+                            if (filters.results.includes(currentResult)) resultSelect.value = currentResult;
+                        }
+
+                        const wtSelect = document.getElementById('filterWicketType');
+                        if (sourceId !== 'filterWicketType' && wtSelect && filters.wicket_types) {
+                            wtSelect.innerHTML = '<option value="All">All Types</option>' + filters.wicket_types.map(w => `<option value="${w}">${w}</option>`).join('');
+                            if (filters.wicket_types.includes(currentWicket)) wtSelect.value = currentWicket;
+                        }
+
+                        const plSelect = document.getElementById('filterPitchLength');
+                        if (sourceId !== 'filterPitchLength' && plSelect && filters.pitch_lengths) {
+                            plSelect.innerHTML = '<option value="All">All Lengths</option>' + filters.pitch_lengths.map(p => `<option value="${p}">${p}</option>`).join('');
+                            if (filters.pitch_lengths.includes(currentPitchLength)) plSelect.value = currentPitchLength;
+                        }
+
+                        const plnSelect = document.getElementById('filterPitchLine');
+                        if (sourceId !== 'filterPitchLine' && plnSelect && filters.pitch_lines) {
+                            plnSelect.innerHTML = '<option value="All">All Lines</option>' + filters.pitch_lines.map(p => `<option value="${p}">${p}</option>`).join('');
+                            if (filters.pitch_lines.includes(currentPitchLine)) plnSelect.value = currentPitchLine;
+                        }
+
+                        const stSelect = document.getElementById('filterShotType');
+                        if (sourceId !== 'filterShotType' && stSelect && filters.shot_types) {
+                            stSelect.innerHTML = '<option value="All">All Shots</option>' + filters.shot_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.shot_types.includes(currentShotType)) stSelect.value = currentShotType;
+                        }
+
+                        const phaseSelect = document.getElementById('filterPhase');
+                        if (sourceId !== 'filterPhase' && phaseSelect && filters.phases) {
+                            phaseSelect.innerHTML = '<option value="All">All Phases</option>' + filters.phases.map(p => `<option value="${p}">${p}</option>`).join('');
+                            if (filters.phases.includes(currentPhase)) phaseSelect.value = currentPhase;
                         }
                     }
                 } catch(e) { 
-                    console.error(e); 
+                    console.error("Filter fetch failed", e);
+                } finally {
+                    document.getElementById('loadingState').style.display = 'none';
                 }
             }
 
@@ -299,15 +437,10 @@
             if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBatterFilters('filterResult'));
             if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBatterFilters('filterPhase'));
             if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBatterFilters('filterRecent'));
-            
-
-                                                            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchBatterFilters('filterOpponent'));
-            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchBatterFilters('filterBowlingType'));
-            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchBatterFilters('filterYear'));
-            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchBatterFilters('filterInnings'));
-            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBatterFilters('filterResult'));
-            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBatterFilters('filterPhase'));
-            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBatterFilters('filterRecent'));
+            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', () => fetchBatterFilters('filterWicketType'));
+            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', () => fetchBatterFilters('filterPitchLength'));
+            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', () => fetchBatterFilters('filterPitchLine'));
+            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', () => fetchBatterFilters('filterShotType'));
 
             function setupSearch() {
                 const input = document.getElementById('athleteSearch');
@@ -403,11 +536,10 @@
                         ctx.fillRect(0, i, width, 20);
                     }
                     
-                    const centerX = width / 2;
-                    const centerY = height / 2;
-                    const radius = Math.min(centerX, centerY) - 10;
-                    
-                    // Draw Boundary
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const radius = Math.min(centerX, centerY) - 20;
+                    const batOriginY = centerY - radius * 0.134; // Calibrated bat position             // Draw Boundary
                     ctx.beginPath();
                     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                     ctx.strokeStyle = '#ffffff';
@@ -446,15 +578,15 @@
                     const labelR = radius + 1;
                     const labels = [
                         { name: 'Square Leg',      angle: 0   },
-                        { name: 'Fine Leg',        angle: 45  },
-                        { name: 'Third Man',       angle: 135 },
-                        { name: 'Backward Point',  angle: 155 },
+                        { name: 'Mid Wicket',      angle: 35  },
+                        { name: 'Mid On',          angle: 70  },
+                        { name: 'Straight',        angle: 90  },
+                        { name: 'Mid Off',         angle: 110 },
+                        { name: 'Cover',           angle: 145 },
                         { name: 'Point',           angle: 180 },
-                        { name: 'Cover',           angle: 225 },
-                        { name: 'Mid Off',         angle: 250 },
-                        { name: 'Straight',        angle: 270 },
-                        { name: 'Mid On',          angle: 290 },
-                        { name: 'Mid Wicket',      angle: 325 },
+                        { name: 'Backward Point',  angle: 205 },
+                        { name: 'Third Man',       angle: 235 },
+                        { name: 'Fine Leg',        angle: 305 },
                     ];
                     labels.forEach(l => {
                         const a = l.angle * Math.PI / 180;
@@ -465,15 +597,27 @@
                     
                     let drawnSpokes = [];
                     
-                    const batOriginY = centerY + 25; // Bottom popping crease
-                    
                     // Draw Spokes
                     scatterData.forEach(w => {
                         ctx.beginPath();
                         ctx.moveTo(centerX, batOriginY);
                         
-                        const mappedX = centerX + w.x * radius;
-                        const mappedY = batOriginY - w.y * radius;
+                        let nx, ny;
+                        if (w.x > 0 || w.y > 0) {
+                            nx = (w.x / 180) - 1.0;
+                            ny = (w.y / 180) - 1.0;
+                        } else if (w.zone > 0) {
+                            const zoneAngles = {
+                                1: {x: 0.6, y: -0.8},  2: {x: 1.0, y: 0.0},  3: {x: 0.7, y: 0.7},  4: {x: 0.0, y: 1.0},
+                                5: {x: -0.7, y: 0.7},  6: {x: -1.0, y: 0.0}, 7: {x: -0.8, y: -0.6}, 8: {x: -0.6, y: -0.8}
+                            };
+                            if (zoneAngles[w.zone]) {
+                                nx = zoneAngles[w.zone].x; ny = zoneAngles[w.zone].y;
+                            } else { return; }
+                        } else { return; }
+                        
+                        const mappedX = centerX + nx * radius;
+                        const mappedY = centerY + ny * radius;
                         ctx.lineTo(mappedX, mappedY);
                         
                         let color = '#facc15'; // 1-3
@@ -549,9 +693,12 @@
                                     <span style="font-weight:600; font-size:1rem;">${closest.data.runs} Runs</span>
                                 </div>
                                 <div style="margin-bottom:4px; color:var(--text-secondary);">Shot: <span style="color:white; font-weight:500;">${closest.data.shot_type && closest.data.shot_type !== 'Unknown' ? closest.data.shot_type : 'Not Specified'}</span></div>
-                                <div style="margin-bottom:4px; color:var(--text-secondary);">Bowler: <span style="color:white; font-weight:500;">${closest.data.bowler || 'Unknown'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Bowler: <span style="color:white; font-weight:500;">${closest.data.bowler_name || 'Unknown'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Length: <span style="color:white; font-weight:500;">${closest.data.length || 'Unknown'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Line: <span style="color:white; font-weight:500;">${closest.data.line || 'Unknown'}</span></div>
                                 <div style="margin-bottom:4px; color:var(--text-secondary);">Over: <span style="color:white; font-weight:500;">${closest.data.over - 1}${closest.data.ball > 0 ? '.' + closest.data.ball : ''}</span></div>
-                                <div style="color:var(--text-secondary);">Date: <span style="color:white; font-weight:500;">${closest.data.date || 'Unknown'}</span></div>
+                                <div style="margin-bottom:4px; color:var(--text-secondary);">Date: <span style="color:white; font-weight:500;">${closest.data.date ? new Date(closest.data.date).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'Unknown'}</span></div>
+                                <div style="color:var(--text-secondary);">Time: <span style="color:white; font-weight:500;">${closest.data.date ? new Date(closest.data.date).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : 'Unknown'} IST</span></div>
                             `;
                             canvas.style.cursor = 'pointer';
                         } else {
@@ -614,6 +761,162 @@
                         scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
                     }
                 });
+
+                // Pitch Heatmap
+                renderPitchHeatmap(data.pitch_heatmap);
+            }
+
+            function renderPitchHeatmap(heatmapData) {
+                const grid = document.getElementById('pitchHeatmapGrid');
+                if (!grid) return;
+                
+                // Keep the first 4 children (the headers)
+                while (grid.children.length > 4) {
+                    grid.removeChild(grid.lastChild);
+                }
+                
+                const lengths = ['FULL_TOSS', 'YORKER', 'FULL', 'GOOD_LENGTH', 'SHORT_OF_A_GOOD_LENGTH', 'SHORT'];
+                const lengthLabels = ['Full Toss', 'Yorker', 'Full Length', 'Good Length', 'Short of good length', 'Short Length'];
+                const lines = ['WIDE_OUTSIDE_OFFSTUMP', 'OUTSIDE_OFFSTUMP', 'ON_THE_STUMPS', 'DOWN_LEG', 'WIDE_DOWN_LEG'];
+                
+                let maxWickets = 0;
+                let maxRuns = 0;
+                const map = {};
+                if (heatmapData && heatmapData.length) {
+                    heatmapData.forEach(d => {
+                        if (!map[d.length]) map[d.length] = {};
+                        map[d.length][d.line] = d;
+                        if (d.wickets > maxWickets) maxWickets = d.wickets;
+                        if (d.runs > maxRuns) maxRuns = d.runs;
+                    });
+                }
+                
+                const maxWGradient = maxWickets > 0 ? maxWickets : 1;
+                const maxRGradient = maxRuns > 0 ? maxRuns : 1;
+
+                for (let r = 0; r < lengths.length; r++) {
+                    const labelCell = document.createElement('div');
+                    labelCell.className = 'pitch-label';
+                    labelCell.textContent = lengthLabels[r];
+                    grid.appendChild(labelCell);
+                    
+                    for (let c = 0; c < lines.length; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'pitch-cell';
+                        
+                        const cellData = map[lengths[r]] && map[lengths[r]][lines[c]];
+                        if (cellData) {
+                            if (cellData.wickets > 0) {
+                                const intensity = 0.4 + (0.6 * (cellData.wickets / maxWGradient));
+                                cell.style.background = `rgba(249, 115, 22, ${intensity})`;
+                                cell.style.borderColor = `rgba(249, 115, 22, 0.4)`;
+                                cell.textContent = cellData.wickets + 'W';
+                            } else if (cellData.runs > 0) {
+                                const intensity = 0.1 + (0.3 * (cellData.runs / maxRGradient));
+                                cell.style.background = `rgba(59, 130, 246, ${intensity})`;
+                                cell.style.borderColor = `rgba(59, 130, 246, 0.2)`;
+                            }
+                            let tooltipText = `Runs: ${cellData.runs} | Balls: ${cellData.balls} | Wickets: ${cellData.wickets}\n`;
+                            if (cellData.runs > 0 && cellData.shots && Object.keys(cellData.shots).length > 0) {
+                                tooltipText += `\n-- Runs by Shot --\n`;
+                                // Sort shots by runs descending
+                                const sortedShots = Object.entries(cellData.shots).sort((a,b) => b[1] - a[1]);
+                                for (const [shot, r] of sortedShots) {
+                                    tooltipText += `${shot.charAt(0).toUpperCase() + shot.slice(1)}: ${r}\n`;
+                                }
+                            }
+                            if (cellData.wickets > 0 && cellData.wicket_events && cellData.wicket_events.length > 0) {
+                                tooltipText += `\n-- Wickets --\n`;
+                                cellData.wicket_events.forEach(w => {
+                                    tooltipText += `• ${w.shot} \u2192 ${w.type}\n`;
+                                });
+                            }
+                            // Setup custom tooltip
+                            cell.addEventListener('mouseenter', (e) => {
+                                cell.style.transform = 'scale(1.15)';
+                                cell.style.zIndex = '10';
+                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+                                let tooltip = document.getElementById('heatmap-tooltip');
+                                if (!tooltip) {
+                                    tooltip = document.createElement('div');
+                                    tooltip.id = 'heatmap-tooltip';
+                                    tooltip.style.position = 'fixed';
+                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
+                                    tooltip.style.color = '#f8fafc';
+                                    tooltip.style.padding = '12px 16px';
+                                    tooltip.style.borderRadius = '8px';
+                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                                    tooltip.style.pointerEvents = 'none';
+                                    tooltip.style.zIndex = '9999';
+                                    tooltip.style.fontSize = '12px';
+                                    tooltip.style.fontFamily = 'Inter, sans-serif';
+                                    tooltip.style.whiteSpace = 'pre-wrap';
+                                    tooltip.style.lineHeight = '1.5';
+                                    document.body.appendChild(tooltip);
+                                }
+                                tooltip.style.display = 'block';
+                                tooltip.textContent = tooltipText.trim();
+                            });
+                            cell.addEventListener('mousemove', (e) => {
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) {
+                                    tooltip.style.left = (e.clientX + 15) + 'px';
+                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                }
+                            });
+                            cell.addEventListener('mouseleave', (e) => {
+                                cell.style.transform = 'scale(1)';
+                                cell.style.zIndex = '1';
+                                cell.style.boxShadow = 'none';
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) tooltip.style.display = 'none';
+                            });
+                        } else {
+                            cell.addEventListener('mouseenter', (e) => {
+                                cell.style.transform = 'scale(1.15)';
+                                cell.style.zIndex = '10';
+                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+                                let tooltip = document.getElementById('heatmap-tooltip');
+                                if (!tooltip) {
+                                    tooltip = document.createElement('div');
+                                    tooltip.id = 'heatmap-tooltip';
+                                    tooltip.style.position = 'fixed';
+                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
+                                    tooltip.style.color = '#f8fafc';
+                                    tooltip.style.padding = '12px 16px';
+                                    tooltip.style.borderRadius = '8px';
+                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                                    tooltip.style.pointerEvents = 'none';
+                                    tooltip.style.zIndex = '9999';
+                                    tooltip.style.fontSize = '12px';
+                                    tooltip.style.fontFamily = 'Inter, sans-serif';
+                                    tooltip.style.whiteSpace = 'pre-wrap';
+                                    tooltip.style.lineHeight = '1.5';
+                                    document.body.appendChild(tooltip);
+                                }
+                                tooltip.style.display = 'block';
+                                tooltip.textContent = "No data";
+                            });
+                            cell.addEventListener('mousemove', (e) => {
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) {
+                                    tooltip.style.left = (e.clientX + 15) + 'px';
+                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                }
+                            });
+                            cell.addEventListener('mouseleave', (e) => {
+                                cell.style.transform = 'scale(1)';
+                                cell.style.zIndex = '1';
+                                cell.style.boxShadow = 'none';
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) tooltip.style.display = 'none';
+                            });
+                        }
+                        grid.appendChild(cell);
+                    }
+                }
             }
 
             async function fetchStats() {
@@ -634,7 +937,11 @@
                     innings: document.getElementById('filterInnings').value,
                     result: document.getElementById('filterResult').value,
                     year: document.getElementById('filterYear').value,
-                    recent: document.getElementById('filterRecent').value
+                    recent: document.getElementById('filterRecent').value,
+                    wicket_type: document.getElementById('filterWicketType') ? document.getElementById('filterWicketType').value : 'All',
+                    pitch_length: document.getElementById('filterPitchLength') ? document.getElementById('filterPitchLength').value : 'All',
+                    pitch_line: document.getElementById('filterPitchLine') ? document.getElementById('filterPitchLine').value : 'All',
+                    shot_type: document.getElementById('filterShotType') ? document.getElementById('filterShotType').value : 'All'
                 });
                 
                 try {
