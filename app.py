@@ -10,22 +10,49 @@ import data_service as ds
 
 app = Flask(__name__)
 
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
+
+import datetime
+@app.before_request
+def log_request_info():
+    with open("requests.log", "a") as f:
+        f.write(f"[{datetime.datetime.now()}] URL: {request.url}\n")
+        f.write(f"[{datetime.datetime.now()}] ARGS: {dict(request.args)}\n")
+
+
 
 # ── Helper ───────────────────────────────────────────────────
 
 def _filters(args):
     """Extract filter dict from request query params."""
-    return {
-        "format":       args.get("format", "All"),
-        "league":       args.get("league", "All"),
-        "opponent":     args.get("opponent", "All"),
-        "phase":        args.get("phase", "All"),
-        "venue":        args.get("venue", "All"),
-        "year":         args.get("year", "All"),
-        "innings":      args.get("innings", "All"),
-        "bowling_type": args.get("bowling_type", "All"),
-        "recent":       args.get("recent", "All"),
-    }
+    keys = [
+        "format", "league", "opponent", "phase", "venue", "year", 
+        "innings", "bowling_type", "batting_type", "recent", "result",
+        "wicket_type", "pitch_length", "pitch_line", "shot_type"
+    ]
+    f = {}
+    for k in keys:
+        val = args.getlist(k)
+        # Handle comma-separated arrays sent as a single string
+        if len(val) == 1 and "," in val[0]:
+            val = [x.strip() for x in val[0].split(",") if x.strip()]
+            
+        if not val or val == [''] or val == ['All']:
+            f[k] = "All"
+        elif len(val) == 1:
+            f[k] = val[0]
+        else:
+            f[k] = val
+            
+        f[f"{k}_not"] = args.get(f"{k}_not", "false").lower() == "true"
+        
+    return f
 
 
 # ── Pages ────────────────────────────────────────────────────

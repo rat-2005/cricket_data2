@@ -1,0 +1,158 @@
+[2026-06-30 22:58:16.860688] URL: http://127.0.0.1:5000/batter?id=49752
+[2026-06-30 22:58:16.860926] ARGS: {'id': '49752'}
+[2026-06-30 22:58:16.904291] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 22:58:16.904429] ARGS: {'v': '2'}
+[2026-06-30 22:58:16.913406] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 22:58:16.913470] ARGS: {'v': '3'}
+[2026-06-30 22:58:17.041363] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 22:58:17.041419] ARGS: {}
+[2026-06-30 22:58:17.149625] URL: http://127.0.0.1:5000/api/athlete/49752
+[2026-06-30 22:58:17.149691] ARGS: {}
+[2026-06-30 22:58:36.400118] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=All&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 22:58:36.400355] ARGS: {'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 22:58:42.609672] URL: http://127.0.0.1:5000/
+[2026-06-30 22:58:42.609780] ARGS: {}
+[2026-06-30 22:59:12.182738] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=All&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 22:59:12.182818] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 22:59:28.107106] URL: http://127.0.0.1:5000/static/css/style.css
+[2026-06-30 22:59:28.107210] ARGS: {}
+[2026-06-30 22:59:28.464748] URL: http://127.0.0.1:5000/favicon.ico
+[2026-06-30 22:59:28.464808] ARGS: {}
+[2026-06-30 22:59:30.995973] URL: http://127.0.0.1:5000/batter
+[2026-06-30 22:59:30.996064] ARGS: {}
+[2026-06-30 22:59:31.011567] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 22:59:31.011754] ARGS: {'v': '2'}
+[2026-06-30 22:59:31.015397] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 22:59:31.015485] ARGS: {'v': '3'}
+[2026-06-30 22:59:31.687215] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 22:59:31.687278] ARGS: {}
+[2026-06-30 22:59:35.353565] URL: http://127.0.0.1:5000/api/search?q=V
+[2026-06-30 22:59:35.353637] ARGS: {'q': 'V'}
+[2026-06-30 22:59:36.757125] URL: http://127.0.0.1:5000/api/search?q=Virat
+[2026-06-30 22:59:36.757235] ARGS: {'q': 'Virat'}
+[2026-06-30 22:59:39.084892] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=All&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 22:59:39.085011] ARGS: {'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 22:59:51.300275] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 22:59:51.300449] ARGS: {'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 22:59:54.213046] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=ODI&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 22:59:54.213140] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'ODI', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:02:52.262240] URL: http://127.0.0.1:5000/faceoff
+[2026-06-30 23:02:52.264010] ARGS: {}
+[2026-06-30 23:02:52.360905] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:02:52.361038] ARGS: {'v': '2'}
+[2026-06-30 23:02:52.373868] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:02:52.373956] ARGS: {}
+[2026-06-30 23:02:56.411553] URL: http://127.0.0.1:5000/api/search?q=V
+[2026-06-30 23:02:56.411733] ARGS: {'q': 'V'}
+[2026-06-30 23:02:56.902460] URL: http://127.0.0.1:5000/api/search?q=Vi
+[2026-06-30 23:02:56.902605] ARGS: {'q': 'Vi'}
+[2026-06-30 23:02:57.218330] URL: http://127.0.0.1:5000/api/search?q=Vir
+[2026-06-30 23:02:57.218436] ARGS: {'q': 'Vir'}
+[2026-06-30 23:03:01.994133] URL: http://127.0.0.1:5000/api/search?q=M&against_batter=49752
+[2026-06-30 23:03:01.994216] ARGS: {'q': 'M', 'against_batter': '49752'}
+[2026-06-30 23:03:03.090820] URL: http://127.0.0.1:5000/api/search?q=Ma&against_batter=49752
+[2026-06-30 23:03:03.091016] ARGS: {'q': 'Ma', 'against_batter': '49752'}
+[2026-06-30 23:03:04.053668] URL: http://127.0.0.1:5000/api/search?q=Mal&against_batter=49752
+[2026-06-30 23:03:04.053852] ARGS: {'q': 'Mal', 'against_batter': '49752'}
+[2026-06-30 23:03:04.608138] URL: http://127.0.0.1:5000/api/search?q=Malin&against_batter=49752
+[2026-06-30 23:03:04.608289] ARGS: {'q': 'Malin', 'against_batter': '49752'}
+[2026-06-30 23:03:07.946489] URL: http://127.0.0.1:5000/api/faceoff_filters?batter_id=49752&bowler_id=45105&format=All&league=All&venue=All&year=All&phase=All&recent=All&innings=All&result=All&wicket_type=All&pitch_length=All&pitch_line=All&shot_type=All
+[2026-06-30 23:03:07.946567] ARGS: {'batter_id': '49752', 'bowler_id': '45105', 'format': 'All', 'league': 'All', 'venue': 'All', 'year': 'All', 'phase': 'All', 'recent': 'All', 'innings': 'All', 'result': 'All', 'wicket_type': 'All', 'pitch_length': 'All', 'pitch_line': 'All', 'shot_type': 'All'}
+[2026-06-30 23:07:20.151910] URL: http://127.0.0.1:5000/
+[2026-06-30 23:07:20.154001] ARGS: {}
+[2026-06-30 23:08:57.305264] URL: http://127.0.0.1:5000/static/css/style.css
+[2026-06-30 23:08:57.305377] ARGS: {}
+[2026-06-30 23:09:18.918254] URL: http://127.0.0.1:5000/
+[2026-06-30 23:09:18.918344] ARGS: {}
+[2026-06-30 23:09:23.335009] URL: http://127.0.0.1:5000/static/css/style.css
+[2026-06-30 23:09:23.335095] ARGS: {}
+[2026-06-30 23:09:26.015771] URL: http://127.0.0.1:5000/batter
+[2026-06-30 23:09:26.015859] ARGS: {}
+[2026-06-30 23:09:26.053776] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:09:26.053882] ARGS: {'v': '2'}
+[2026-06-30 23:09:26.055217] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 23:09:26.055328] ARGS: {'v': '3'}
+[2026-06-30 23:09:26.292740] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:09:26.292827] ARGS: {}
+[2026-06-30 23:09:29.393189] URL: http://127.0.0.1:5000/api/search?q=V
+[2026-06-30 23:09:29.393273] ARGS: {'q': 'V'}
+[2026-06-30 23:09:30.291493] URL: http://127.0.0.1:5000/api/search?q=Virat
+[2026-06-30 23:09:30.291647] ARGS: {'q': 'Virat'}
+[2026-06-30 23:09:31.404228] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=All&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:09:31.404466] ARGS: {'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:10:00.226791] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:10:00.227051] ARGS: {'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:10:05.750375] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:10:05.750543] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:11:51.250057] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:11:51.250249] ARGS: {'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:11:57.021648] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:11:57.021794] ARGS: {'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:14:32.954788] URL: http://127.0.0.1:5000/
+[2026-06-30 23:14:32.955097] ARGS: {}
+[2026-06-30 23:14:37.581433] URL: http://127.0.0.1:5000/static/css/style.css
+[2026-06-30 23:14:37.581569] ARGS: {}
+[2026-06-30 23:14:40.398326] URL: http://127.0.0.1:5000/
+[2026-06-30 23:14:40.398393] ARGS: {}
+[2026-06-30 23:14:44.323006] URL: http://127.0.0.1:5000/static/css/style.css
+[2026-06-30 23:14:44.323122] ARGS: {}
+[2026-06-30 23:14:52.223081] URL: http://127.0.0.1:5000/batter
+[2026-06-30 23:14:52.223196] ARGS: {}
+[2026-06-30 23:14:52.247198] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:14:52.247303] ARGS: {'v': '2'}
+[2026-06-30 23:14:52.252231] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 23:14:52.252327] ARGS: {'v': '3'}
+[2026-06-30 23:14:52.272751] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:14:52.272846] ARGS: {}
+[2026-06-30 23:14:56.628260] URL: http://127.0.0.1:5000/api/search?q=V
+[2026-06-30 23:14:56.628487] ARGS: {'q': 'V'}
+[2026-06-30 23:14:57.669569] URL: http://127.0.0.1:5000/api/search?q=Virat
+[2026-06-30 23:14:57.669760] ARGS: {'q': 'Virat'}
+[2026-06-30 23:14:59.387067] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=All&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:14:59.387171] ARGS: {'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:15:27.346062] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=All&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:15:27.349480] ARGS: {'id': '49752', 'format': 'All', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:15:31.865411] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:15:31.880084] ARGS: {'id': '49752', 'format': 'ODI', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:15:36.701450] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=ODI&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:15:36.701557] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'ODI', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:16:30.304774] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:16:30.304898] ARGS: {'id': '49752', 'format': 'T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:16:33.599153] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=T20I&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:16:33.599400] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:16:50.100601] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=T20I&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:16:50.100733] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:17:31.837979] URL: http://127.0.0.1:5000/api/batter_filters?id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&phase=All&phase_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:17:31.838105] ARGS: {'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'phase': 'All', 'phase_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:17:36.026229] URL: http://127.0.0.1:5000/api/stats/batter?debug_version=v3&id=49752&format=ODI,T20I&format_not=false&league=All&league_not=false&phase=All&phase_not=false&venue=All&venue_not=false&opponent=All&opponent_not=false&bowling_type=All&bowling_type_not=false&innings=All&innings_not=false&result=All&result_not=false&year=All&year_not=false&recent=All&recent_not=false&wicket_type=All&wicket_type_not=false&pitch_length=All&pitch_length_not=false&pitch_line=All&pitch_line_not=false&shot_type=All&shot_type_not=false
+[2026-06-30 23:17:36.026412] ARGS: {'debug_version': 'v3', 'id': '49752', 'format': 'ODI,T20I', 'format_not': 'false', 'league': 'All', 'league_not': 'false', 'phase': 'All', 'phase_not': 'false', 'venue': 'All', 'venue_not': 'false', 'opponent': 'All', 'opponent_not': 'false', 'bowling_type': 'All', 'bowling_type_not': 'false', 'innings': 'All', 'innings_not': 'false', 'result': 'All', 'result_not': 'false', 'year': 'All', 'year_not': 'false', 'recent': 'All', 'recent_not': 'false', 'wicket_type': 'All', 'wicket_type_not': 'false', 'pitch_length': 'All', 'pitch_length_not': 'false', 'pitch_line': 'All', 'pitch_line_not': 'false', 'shot_type': 'All', 'shot_type_not': 'false'}
+[2026-06-30 23:30:23.898385] URL: http://127.0.0.1:5000/bowler
+[2026-06-30 23:30:23.899597] ARGS: {}
+[2026-06-30 23:30:23.987672] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 23:30:23.987795] ARGS: {'v': '3'}
+[2026-06-30 23:30:23.987947] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:30:23.988007] ARGS: {'v': '2'}
+[2026-06-30 23:30:24.007546] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:30:24.007658] ARGS: {}
+[2026-06-30 23:30:28.674251] URL: http://127.0.0.1:5000/batter
+[2026-06-30 23:30:28.674380] ARGS: {}
+[2026-06-30 23:30:28.706155] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:30:28.706244] ARGS: {'v': '2'}
+[2026-06-30 23:30:28.707451] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 23:30:28.707517] ARGS: {'v': '3'}
+[2026-06-30 23:30:28.719286] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:30:28.719389] ARGS: {}
+[2026-06-30 23:30:31.446997] URL: http://127.0.0.1:5000/faceoff
+[2026-06-30 23:30:31.447123] ARGS: {}
+[2026-06-30 23:30:31.505359] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:30:31.505445] ARGS: {'v': '2'}
+[2026-06-30 23:30:31.517299] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:30:31.517364] ARGS: {}
+[2026-06-30 23:30:35.559845] URL: http://127.0.0.1:5000/batter
+[2026-06-30 23:30:35.559979] ARGS: {}
+[2026-06-30 23:30:35.582939] URL: http://127.0.0.1:5000/static/css/style.css?v=2
+[2026-06-30 23:30:35.583117] ARGS: {'v': '2'}
+[2026-06-30 23:30:35.584684] URL: http://127.0.0.1:5000/static/js/custom-select.js?v=3
+[2026-06-30 23:30:35.584852] ARGS: {'v': '3'}
+[2026-06-30 23:30:35.595591] URL: http://127.0.0.1:5000/api/filters
+[2026-06-30 23:30:35.595694] ARGS: {}

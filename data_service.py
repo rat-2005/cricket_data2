@@ -130,79 +130,82 @@ def _cs_format_where(fmt, prefix="cm"):
     return m.get(fmt, f"{prefix}.match_type = '{_esc(fmt)}'")
 
 
+def _handle_filter(val, is_not, sql_builder_fn):
+    if val == "All" or val == ["All"] or not val:
+        return ""
+    if not isinstance(val, list):
+        val = [val]
+    conds = []
+    for v in val:
+        c = sql_builder_fn(v)
+        if c:
+            conds.append(f"(NOT ({c}))" if is_not else f"({c})")
+    if not conds:
+        return ""
+    joiner = " AND " if is_not else " OR "
+    return f"({joiner.join(conds)})"
+
 def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
     """Build WHERE additions for cricinfo_parquet cp + cricinfo_metadata m."""
     parts = []
-    fmt = filters.get("format", "All")
-    if fmt != "All":
-        parts.append(_ci_format_where(fmt))
+    
+    cond = _handle_filter(filters.get("format", "All"), filters.get("format_not", False), _ci_format_where)
+    if cond: parts.append(cond)
+    
+    def _phase(p):
+        if p == "Final": return "m.title ILIKE '%Final%' AND m.title NOT ILIKE '%Semi%' AND m.title NOT ILIKE '%Quarter%'"
+        if p == "Semi-Final": return "m.title ILIKE '%Semi%'"
+        if p == "Qualifier": return "m.title ILIKE '%Qualifier%'"
+        if p == "Eliminator": return "m.title ILIKE '%Eliminator%'"
+        if p == "Group Stage": return "m.title NOT ILIKE '%Final%' AND m.title NOT ILIKE '%Qualifier%' AND m.title NOT ILIKE '%Eliminator%' AND m.title NOT ILIKE '%Semi%' AND m.title NOT ILIKE '%Quarter%'"
+        return ""
+    cond = _handle_filter(filters.get("phase", "All"), filters.get("phase_not", False), _phase)
+    if cond: parts.append(cond)
+    
+    def _inn(i):
+        return f"cp.inningNumber = {i}" if i in ("1", "2", "3", "4") else ""
+    cond = _handle_filter(filters.get("innings", "All"), filters.get("innings_not", False), _inn)
+    if cond: parts.append(cond)
 
-    phase = filters.get("phase", "All")
-    if phase == "Final":
-        parts.append("m.title ILIKE '%Final%' AND m.title NOT ILIKE '%Semi%' AND m.title NOT ILIKE '%Quarter%'")
-    elif phase == "Semi-Final":
-        parts.append("m.title ILIKE '%Semi%'")
-    elif phase == "Qualifier":
-        parts.append("m.title ILIKE '%Qualifier%'")
-    elif phase == "Eliminator":
-        parts.append("m.title ILIKE '%Eliminator%'")
-    elif phase == "Group Stage":
-        parts.append("m.title NOT ILIKE '%Final%' AND m.title NOT ILIKE '%Qualifier%' AND m.title NOT ILIKE '%Eliminator%' AND m.title NOT ILIKE '%Semi%' AND m.title NOT ILIKE '%Quarter%'")
+    cond = _handle_filter(filters.get("venue", "All"), filters.get("venue_not", False), lambda v: f"m.groundName = '{_esc(v)}'")
+    if cond: parts.append(cond)
 
-    inn = filters.get("innings", "All")
-    if inn in ("1", "2", "3", "4"):
-        parts.append(f"cp.inningNumber = {inn}")
+    cond = _handle_filter(filters.get("opponent", "All"), filters.get("opponent_not", False), lambda o: f"(m.team1Name ILIKE '%{_esc(o)}%' OR m.team2Name ILIKE '%{_esc(o)}%')")
+    if cond: parts.append(cond)
 
-    venue = filters.get("venue", "All")
-    if venue != "All":
-        parts.append(f"m.groundName = '{_esc(venue)}'")
+    cond = _handle_filter(filters.get("year", "All"), filters.get("year_not", False), lambda y: f"EXTRACT(YEAR FROM CAST(m.startDate AS DATE)) = {int(y)}")
+    if cond: parts.append(cond)
 
-    opponent = filters.get("opponent", "All")
-    if opponent != "All":
-        o = _esc(opponent)
-        parts.append(f"(m.team1Name ILIKE '%{o}%' OR m.team2Name ILIKE '%{o}%')")
+    cond = _handle_filter(filters.get("league", "All"), filters.get("league_not", False), lambda l: f"m.seriesName = '{_esc(l)}'")
+    if cond: parts.append(cond)
 
-    year = filters.get("year", "All")
-    if year != "All":
-        parts.append(f"EXTRACT(YEAR FROM CAST(m.startDate AS DATE)) = {int(year)}")
+    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"cp.bowlerPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE bowlingStyle = '{_esc(b)}')")
+    if cond: parts.append(cond)
 
-    league = filters.get("league", "All")
-    if league != "All":
-        parts.append(f"m.seriesName = '{_esc(league)}'")
+    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"cp.batsmanPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE battingStyle = '{_esc(b)}')")
+    if cond: parts.append(cond)
 
-    bowl = filters.get("bowling_type", "All")
-    if bowl != "All":
-        parts.append(f"cp.bowlerPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE bowlingStyle = '{_esc(bowl)}')")
-        
-    bat = filters.get("batting_type", "All")
-    if bat != "All":
-        parts.append(f"cp.batsmanPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE battingStyle = '{_esc(bat)}')")
+    def _res(r):
+        if player_id_field:
+            if r == "Won": return f"m.winnerTeamId = (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {player_id_field})"
+            if r == "Lost": return f"m.winnerTeamId IS NOT NULL AND m.winnerTeamId != (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {player_id_field})"
+        return ""
+    cond = _handle_filter(filters.get("result", "All"), filters.get("result_not", False), _res)
+    if cond: parts.append(cond)
 
-    result = filters.get("result", "All")
-    if result != "All" and player_id_field:
-        if result == "Won":
-            parts.append(f"m.winnerTeamId = (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {player_id_field})")
-        elif result == "Lost":
-            parts.append(f"m.winnerTeamId IS NOT NULL AND m.winnerTeamId != (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {player_id_field})")
+    def _wkt(w):
+        return "(cp.isWicket IS NULL OR cp.isWicket = FALSE)" if w == "Not Out" else f"cp.dismissalType = '{_esc(w)}'"
+    cond = _handle_filter(filters.get("wicket_type", "All"), filters.get("wicket_type_not", False), _wkt)
+    if cond: parts.append(cond)
 
-    wicket = filters.get("wicket_type", "All")
-    if wicket != "All":
-        if wicket == "Not Out":
-            parts.append("(cp.isWicket IS NULL OR cp.isWicket = FALSE)")
-        else:
-            parts.append(f"cp.dismissalType = '{_esc(wicket)}'")
-            
-    plength = filters.get("pitch_length", "All")
-    if plength != "All":
-        parts.append(f"cp.pitchLength = '{_esc(plength)}'")
-        
-    pline = filters.get("pitch_line", "All")
-    if pline != "All":
-        parts.append(f"cp.pitchLine = '{_esc(pline)}'")
-        
-    stype = filters.get("shot_type", "All")
-    if stype != "All":
-        parts.append(f"cp.shotType = '{_esc(stype)}'")
+    cond = _handle_filter(filters.get("pitch_length", "All"), filters.get("pitch_length_not", False), lambda p: f"cp.pitchLength = '{_esc(p)}'")
+    if cond: parts.append(cond)
+
+    cond = _handle_filter(filters.get("pitch_line", "All"), filters.get("pitch_line_not", False), lambda p: f"cp.pitchLine = '{_esc(p)}'")
+    if cond: parts.append(cond)
+
+    cond = _handle_filter(filters.get("shot_type", "All"), filters.get("shot_type_not", False), lambda s: f"cp.shotType = '{_esc(s)}'")
+    if cond: parts.append(cond)
 
     return (" AND " + " AND ".join(parts)) if parts else ""
 
@@ -210,76 +213,64 @@ def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
 def _build_cs_where(filters, player_id_field=None):
     """Build WHERE additions for cricsheet_deliveries d + cricsheet_matches cm."""
     parts = []
-    fmt = filters.get("format", "All")
-    if fmt != "All":
-        parts.append(_cs_format_where(fmt))
+    
+    cond = _handle_filter(filters.get("format", "All"), filters.get("format_not", False), _cs_format_where)
+    if cond: parts.append(cond)
+    
+    def _phase(p):
+        if p == "Final": return "d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Final%' AND title NOT ILIKE '%Semi%' AND title NOT ILIKE '%Quarter%')"
+        if p == "Semi-Final": return "d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Semi%')"
+        if p == "Qualifier": return "d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Qualifier%')"
+        if p == "Eliminator": return "d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Eliminator%')"
+        if p == "Group Stage": return "d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title NOT ILIKE '%Final%' AND title NOT ILIKE '%Qualifier%' AND title NOT ILIKE '%Eliminator%' AND title NOT ILIKE '%Semi%' AND title NOT ILIKE '%Quarter%')"
+        return ""
+    cond = _handle_filter(filters.get("phase", "All"), filters.get("phase_not", False), _phase)
+    if cond: parts.append(cond)
 
-    phase = filters.get("phase", "All")
-    if phase == "Final":
-        parts.append("d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Final%' AND title NOT ILIKE '%Semi%' AND title NOT ILIKE '%Quarter%')")
-    elif phase == "Semi-Final":
-        parts.append("d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Semi%')")
-    elif phase == "Qualifier":
-        parts.append("d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Qualifier%')")
-    elif phase == "Eliminator":
-        parts.append("d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title ILIKE '%Eliminator%')")
-    elif phase == "Group Stage":
-        parts.append("d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE title NOT ILIKE '%Final%' AND title NOT ILIKE '%Qualifier%' AND title NOT ILIKE '%Eliminator%' AND title NOT ILIKE '%Semi%' AND title NOT ILIKE '%Quarter%')")
+    def _inn(i):
+        return f"d.inning = {i}" if i in ("1", "2", "3", "4") else ""
+    cond = _handle_filter(filters.get("innings", "All"), filters.get("innings_not", False), _inn)
+    if cond: parts.append(cond)
 
-    inn = filters.get("innings", "All")
-    if inn in ("1", "2", "3", "4"):
-        parts.append(f"d.inning = {inn}")
+    cond = _handle_filter(filters.get("venue", "All"), filters.get("venue_not", False), lambda v: f"cm.venue = '{_esc(v)}'")
+    if cond: parts.append(cond)
 
-    venue = filters.get("venue", "All")
-    if venue != "All":
-        parts.append(f"cm.venue = '{_esc(venue)}'")
+    cond = _handle_filter(filters.get("opponent", "All"), filters.get("opponent_not", False), lambda o: f"(cm.team1 ILIKE '%{_esc(o)}%' OR cm.team2 ILIKE '%{_esc(o)}%')")
+    if cond: parts.append(cond)
 
-    opponent = filters.get("opponent", "All")
-    if opponent != "All":
-        o = _esc(opponent)
-        parts.append(f"(cm.team1 ILIKE '%{o}%' OR cm.team2 ILIKE '%{o}%')")
+    cond = _handle_filter(filters.get("year", "All"), filters.get("year_not", False), lambda y: f"EXTRACT(YEAR FROM CAST(cm.date AS DATE)) = {int(y)}")
+    if cond: parts.append(cond)
 
-    year = filters.get("year", "All")
-    if year != "All":
-        parts.append(f"EXTRACT(YEAR FROM CAST(cm.date AS DATE)) = {int(year)}")
+    cond = _handle_filter(filters.get("league", "All"), filters.get("league_not", False), lambda l: f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE seriesName = '{_esc(l)}')")
+    if cond: parts.append(cond)
 
-    league = filters.get("league", "All")
-    if league != "All":
-        parts.append(f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE seriesName = '{_esc(league)}')")
+    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"d.bowler IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.bowlingStyle = '{_esc(b)}')")
+    if cond: parts.append(cond)
 
-    bowl = filters.get("bowling_type", "All")
-    if bowl != "All":
-        parts.append(f"d.bowler IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.bowlingStyle = '{_esc(bowl)}')")
+    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"d.batter IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.battingStyle = '{_esc(b)}')")
+    if cond: parts.append(cond)
 
-    bat = filters.get("batting_type", "All")
-    if bat != "All":
-        parts.append(f"d.batter IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.battingStyle = '{_esc(bat)}')")
+    def _res(r):
+        if player_id_field:
+            if r == "Won": return f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE winnerTeamId = (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cricinfo_metadata.match_id AND playerId = {player_id_field}))"
+            if r == "Lost": return f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE winnerTeamId IS NOT NULL AND winnerTeamId != (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cricinfo_metadata.match_id AND playerId = {player_id_field}))"
+        return ""
+    cond = _handle_filter(filters.get("result", "All"), filters.get("result_not", False), _res)
+    if cond: parts.append(cond)
 
-    result = filters.get("result", "All")
-    if result != "All" and player_id_field:
-        if result == "Won":
-            parts.append(f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE winnerTeamId = (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cricinfo_metadata.match_id AND playerId = {player_id_field}))")
-        elif result == "Lost":
-            parts.append(f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE winnerTeamId IS NOT NULL AND winnerTeamId != (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cricinfo_metadata.match_id AND playerId = {player_id_field}))")
+    def _wkt(w):
+        return "d.dismissal_kind IS NULL" if w == "Not Out" else f"d.dismissal_kind = '{_esc(w)}'"
+    cond = _handle_filter(filters.get("wicket_type", "All"), filters.get("wicket_type_not", False), _wkt)
+    if cond: parts.append(cond)
 
-    wicket = filters.get("wicket_type", "All")
-    if wicket != "All":
-        if wicket == "Not Out":
-            parts.append("d.dismissal_kind IS NULL")
-        else:
-            parts.append(f"d.dismissal_kind = '{_esc(wicket)}'")
-            
-    plength = filters.get("pitch_length", "All")
-    if plength != "All":
-        parts.append("FALSE")
-        
-    pline = filters.get("pitch_line", "All")
-    if pline != "All":
-        parts.append("FALSE")
-        
-    stype = filters.get("shot_type", "All")
-    if stype != "All":
-        parts.append("FALSE")
+    cond = _handle_filter(filters.get("pitch_length", "All"), filters.get("pitch_length_not", False), lambda p: "FALSE")
+    if cond: parts.append(cond)
+
+    cond = _handle_filter(filters.get("pitch_line", "All"), filters.get("pitch_line_not", False), lambda p: "FALSE")
+    if cond: parts.append(cond)
+
+    cond = _handle_filter(filters.get("shot_type", "All"), filters.get("shot_type_not", False), lambda s: "FALSE")
+    if cond: parts.append(cond)
 
     return (" AND " + " AND ".join(parts)) if parts else ""
 

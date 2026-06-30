@@ -104,11 +104,49 @@ header {
     -webkit-backdrop-filter: blur(16px);
     box-shadow: var(--card-shadow);
     transition: transform 0.3s ease, border-color 0.3s ease;
+    overflow: visible;
 }
 
 .glass-panel:hover {
     border-color: rgba(255, 255, 255, 0.15);
 }
+
+/* Search Autocomplete Dropdown */
+.search-results {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1a2e;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    margin-top: 4px;
+}
+
+.search-results.active {
+    display: block;
+}
+
+.search-result-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.15s ease;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
 
 /* Dashboard Layout */
 .dashboard {
@@ -486,4 +524,140 @@ select option {
 #filterVenue option {
     color: #34d399;
     /* Emerald Green */
+}
+
+/* Filter toggles (Multi / Not) */
+.filter-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.filter-btn.active-multi {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.filter-btn.active-not {
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+}
+
+select[multiple] {
+    height: auto;
+    min-height: 80px;
+    padding: 0.4rem;
+}
+/* Custom Multi-Select Dropdown */
+.custom-multi-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-multi-header {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-multi-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    width: max-content;
+    max-width: 300px;
+    background: #1a1a2e;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    margin-top: 4px;
+    z-index: 1001;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    flex-direction: column;
+}
+
+.custom-multi-dropdown.active {
+    display: flex;
+}
+
+.custom-multi-options {
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+
+.custom-multi-option {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.custom-multi-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-multi-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.custom-multi-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.custom-multi-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 0.4rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: opacity 0.2s;
+}
+
+.custom-multi-btn:hover {
+    opacity: 0.9;
+}
+
+.custom-multi-header span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+    display: inline-block;
 }

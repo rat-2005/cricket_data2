@@ -1,338 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bowler Analytics | Cricket Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/static/css/style.css?v=2" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container fade-in">
-        <header>
-            <div class="logo">
-                <a href="/" style="text-decoration: none;"><h1>Cricket Analytics</h1></a>
-            </div>
-            <div class="nav-links">
-                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter</a>
-                <a href="/bowler" class="active"><i class="fas fa-bolt"></i> Bowler</a>
-                <a href="/faceoff"><i class="fas fa-people-arrows"></i> Face-off</a>
-            </div>
-        </header>
 
-        <div class="dashboard">
-            <!-- Top Bar for Selection & Filters -->
-            <div class="glass-panel" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; position: relative; z-index: 50;">
-                <div style="flex: 2; min-width: 250px; position: relative; z-index: 1000;">
-                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Select Bowler</label>
-                    <input type="text" id="athleteSearch" placeholder="Search bowler..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
-                    <div id="searchResults" class="search-results"></div>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelFormat" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Format</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterFormat', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterFormat', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterFormat" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Formats</option></select>
-                </div>
-                
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelLeague" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">League</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterLeague', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterLeague', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterLeague" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Leagues</option></select>
-                </div>
-                
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Phase</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPhase', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterPhase', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterPhase" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
-                        <option value="All">All Phases</option>
-                        <option value="Powerplay">Powerplay (1-6)</option>
-                        <option value="Middle">Middle Overs (7-15)</option>
-                        <option value="Death">Death Overs (16-20)</option>
-                    </select>
-                </div>
-                
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelVenue" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Venue</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterVenue', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterVenue', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterVenue" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Venues</option></select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelOpponent" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Opponent</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterOpponent', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterOpponent', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterOpponent" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Opponents</option></select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelBattingType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Batting Type</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterBattingType', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterBattingType', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterBattingType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Types</option></select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Year</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterYear', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterYear', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterYear" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Years</option></select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelInnings" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Innings</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterInnings', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterInnings', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterInnings" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
-                        <option value="All">All Innings</option>
-                        <option value="1">1st Innings</option>
-                        <option value="2">2nd Innings</option>
-                        <option value="3">3rd Innings</option>
-                        <option value="4">4th Innings</option>
-                    </select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelResult" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Match Result</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterResult', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterResult', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterResult" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
-                        <option value="All">All Results</option>
-                        <option value="Won">Won</option>
-                        <option value="Lost">Lost</option>
-                    </select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelRecent" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Recent Matches</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterRecent', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterRecent', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterRecent" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
-                        <option value="All">All Matches</option>
-                        <option value="5">Last 5 Matches</option>
-                        <option value="10">Last 10 Matches</option>
-                        <option value="20">Last 20 Matches</option>
-                    </select>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelWicketType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Wicket Type</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterWicketType', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterWicketType', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterWicketType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Types</option></select>
-                </div>
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelPitchLength" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Length</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLength', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLength', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterPitchLength" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Lengths</option></select>
-                </div>
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelPitchLine" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Line</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLine', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLine', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterPitchLine" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Lines</option></select>
-                </div>
-                <div style="flex: 1; min-width: 150px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label id="labelShotType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Shot Type</label>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterShotType', this)" title="Multi-select">Multi</button>
-                            <button type="button" class="filter-btn" onclick="toggleNot('filterShotType', this)" title="Exclude selected">Not</button>
-                        </div>
-                    </div>
-                    <select id="filterShotType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Shots</option></select>
-                </div>
-                
-                <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
-                        <input type="checkbox" id="splitByFormat" style="width: 16px; height: 16px; cursor: pointer;"> Split Formats
-                    </label>
-                    <button onclick="fetchStats()" style="padding: 0.8rem 2rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--neon-glow); transition: transform 0.2s;">
-                        Analyze
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats Display -->
-            <div>
-                <div class="player-header">
-                    <div class="glass-panel" style="display: inline-block; padding: 1.5rem 4rem;">
-                        <a id="athleteProfileLink" href="#" style="text-decoration: none; color: inherit; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <h2 class="player-name" id="athleteName" style="margin-bottom: 0;">?</h2>
-                            <div style="font-size: 0.85rem; color: var(--accent-blue); margin-bottom: 0.5rem;"><i class="fas fa-external-link-alt"></i> View Full Profile</div>
-                        </a>
-                        <div style="color: var(--text-secondary); font-family: 'Outfit';">Career Bowling Overview</div>
-                    </div>
-                </div>
-                
-                <div id="loadingState">
-                    <span class="loader"></span>
-                    <p style="margin-top: 1rem; color: var(--text-secondary); font-family: 'Outfit';">Fetching Analytics...</p>
-                </div>
-
-                <div id="mainContent" style="display: none;">
-                    <div class="bento-grid" id="statsGrid">
-                        <!-- Basic Stats Injected Here -->
-                    </div>
-
-                    <div class="bento-grid" style="margin-top: 1.5rem;" id="chartsRow">
-                        <!-- Pitch Heatmap -->
-                        <div class="glass-panel span-4 chart-container" style="min-height: 400px; padding: 1.5rem;">
-                            <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-fire" style="color: #f97316;"></i> Pitch Heatmap</h3>
-                            </div>
-                            <div class="chart-wrapper" style="display:flex; justify-content:center; padding: 1rem 0; overflow-x: auto;">
-                                <style>
-                                .pitch-grid {
-                                    display: grid;
-                                    grid-template-columns: 140px repeat(5, 50px);
-                                    grid-template-rows: 40px repeat(6, 40px);
-                                    gap: 2px;
-                                    background: transparent;
-                                }
-                                .pitch-header-cell {
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: flex-end;
-                                    font-size: 0.8rem;
-                                    color: #94a3b8;
-                                    padding-bottom: 5px;
-                                }
-                                .pitch-header-stumps {
-                                    font-size: 1.2rem;
-                                    font-weight: bold;
-                                    letter-spacing: -2px;
-                                    color: #cbd5e1;
-                                }
-                                .pitch-label {
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: flex-end;
-                                    padding-right: 12px;
-                                    font-size: 0.85rem;
-                                    color: #94a3b8;
-                                    border-bottom: 1px dashed rgba(255,255,255,0.1);
-                                }
-                                .pitch-cell {
-                                    background: rgba(255,255,255,0.02);
-                                    border: 1px solid rgba(255,255,255,0.05);
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    font-size: 0.8rem;
-                                    font-weight: 600;
-                                    color: #f8fafc;
-                                    transition: all 0.2s;
-                                    cursor: default;
-                                    border-radius: 4px;
-                                }
-                                .pitch-cell:hover {
-                                    transform: scale(1.05);
-                                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                                    z-index: 10;
-                                }
-                                </style>
-                                <div class="pitch-grid" id="pitchHeatmapGrid">
-                                    <!-- Headers -->
-                                    <div></div>
-                                    <div class="pitch-header-cell" style="grid-column: 2 / span 2; border-bottom: 1px dashed rgba(255,255,255,0.1);">OFF</div>
-                                    <div class="pitch-header-cell" style="border-bottom: 1px dashed rgba(255,255,255,0.1);"><span class="pitch-header-stumps">|||</span></div>
-                                    <div class="pitch-header-cell" style="grid-column: 5 / span 2; border-bottom: 1px dashed rgba(255,255,255,0.1);">LEG</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Wicket Types -->
-                        <div class="glass-panel span-2 chart-container" style="min-height: 350px;">
-                            <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-skull" style="color: var(--accent-blue);"></i> Dismissal Methods</h3>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="wicketChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Pace Profile -->
-                        <div class="glass-panel span-4 chart-container" style="min-height: 300px;">
-                            <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-tachometer-alt" style="color: var(--accent-green);"></i> Pace Profile Curve</h3>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="paceChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="emptyState" style="text-align: center; padding: 4rem; color: var(--text-secondary);">
-                    <i class="fas fa-search" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;"></i>
-                    <h3 style="font-family: 'Outfit'; color: white;">Awaiting Selection</h3>
-                    <p>Search and select a bowler to view their deep analytics.</p>
-                </div>
-            </div>
-        </div>
-        
-        <script src="/static/js/custom-select.js?v=3"></script>
-            <script>
             let currentAthleteId = "{{ athlete_id or '' }}";
             let heatmapChartInstance = null;
             let wicketChartInstance = null;
@@ -511,19 +177,9 @@
             function getFilterVal(id) {
                 const el = document.getElementById(id);
                 if (!el) return 'All';
-                
-                if (el.parentElement && el.parentElement.classList.contains('custom-multi-wrapper')) {
-                    const checkboxes = el.parentElement.querySelectorAll('input[type="checkbox"]:checked');
-                    if (checkboxes.length > 0) {
-                        return Array.from(checkboxes).map(cb => cb.dataset.value).join(',');
-                    } else {
-                        return 'All';
-                    }
-                }
-                
-                if (el.multiple) {
+                if (el.hasAttribute('multiple')) {
                     const vals = Array.from(el.selectedOptions).map(o => o.value);
-                    return vals.length ? vals.join(',') : 'All';
+                    return vals.length ? vals : 'All';
                 }
                 return el.value || 'All';
             }
@@ -545,52 +201,24 @@
             function toggleMulti(selectId, btn) {
                 const sel = document.getElementById(selectId);
                 if (!sel) return;
-                if (btn.classList.contains('active-multi')) {
-                    revertCustomMultiSelect(selectId);
+                if (sel.hasAttribute('multiple')) {
+                    sel.removeAttribute('multiple');
                     btn.classList.remove('active-multi');
                 } else {
-                    convertToCustomMultiSelect(selectId);
+                    sel.setAttribute('multiple', 'multiple');
                     btn.classList.add('active-multi');
                 }
             }
             function toggleNot(selectId, btn) {
                 const sel = document.getElementById(selectId);
                 if (!sel) return;
-                
-                const isNowNot = sel.dataset.not !== "true";
-                sel.dataset.not = isNowNot ? "true" : "false";
-                
-                if (isNowNot) {
-                    btn.classList.add('active-not');
-                    // Add Not to all options
-                    Array.from(sel.options).forEach(opt => {
-                        if (opt.value !== 'All' && !opt.text.startsWith('Not ')) opt.text = 'Not ' + opt.text;
-                    });
-                } else {
+                if (sel.dataset.not === "true") {
+                    sel.dataset.not = "false";
                     btn.classList.remove('active-not');
-                    // Remove Not from all options
-                    Array.from(sel.options).forEach(opt => {
-                        if (opt.text.startsWith('Not ')) opt.text = opt.text.replace('Not ', '');
-                    });
+                } else {
+                    sel.dataset.not = "true";
+                    btn.classList.add('active-not');
                 }
-                
-                // If custom multi is active, also update its labels
-                if (sel.parentElement && sel.parentElement.classList.contains('custom-multi-wrapper')) {
-                    const labels = sel.parentElement.querySelectorAll('.custom-multi-option span');
-                    labels.forEach(label => {
-                        if (isNowNot) {
-                            if (!label.innerText.startsWith('Not ') && label.innerText !== 'All') {
-                                label.innerText = 'Not ' + label.innerText;
-                            }
-                        } else {
-                            if (label.innerText.startsWith('Not ')) {
-                                label.innerText = label.innerText.replace('Not ', '');
-                            }
-                        }
-                    });
-                }
-                
-                sel.dispatchEvent(new Event('change'));
             }
             function setupSearch() {
                 const input = document.getElementById('athleteSearch');
@@ -699,20 +327,20 @@ document.getElementById('loadingState').style.display = 'flex';
                 
                 const baseParams = new URLSearchParams({
                     id: currentAthleteId,
-                    format: getFilterVal('filterFormat'), format_not: getFilterNot('filterFormat'),
-                    league: getFilterVal('filterLeague'), league_not: getFilterNot('filterLeague'),
-                    phase: getFilterVal('filterPhase'), phase_not: getFilterNot('filterPhase'),
-                    venue: getFilterVal('filterVenue'), venue_not: getFilterNot('filterVenue'),
-                    opponent: getFilterVal('filterOpponent'), opponent_not: getFilterNot('filterOpponent'),
-                    batting_type: getFilterVal('filterBattingType'), batting_type_not: getFilterNot('filterBattingType'),
-                    year: getFilterVal('filterYear'), year_not: getFilterNot('filterYear'),
-                    innings: getFilterVal('filterInnings'), innings_not: getFilterNot('filterInnings'),
-                    result: getFilterVal('filterResult'), result_not: getFilterNot('filterResult'),
-                    recent: getFilterVal('filterRecent'), recent_not: getFilterNot('filterRecent'),
-                    wicket_type: getFilterVal('filterWicketType'), wicket_type_not: getFilterNot('filterWicketType'),
-                    pitch_length: getFilterVal('filterPitchLength'), pitch_length_not: getFilterNot('filterPitchLength'),
-                    pitch_line: getFilterVal('filterPitchLine'), pitch_line_not: getFilterNot('filterPitchLine'),
-                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType')
+                    format: document.getElementById('filterFormat').value,
+                    league: document.getElementById('filterLeague').value,
+                    phase: document.getElementById('filterPhase').value,
+                    venue: document.getElementById('filterVenue').value,
+                    opponent: document.getElementById('filterOpponent').value,
+                    batting_type: document.getElementById('filterBattingType').value,
+                    year: document.getElementById('filterYear').value,
+                    innings: document.getElementById('filterInnings').value,
+                    result: document.getElementById('filterResult').value,
+                    recent: document.getElementById('filterRecent').value,
+                    wicket_type: document.getElementById('filterWicketType').value,
+                    pitch_length: document.getElementById('filterPitchLength').value,
+                    pitch_line: document.getElementById('filterPitchLine').value,
+                    shot_type: document.getElementById('filterShotType').value
                 });
                 
                 try {
@@ -767,7 +395,7 @@ document.getElementById('loadingState').style.display = 'flex';
                     } else {
                         document.getElementById('chartsRow').style.display = 'grid';
                         document.getElementById('statsGrid').className = 'bento-grid';
-                        
+                        baseParams.set('format', document.getElementById('filterFormat').value);
                         
                         const res = await fetch(`/api/stats/bowler?${baseParams.toString()}`);
                         const data = await res.json();
@@ -959,7 +587,4 @@ document.getElementById('loadingState').style.display = 'flex';
             setupSearch();
 
             init();
-        </script>
-    </div>
-</body>
-</html>
+        
