@@ -3,7 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if athlete %}{{ athlete.full_name }} - Profile{% else %}Player Profile{% endif %} | Cricket Analytics</title>
+    <meta name="theme-color" content="#0a0f1e">
+    <title>{% if athlete %}{{ athlete.full_name }} Complete Cricket Profile | Cricket Analytics{% else %}Player Profile{% endif %}</title>
+    
+    {% if athlete %}
+    <meta name="description" content="Complete cricket profile for {{ athlete.full_name }}. View batting and bowling statistics, recent performances, and detailed analytics.">
+    <meta property="og:title" content="{{ athlete.full_name }} - Cricket Profile">
+    <meta property="og:description" content="View full batting & bowling analytics for {{ athlete.full_name }}.">
+    <meta property="og:type" content="profile">
+    <link rel="canonical" href="https://thej05-cricket-stats.hf.space/player/{{ slug }}">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{{ athlete.full_name }}",
+      "url": "https://thej05-cricket-stats.hf.space/player/{{ slug }}",
+      "description": "Cricket statistics and analytics for {{ athlete.full_name }}"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://thej05-cricket-stats.hf.space/"},
+        {"@type": "ListItem", "position": 2, "name": "Players"},
+        {"@type": "ListItem", "position": 3, "name": "{{ athlete.full_name }}"}
+      ]
+    }
+    </script>
+    {% endif %}
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>

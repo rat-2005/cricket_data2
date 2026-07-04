@@ -3,7 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batter vs Bowler Face-off | Cricket Analytics</title>
+    <meta name="theme-color" content="#0a0f1e">
+    <title>{% if batter_info and bowler_info %}{{ batter_info.full_name }} vs {{ bowler_info.full_name }} Head-to-Head Stats | Cricket Analytics{% else %}Batter vs Bowler Face-off | Cricket Analytics{% endif %}</title>
+    
+    {% if batter_info and bowler_info %}
+    <meta name="description" content="{{ batter_info.full_name }} vs {{ bowler_info.full_name }} head-to-head cricket statistics. Complete pitch map, wagon wheel analysis, and match records.">
+    <meta property="og:title" content="{{ batter_info.full_name }} vs {{ bowler_info.full_name }} - Head-to-Head Stats">
+    <meta property="og:description" content="Detailed head-to-head analytics for {{ batter_info.full_name }} against {{ bowler_info.full_name }}.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://thej05-cricket-stats.hf.space/faceoff/{{ batter_info.slug }}-vs-{{ bowler_info.slug }}">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is {{ batter_info.full_name }}'s record against {{ bowler_info.full_name }}?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "View complete statistics, strike rate, and dismissals for {{ batter_info.full_name }} vs {{ bowler_info.full_name }} on Cricket Analytics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many times has {{ bowler_info.full_name }} dismissed {{ batter_info.full_name }}?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Find out exact dismissal counts and how {{ bowler_info.full_name }} gets {{ batter_info.full_name }} out using our advanced pitch map."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://thej05-cricket-stats.hf.space/"},
+        {"@type": "ListItem", "position": 2, "name": "Face-offs", "item": "https://thej05-cricket-stats.hf.space/faceoff"},
+        {"@type": "ListItem", "position": 3, "name": "{{ batter_info.full_name }} vs {{ bowler_info.full_name }}"}
+      ]
+    }
+    </script>
+    {% else %}
+    <meta name="description" content="Compare any cricket batter against any bowler to see their head-to-head statistics, pitch maps, and wagon wheels.">
+    {% endif %}
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/static/css/style.css?v=2" rel="stylesheet">

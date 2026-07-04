@@ -3,7 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bowler Analytics | Cricket Analytics</title>
+    <meta name="theme-color" content="#0a0f1e">
+    <title>{% if info %}{{ info.full_name }} Bowling Stats & Analytics{% else %}Bowler Analytics{% endif %} | Cricket Analytics</title>
+    
+    {% if info %}
+    <meta name="description" content="{{ info.full_name }} bowling statistics. Detailed wicket maps, economy rates, and venue breakdown.">
+    <meta property="og:title" content="{{ info.full_name }} - Bowling Stats">
+    <meta property="og:description" content="Detailed bowling analytics and pitch maps for {{ info.full_name }}.">
+    <meta property="og:type" content="profile">
+    <link rel="canonical" href="https://thej05-cricket-stats.hf.space/bowler/{{ info.slug }}">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{{ info.full_name }}",
+      "url": "https://thej05-cricket-stats.hf.space/bowler/{{ info.slug }}",
+      "description": "Bowling statistics and analytics for {{ info.full_name }}"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://thej05-cricket-stats.hf.space/"},
+        {"@type": "ListItem", "position": 2, "name": "Bowlers", "item": "https://thej05-cricket-stats.hf.space/bowler"},
+        {"@type": "ListItem", "position": 3, "name": "{{ info.full_name }}"}
+      ]
+    }
+    </script>
+    {% else %}
+    <meta name="description" content="Search for any cricket bowler to see their complete statistical profile, wicket maps, and economy analysis.">
+    {% endif %}
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/static/css/style.css?v=2" rel="stylesheet">

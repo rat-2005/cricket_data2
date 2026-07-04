@@ -409,6 +409,7 @@ def search_players(q, against_batter=None, against_bowler=None, limit=10):
     results = query(base_sql, [like_q, start_q, limit])
     for r in results:
         r["id"] = str(r["id"])
+        r["slug"] = get_player_slug(r["id"], r["full_name"])
         if r["primary_team"]:
             r["primary_team"] = f"{r['primary_team']} ({r['total_matches']} matches)"
         else:
@@ -432,6 +433,25 @@ def get_player_info(player_id):
     """, [int(player_id)])
     if info:
         info["id"] = str(info["id"])
+        info["slug"] = get_player_slug(info["id"], info["full_name"])
+    return info
+
+def get_player_slug(player_id, full_name=None):
+    if not full_name:
+        info = query_one("SELECT cricinfo_name FROM player_name_bridge WHERE internal_id = ? LIMIT 1", [int(player_id)])
+        full_name = info["cricinfo_name"] if info else str(player_id)
+    return full_name.lower().replace(" ", "-").replace(".", "").replace("'", "")
+
+def get_player_by_slug(slug):
+    slug_clean = slug.replace("-", "").replace(".", "").replace("'", "")
+    info = query_one("""
+        SELECT DISTINCT
+            pnb.internal_id AS id,
+            pnb.cricinfo_name AS full_name
+        FROM player_name_bridge pnb
+        WHERE LOWER(REPLACE(REPLACE(REPLACE(pnb.cricinfo_name, ' ', ''), '.', ''), '''', '')) = ?
+        LIMIT 1
+    """, [slug_clean.lower()])
     return info
 
 

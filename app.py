@@ -5,7 +5,7 @@ Thin Flask layer. All data logic lives in data_service.py (blackbox).
 All database access goes through db.py (DuckDB + S3 Parquet).
 No PostgreSQL. No raw SQL in this file.
 """
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 import data_service as ds
 
 app = Flask(__name__)
@@ -82,21 +82,65 @@ def index():
 
 
 @app.route("/batter")
-def batter_page():
-    return render_template("batter.html", athlete_id=request.args.get("id"))
+@app.route("/batter/<slug>")
+def batter_page(slug=None):
+    athlete_id = request.args.get("id")
+    info = None
+    if slug:
+        info = ds.get_player_by_slug(slug)
+        if info: athlete_id = info["id"]
+    elif athlete_id:
+        info = ds.get_player_info(athlete_id)
+        if info and "slug" in info:
+            return redirect(f"/batter/{info['slug']}")
+    return render_template("batter.html", athlete_id=athlete_id, info=info)
 
 
 @app.route("/bowler")
-def bowler_page():
-    return render_template("bowler.html", athlete_id=request.args.get("id"))
+@app.route("/bowler/<slug>")
+def bowler_page(slug=None):
+    athlete_id = request.args.get("id")
+    info = None
+    if slug:
+        info = ds.get_player_by_slug(slug)
+        if info: athlete_id = info["id"]
+    elif athlete_id:
+        info = ds.get_player_info(athlete_id)
+        if info and "slug" in info:
+            return redirect(f"/bowler/{info['slug']}")
+    return render_template("bowler.html", athlete_id=athlete_id, info=info)
 
 
 @app.route("/faceoff")
-def faceoff_page():
+@app.route("/faceoff/<slugs>")
+def faceoff_page(slugs=None):
+    batter_id = request.args.get("batter_id")
+    bowler_id = request.args.get("bowler_id")
+    batter_info = None
+    bowler_info = None
+    
+    if slugs and "-vs-" in slugs:
+        parts = slugs.split("-vs-")
+        if len(parts) == 2:
+            batter_info = ds.get_player_by_slug(parts[0])
+            bowler_info = ds.get_player_by_slug(parts[1])
+            if batter_info: batter_id = batter_info["id"]
+            if bowler_info: bowler_id = bowler_info["id"]
+            
+    if (batter_id and not batter_info) or (bowler_id and not bowler_info):
+        if batter_id: batter_info = ds.get_player_info(batter_id)
+        if bowler_id: bowler_info = ds.get_player_info(bowler_id)
+        
+        # If both present and we didn't come from a slug route, redirect to slug route
+        if batter_info and bowler_info and "slug" in batter_info and "slug" in bowler_info and not slugs:
+            return redirect(f"/faceoff/{batter_info['slug']}-vs-{bowler_info['slug']}")
+
     return render_template(
         "faceoff.html",
-        batter_id=request.args.get("batter_id"),
-        bowler_id=request.args.get("bowler_id"),
+        batter_id=batter_id,
+        bowler_id=bowler_id,
+        batter_info=batter_info,
+        bowler_info=bowler_info
     )
 
 
@@ -105,18 +149,43 @@ def player_search():
     return render_template("player.html", athlete=None, batting=None, bowling=None)
 
 
-@app.route("/player/<athlete_id>")
-def player_profile(athlete_id):
+@app.route("/player/<identifier>")
+def player_profile(identifier):
+    # Try as slug first
+    info = ds.get_player_by_slug(identifier)
+    if info:
+        athlete_id = info["id"]
+    else:
+        # Fallback to ID
+        athlete_id = identifier
+        info = ds.get_player_info(athlete_id)
+        if info and "slug" in info:
+            return redirect(f"/player/{info['slug']}")
+            
     data = ds.get_player_profile(athlete_id)
     if not data:
         return "Player not found", 404
+        
     return render_template(
         "player.html",
         athlete=data["athlete"],
         batting=data["batting"],
         bowling=data["bowling"],
+        slug=info["slug"] if info and "slug" in info else identifier
     )
 
+
+@app.route("/robots.txt")
+def robots_txt():
+    content = f"User-agent: *\nAllow: /\nSitemap: {request.host_url}sitemap.xml\n"
+    from flask import Response
+    return Response(content, mimetype="text/plain")
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    # In a real app, generate from database of top players and faceoffs.
+    # We will return a basic static sitemap for now or dynamic if easy.
+    return render_template("sitemap.xml", host=request.host_url)
 
 # ── APIs ─────────────────────────────────────────────────────
 
