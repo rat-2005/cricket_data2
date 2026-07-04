@@ -288,10 +288,7 @@
                     </div>
                 </div>
                 
-                <div id="loadingState">
-                    <span class="loader"></span>
-                    <p style="margin-top: 1rem; color: var(--text-secondary); font-family: 'Outfit';">Fetching Analytics...</p>
-                </div>
+
 
                 <div id="mainContent" style="display: none;">
                     <div class="bento-grid" id="statsGrid">
@@ -1028,6 +1025,11 @@ document.getElementById('loadingState').style.display = 'flex';
             init();
             initializeAllCustomSelects();
 </script>
+    </div>
+    
+    <div id="loadingState">
+        <span class="loader"></span>
+        <p style="margin-top: 1rem; color: var(--text-secondary); font-family: 'Outfit';">Fetching Analytics...</p>
     </div>
 </body>
 </html>
