@@ -145,7 +145,7 @@ def _handle_filter(val, is_not, sql_builder_fn):
     joiner = " AND " if is_not else " OR "
     return f"({joiner.join(conds)})"
 
-def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
+def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId", is_batter=True):
     """Build WHERE additions for cricinfo_parquet cp + cricinfo_metadata m."""
     parts = []
     
@@ -175,14 +175,24 @@ def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
 
     cond = _handle_filter(filters.get("year", "All"), filters.get("year_not", False), lambda y: f"EXTRACT(YEAR FROM CAST(m.startDate AS DATE)) = {int(y)}")
     if cond: parts.append(cond)
+    
+    def _ci_delivery_output(o):
+        runs_expr = "COALESCE(cp.batsmanRuns, 0)" if is_batter else "(COALESCE(cp.batsmanRuns, 0) + COALESCE(cp.wides, 0) + COALESCE(cp.noballs, 0))"
+        if o == "Wicket": return "cp.isWicket = TRUE"
+        if o == "Wide": return "COALESCE(cp.wides, 0) > 0"
+        if o == "7+": return f"{runs_expr} >= 7"
+        try: return f"{runs_expr} = {int(o)}"
+        except ValueError: return ""
+    cond = _handle_filter(filters.get("delivery_output", "All"), filters.get("delivery_output_not", False), _ci_delivery_output)
+    if cond: parts.append(cond)
 
     cond = _handle_filter(filters.get("league", "All"), filters.get("league_not", False), lambda l: f"m.seriesName = '{_esc(l)}'")
     if cond: parts.append(cond)
 
-    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"cp.bowlerPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE bowlingStyle = '{_esc(b)}')")
+    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"cp.bowlerPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE bowlingStyle ILIKE '%{_esc(b)}%')")
     if cond: parts.append(cond)
 
-    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"cp.batsmanPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE battingStyle = '{_esc(b)}')")
+    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"cp.batsmanPlayerId IN (SELECT playerId FROM cricinfo_player_styles WHERE battingStyle ILIKE '%{_esc(b)}%')")
     if cond: parts.append(cond)
 
     def _res(r):
@@ -194,7 +204,46 @@ def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
     if cond: parts.append(cond)
 
     def _wkt(w):
-        return "(cp.isWicket IS NULL OR cp.isWicket = FALSE)" if w == "Not Out" else f"cp.dismissalType = '{_esc(w)}'"
+        if is_batter:
+            if w == "Not Out":
+                return f"cp.match_id::VARCHAR || '-' || cp.inningNumber::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND isOut = FALSE)"
+            mapping = {
+                "caught": 1.0,
+                "bowled": 2.0,
+                "lbw": 3.0,
+                "run out": 4.0,
+                "stumped": 5.0,
+                "hit wicket": 6.0,
+                "handled the ball": 7.0,
+                "obstructing the field": 8.0,
+                "timed out": 10.0,
+                "retired out": 11.0,
+                "retired hurt": 13.0
+            }
+            val = mapping.get(w, w)
+            if isinstance(val, float):
+                return f"cp.match_id::VARCHAR || '-' || cp.inningNumber::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND dismissalType = {val})"
+            return f"cp.match_id::VARCHAR || '-' || cp.inningNumber::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND dismissalType = '{_esc(w)}')"
+        else:
+            if w == "Not Out":
+                return "(cp.isWicket IS NULL OR cp.isWicket = FALSE)"
+            mapping = {
+                "caught": 1.0,
+                "bowled": 2.0,
+                "lbw": 3.0,
+                "run out": 4.0,
+                "stumped": 5.0,
+                "hit wicket": 6.0,
+                "handled the ball": 7.0,
+                "obstructing the field": 8.0,
+                "timed out": 10.0,
+                "retired out": 11.0,
+                "retired hurt": 13.0
+            }
+            val = mapping.get(w, w)
+            if isinstance(val, float):
+                return f"cp.dismissalType = {val}"
+            return f"cp.dismissalType = '{_esc(w)}'"
     cond = _handle_filter(filters.get("wicket_type", "All"), filters.get("wicket_type_not", False), _wkt)
     if cond: parts.append(cond)
 
@@ -210,7 +259,7 @@ def _build_ci_where(filters, player_id_field="cp.batsmanPlayerId"):
     return (" AND " + " AND ".join(parts)) if parts else ""
 
 
-def _build_cs_where(filters, player_id_field=None):
+def _build_cs_where(filters, player_id_field=None, is_batter=True):
     """Build WHERE additions for cricsheet_deliveries d + cricsheet_matches cm."""
     parts = []
     
@@ -240,14 +289,24 @@ def _build_cs_where(filters, player_id_field=None):
 
     cond = _handle_filter(filters.get("year", "All"), filters.get("year_not", False), lambda y: f"EXTRACT(YEAR FROM CAST(cm.date AS DATE)) = {int(y)}")
     if cond: parts.append(cond)
+    
+    def _cs_delivery_output(o):
+        runs_expr = "COALESCE(d.batter_runs, 0)" if is_batter else "(COALESCE(d.batter_runs, 0) + COALESCE(d.wides, 0) + COALESCE(d.noballs, 0))"
+        if o == "Wicket": return "d.dismissal_kind IS NOT NULL AND d.dismissal_kind != ''"
+        if o == "Wide": return "COALESCE(d.wides, 0) > 0"
+        if o == "7+": return f"{runs_expr} >= 7"
+        try: return f"{runs_expr} = {int(o)}"
+        except ValueError: return ""
+    cond = _handle_filter(filters.get("delivery_output", "All"), filters.get("delivery_output_not", False), _cs_delivery_output)
+    if cond: parts.append(cond)
 
     cond = _handle_filter(filters.get("league", "All"), filters.get("league_not", False), lambda l: f"d.match_id IN (SELECT match_id FROM cricinfo_metadata WHERE seriesName = '{_esc(l)}')")
     if cond: parts.append(cond)
 
-    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"d.bowler IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.bowlingStyle = '{_esc(b)}')")
+    cond = _handle_filter(filters.get("bowling_type", "All"), filters.get("bowling_type_not", False), lambda b: f"d.bowler IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.bowlingStyle ILIKE '%{_esc(b)}%')")
     if cond: parts.append(cond)
 
-    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"d.batter IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.battingStyle = '{_esc(b)}')")
+    cond = _handle_filter(filters.get("batting_type", "All"), filters.get("batting_type_not", False), lambda b: f"d.batter IN (SELECT pnb.cricsheet_name FROM player_name_bridge pnb JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId WHERE cps.battingStyle ILIKE '%{_esc(b)}%')")
     if cond: parts.append(cond)
 
     def _res(r):
@@ -259,7 +318,28 @@ def _build_cs_where(filters, player_id_field=None):
     if cond: parts.append(cond)
 
     def _wkt(w):
-        return "d.dismissal_kind IS NULL" if w == "Not Out" else f"d.dismissal_kind = '{_esc(w)}'"
+        if is_batter and player_id_field:
+            if w == "Not Out":
+                return f"d.match_id::VARCHAR || '-' || d.inning::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND isOut = FALSE)"
+            mapping = {
+                "caught": 1.0,
+                "bowled": 2.0,
+                "lbw": 3.0,
+                "run out": 4.0,
+                "stumped": 5.0,
+                "hit wicket": 6.0,
+                "handled the ball": 7.0,
+                "obstructing the field": 8.0,
+                "timed out": 10.0,
+                "retired out": 11.0,
+                "retired hurt": 13.0
+            }
+            val = mapping.get(w, w)
+            if isinstance(val, float):
+                return f"d.match_id::VARCHAR || '-' || d.inning::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND dismissalType = {val})"
+            return f"d.match_id::VARCHAR || '-' || d.inning::VARCHAR IN (SELECT match_id::VARCHAR || '-' || inningNumber::VARCHAR FROM cricinfo_batting WHERE playerId = {player_id_field} AND dismissalType = '{_esc(w)}')"
+        else:
+            return "d.dismissal_kind IS NULL" if w == "Not Out" else f"d.dismissal_kind = '{_esc(w)}'"
     cond = _handle_filter(filters.get("wicket_type", "All"), filters.get("wicket_type_not", False), _wkt)
     if cond: parts.append(cond)
 
@@ -297,19 +377,21 @@ def search_players(q, against_batter=None, against_bowler=None, limit=10):
 
     base_sql = """
         SELECT DISTINCT
-
-            internal_id   AS id,
-            cricinfo_name AS full_name,
-            cricinfo_name AS short_name
-        FROM player_name_bridge
-        WHERE cricinfo_name IS NOT NULL
-          AND cricinfo_name ILIKE ?
+            pnb.internal_id   AS id,
+            pnb.cricinfo_name AS full_name,
+            pnb.cricinfo_name AS short_name,
+            ppt.primary_team  AS primary_team,
+            COALESCE(ppt.total_matches, 0) AS total_matches
+        FROM player_name_bridge pnb
+        LEFT JOIN player_primary_team ppt ON pnb.internal_id = ppt.playerId
+        WHERE pnb.cricinfo_name IS NOT NULL
+          AND pnb.cricinfo_name ILIKE ?
     """
 
     # Narrow to valid face-off opponents
     if against_batter:
         base_sql += f"""
-          AND internal_id IN (
+          AND pnb.internal_id IN (
               SELECT DISTINCT bowlerPlayerId FROM cricinfo_parquet
               WHERE batsmanPlayerId = {int(against_batter)}
           )
@@ -322,11 +404,15 @@ def search_players(q, against_batter=None, against_bowler=None, limit=10):
           )
         """
 
-    base_sql += " ORDER BY CASE WHEN cricinfo_name ILIKE ? THEN 1 ELSE 2 END, cricinfo_name LIMIT ?"
+    base_sql += " ORDER BY CASE WHEN cricinfo_name ILIKE ? THEN 1 ELSE 2 END, total_matches DESC, cricinfo_name LIMIT ?"
 
     results = query(base_sql, [like_q, start_q, limit])
     for r in results:
         r["id"] = str(r["id"])
+        if r["primary_team"]:
+            r["primary_team"] = f"{r['primary_team']} ({r['total_matches']} matches)"
+        else:
+            r["primary_team"] = f"Unknown Team ({r['total_matches']} matches)"
     return results
 
 
@@ -334,11 +420,14 @@ def get_player_info(player_id):
     """Get player metadata by internal ESPN athlete ID."""
     info = query_one("""
         SELECT DISTINCT
-            internal_id AS id,
-            cricinfo_name AS full_name,
-            cricinfo_name AS short_name
-        FROM player_name_bridge
-        WHERE internal_id = ?
+            pnb.internal_id AS id,
+            pnb.cricinfo_name AS full_name,
+            pnb.cricinfo_name AS short_name,
+            cps.battingStyle,
+            cps.bowlingStyle
+        FROM player_name_bridge pnb
+        LEFT JOIN cricinfo_player_styles cps ON pnb.internal_id = cps.playerId
+        WHERE pnb.internal_id = ?
         LIMIT 1
     """, [int(player_id)])
     if info:
@@ -601,7 +690,8 @@ def get_batter_stats(player_id, filters):
     wagon_wheel = query(f"""
         SELECT cp.wagonX AS x, cp.wagonY AS y, cp.wagonZone AS zone, cp.batsmanRuns AS runs,
                cp.shotType AS shot_type, cp.overNumber AS over, cp.ballNumber AS ball, cp.timestamp AS date,
-               COALESCE(pl.cricsheet_name, pl.cricinfo_name, 'Unknown') AS bowler_name, cp.pitchLength AS length, cp.pitchLine AS line
+               COALESCE(pl.cricsheet_name, pl.cricinfo_name, 'Unknown') AS bowler_name, cp.pitchLength AS length, cp.pitchLine AS line,
+               cp.isWicket AS is_wicket
         FROM cricinfo_parquet cp
         JOIN cricinfo_metadata m ON cp.match_id = m.match_id
         LEFT JOIN player_name_bridge pl ON cp.bowlerPlayerId = pl.internal_id
@@ -610,11 +700,12 @@ def get_batter_stats(player_id, filters):
           AND (cp.skipped IS NULL OR cp.skipped = FALSE)
           AND COALESCE(cp.wides, 0) = 0 AND COALESCE(cp.legbyes, 0) = 0 AND COALESCE(cp.byes, 0) = 0 AND COALESCE(cp.noballs, 0) = 0
           {ci_w}
+        ORDER BY random() LIMIT 500
     """)
 
     # ── Shot types (cricinfo only) ──
     shot_rows = query(f"""
-        SELECT cp.shotType, COUNT(*)::INT AS cnt
+        SELECT cp.shotType, COUNT(*)::INT AS cnt, SUM(COALESCE(cp.batsmanRuns, 0))::INT AS runs, SUM(CASE WHEN cp.isWicket = TRUE THEN 1 ELSE 0 END)::INT as dismissals
         FROM cricinfo_parquet cp
         JOIN cricinfo_metadata m ON cp.match_id = m.match_id
         WHERE cp.batsmanPlayerId = {pid}
@@ -623,7 +714,7 @@ def get_batter_stats(player_id, filters):
           {ci_w}
         GROUP BY cp.shotType
     """)
-    shot_data = {r["shotType"].title(): r["cnt"] for r in shot_rows}
+    shot_data = {r["shotType"].title(): {"cnt": r["cnt"], "runs": r["runs"], "wickets": r["dismissals"]} for r in shot_rows}
 
     sr = round((total_runs / total_balls * 100), 2) if total_balls > 0 else 0
     dp = round((dots / total_balls * 100), 1) if total_balls > 0 else 0
@@ -651,8 +742,8 @@ def get_batter_stats(player_id, filters):
 def get_bowler_stats(player_id, filters):
     """Full bowling stats with deduplication."""
     pid = int(player_id)
-    ci_w = _build_ci_where(filters, player_id_field="cp.bowlerPlayerId")
-    cs_w = _build_cs_where(filters, player_id_field=str(pid))
+    ci_w = _build_ci_where(filters, player_id_field="cp.bowlerPlayerId", is_batter=False)
+    cs_w = _build_cs_where(filters, player_id_field=str(pid), is_batter=False)
     names = _get_player_names(pid)
     ns = _names_sql(names)
 
@@ -719,6 +810,45 @@ def get_bowler_stats(player_id, filters):
 
     heatmap = _get_pitch_heatmap(f"cp.bowlerPlayerId = {pid}", ci_w)
 
+    wicket_rows = query(f"""
+        WITH ci_wkt AS (
+            SELECT cp.match_id,
+                   CASE 
+                       WHEN cp.dismissalType = 1 THEN 'caught'
+                       WHEN cp.dismissalType = 2 THEN 'bowled'
+                       WHEN cp.dismissalType = 3 THEN 'lbw'
+                       WHEN cp.dismissalType = 4 THEN 'run out'
+                       WHEN cp.dismissalType = 5 THEN 'stumped'
+                       WHEN cp.dismissalType = 6 THEN 'hit wicket'
+                       WHEN cp.dismissalType = 7 THEN 'handled the ball'
+                       WHEN cp.dismissalType = 8 THEN 'obstructing the field'
+                       WHEN cp.dismissalType = 10 THEN 'timed out'
+                       WHEN cp.dismissalType = 11 THEN 'retired out'
+                       WHEN cp.dismissalType = 13 THEN 'retired hurt'
+                       ELSE 'other'
+                   END AS w_type,
+                   COUNT(*) AS cnt
+            FROM cricinfo_parquet cp JOIN cricinfo_metadata m ON cp.match_id = m.match_id
+            WHERE cp.bowlerPlayerId = {pid} AND cp.isWicket = TRUE AND (cp.skipped IS NULL OR cp.skipped=FALSE) {ci_w}
+            GROUP BY cp.match_id, w_type
+        ),
+        cs_wkt AS (
+            SELECT d.match_id,
+                   LOWER(d.dismissal_kind) AS w_type,
+                   COUNT(*) AS cnt
+            FROM cricsheet_deliveries d JOIN cricsheet_matches cm ON d.match_id = cm.match_id
+            WHERE d.bowler IN ({ns}) AND d.is_wicket = TRUE {cs_w}
+            GROUP BY d.match_id, w_type
+        )
+        SELECT COALESCE(ci.w_type, cs.w_type) AS dismissal_type,
+               SUM(GREATEST(COALESCE(ci.cnt,0), COALESCE(cs.cnt,0)))::INT AS cnt
+        FROM ci_wkt ci
+        FULL OUTER JOIN cs_wkt cs ON ci.match_id = cs.match_id AND ci.w_type = cs.w_type
+        GROUP BY dismissal_type
+    """)
+    wicket_data = {r["dismissal_type"].title(): r["cnt"] for r in wicket_rows if r["dismissal_type"] and r["dismissal_type"].lower() not in ("other", "none", "")}
+
+
     return {
         "wickets": w,
         "runs": rc,
@@ -727,6 +857,7 @@ def get_bowler_stats(player_id, filters):
         "eco": eco,
         "best": bb,
         "pitch_heatmap": heatmap,
+        "wicket_data": wicket_data,
     }
 
 
@@ -736,14 +867,26 @@ def get_bowler_stats(player_id, filters):
 
 def get_faceoff_stats(batter_id, bowler_id, filters):
     """Head-to-head stats with wagon wheel."""
-    bid  = int(batter_id)
-    boid = int(bowler_id)
-    ci_w = _build_ci_where(filters)
-    cs_w = _build_cs_where(filters, player_id_field=str(bid))
-    bat_names = _get_player_names(bid)
-    bowl_names = _get_player_names(boid)
-    bn = _names_sql(bat_names)
-    bwn = _names_sql(bowl_names)
+    bid = int(batter_id) if batter_id and batter_id != "All" else None
+    boid = int(bowler_id) if bowler_id and bowler_id != "All" else None
+    
+    # We pass None for player_id_field if bid is not set, so result/wkt filters degrade gracefully.
+    ci_w = _build_ci_where(filters, player_id_field="cp.batsmanPlayerId" if bid else None)
+    cs_w = _build_cs_where(filters, player_id_field=str(bid) if bid else None)
+    
+    ci_player_filter = []
+    if bid: ci_player_filter.append(f"cp.batsmanPlayerId = {bid}")
+    if boid: ci_player_filter.append(f"cp.bowlerPlayerId = {boid}")
+    ci_player_sql = " AND ".join(ci_player_filter) if ci_player_filter else "1=1"
+    
+    cs_player_filter = []
+    if bid:
+        bn = _names_sql(_get_player_names(bid))
+        cs_player_filter.append(f"d.batter IN ({bn})")
+    if boid:
+        bwn = _names_sql(_get_player_names(boid))
+        cs_player_filter.append(f"d.bowler IN ({bwn})")
+    cs_player_sql = " AND ".join(cs_player_filter) if cs_player_filter else "1=1"
 
     stats = query_one(f"""
         WITH ci_match AS (
@@ -760,7 +903,7 @@ def get_faceoff_stats(batter_id, bowler_id, filters):
                 SUM(CASE WHEN COALESCE(cp.wides,0)=0 THEN 1 ELSE 0 END)::INT AS balls
             FROM cricinfo_parquet cp
             JOIN cricinfo_metadata m ON cp.match_id = m.match_id
-            WHERE cp.batsmanPlayerId = {bid} AND cp.bowlerPlayerId = {boid}
+            WHERE {ci_player_sql}
               AND (cp.skipped IS NULL OR cp.skipped = FALSE)
               AND (cp.empty IS NULL OR cp.empty = FALSE)
               {ci_w}
@@ -776,7 +919,7 @@ def get_faceoff_stats(batter_id, bowler_id, filters):
                 SUM(CASE WHEN d.wides=0 THEN 1 ELSE 0 END)::INT AS balls
             FROM cricsheet_deliveries d
             JOIN cricsheet_matches cm ON d.match_id = cm.match_id
-            WHERE d.batter IN ({bn}) AND d.bowler IN ({bwn})
+            WHERE {cs_player_sql}
               {cs_w}
             GROUP BY d.match_id
         ),
@@ -812,34 +955,35 @@ def get_faceoff_stats(batter_id, bowler_id, filters):
     wagon_wheel = query(f"""
         SELECT cp.wagonX AS x, cp.wagonY AS y, cp.wagonZone AS zone, cp.batsmanRuns AS runs,
                cp.shotType AS shot_type, cp.overNumber AS over, cp.ballNumber AS ball, cp.timestamp AS date,
-               COALESCE(pl.cricsheet_name, pl.cricinfo_name, 'Unknown') AS bowler_name, cp.pitchLength AS length, cp.pitchLine AS line
+               COALESCE(pl.cricsheet_name, pl.cricinfo_name, 'Unknown') AS bowler_name, cp.pitchLength AS length, cp.pitchLine AS line, cp.isWicket AS is_wicket
         FROM cricinfo_parquet cp
         JOIN cricinfo_metadata m ON cp.match_id = m.match_id
         LEFT JOIN player_name_bridge pl ON cp.bowlerPlayerId = pl.internal_id
-        WHERE cp.batsmanPlayerId = {bid} AND cp.bowlerPlayerId = {boid}
+        WHERE {ci_player_sql}
           AND cp.wagonX IS NOT NULL AND cp.wagonY IS NOT NULL
           AND (cp.skipped IS NULL OR cp.skipped = FALSE)
           AND COALESCE(cp.wides, 0) = 0 AND COALESCE(cp.legbyes, 0) = 0 AND COALESCE(cp.byes, 0) = 0 AND COALESCE(cp.noballs, 0) = 0
           {ci_w}
+        ORDER BY random() LIMIT 500
     """)
 
     # Shot types (cricinfo only)
     shot_rows = query(f"""
-        SELECT cp.shotType, COUNT(*)::INT AS cnt, SUM(CASE WHEN cp.isWicket THEN 1 ELSE 0 END)::INT as dismissals
+        SELECT cp.shotType, COUNT(*)::INT AS cnt, SUM(COALESCE(cp.batsmanRuns, 0))::INT AS runs, SUM(CASE WHEN cp.isWicket THEN 1 ELSE 0 END)::INT as dismissals
         FROM cricinfo_parquet cp
         JOIN cricinfo_metadata m ON cp.match_id = m.match_id
-        WHERE cp.batsmanPlayerId = {bid} AND cp.bowlerPlayerId = {boid}
+        WHERE {ci_player_sql}
           AND cp.shotType IS NOT NULL AND TRIM(cp.shotType) != ''
           AND (cp.skipped IS NULL OR cp.skipped = FALSE)
           {ci_w}
         GROUP BY cp.shotType
     """)
-    shot_data = {r["shotType"].title(): r["cnt"] for r in shot_rows}
+    shot_data = {r["shotType"].title(): {"cnt": r["cnt"], "runs": r["runs"], "wickets": r["dismissals"]} for r in shot_rows}
     vuln_data = {r["shotType"].title(): r["dismissals"] for r in shot_rows if r["dismissals"] > 0}
-    fav_shot = max(shot_data, key=shot_data.get) if shot_data else "Unknown"
+    fav_shot = max(shot_data, key=lambda k: shot_data[k]["cnt"]) if shot_data else "Unknown"
     dang_shot = max(vuln_data, key=vuln_data.get) if vuln_data else "None"
 
-    heatmap = _get_pitch_heatmap(f"cp.batsmanPlayerId = {bid} AND cp.bowlerPlayerId = {boid}", ci_w)
+    heatmap = _get_pitch_heatmap(ci_player_sql, ci_w)
 
     return {
         "runs": runs,
@@ -1044,20 +1188,57 @@ def get_player_profile(player_id):
 # ═══════════════════════════════════════════════════════════════
 #  FILTERS
 # ═══════════════════════════════════════════════════════════════
+_global_filters_cache = None
 
 def get_global_filters():
     """Static filter options for the filters dropdown."""
-    return {
-        "formats": ["ODI", "T20I", "Test"],
-        "leagues": [],
-        "phases": ["Final", "Semi-Final", "Qualifier", "Eliminator", "Group Stage"],
-        "venues": [],
-        "opponents": [],
-        "wicket_types": [],
-        "pitch_lengths": [],
-        "pitch_lines": [],
-        "shot_types": [],
-    }
+    global _global_filters_cache
+    if _global_filters_cache:
+        return _global_filters_cache
+
+    try:
+        leagues = sorted([r['seriesName'] for r in query("SELECT DISTINCT seriesName FROM cricinfo_metadata WHERE seriesName IS NOT NULL")])
+        venues = sorted([r['groundName'] for r in query("SELECT DISTINCT groundName FROM cricinfo_metadata WHERE groundName IS NOT NULL")])
+        years = sorted([str(r['y']) for r in query("SELECT DISTINCT EXTRACT(YEAR FROM CAST(startDate AS DATE))::INT AS y FROM cricinfo_metadata WHERE startDate IS NOT NULL") if r['y']], reverse=True)
+        t1 = [r['t'] for r in query("SELECT DISTINCT team1Name AS t FROM cricinfo_metadata WHERE team1Name IS NOT NULL")]
+        t2 = [r['t'] for r in query("SELECT DISTINCT team2Name AS t FROM cricinfo_metadata WHERE team2Name IS NOT NULL")]
+        opponents = sorted(list(set(t1 + t2)))
+
+        b_res = query("SELECT DISTINCT battingStyle FROM cricinfo_player_styles WHERE battingStyle IS NOT NULL AND battingStyle != ''")
+        bat_styles = set()
+        for r in b_res:
+            for s in str(r['battingStyle']).split(','):
+                if s.strip(): bat_styles.add(s.strip().title())
+                
+        bo_res = query("SELECT DISTINCT bowlingStyle FROM cricinfo_player_styles WHERE bowlingStyle IS NOT NULL AND bowlingStyle != ''")
+        bowl_styles = set()
+        for r in bo_res:
+            for s in str(r['bowlingStyle']).split(','):
+                if s.strip(): bowl_styles.add(s.strip().title())
+                
+        _global_filters_cache = {
+            "formats": ["ODI", "T20I", "Test"],
+            "leagues": leagues,
+            "phases": ["Final", "Semi-Final", "Qualifier", "Eliminator", "Group Stage"],
+            "venues": venues,
+            "opponents": opponents,
+            "wicket_types": sorted(['caught', 'bowled', 'lbw', 'run out', 'stumped', 'hit wicket', 'handled the ball', 'obstructing the field', 'timed out', 'retired out', 'retired hurt']),
+            "pitch_lengths": ['FULL_TOSS', 'YORKER', 'FULL', 'GOOD_LENGTH', 'SHORT_OF_A_GOOD_LENGTH', 'SHORT'],
+            "pitch_lines": ['WIDE_OUTSIDE_OFFSTUMP', 'OUTSIDE_OFFSTUMP', 'ON_THE_STUMPS', 'DOWN_LEG', 'WIDE_DOWN_LEG'],
+            "shot_types": sorted(["COVER_DRIVE", "PULL", "HOOK", "SQUARE_CUT", "LATE_CUT", "DEFENCE", "LEAVE", "SWEEP", "REVERSE_SWEEP", "GLANCE", "FLICK", "DRIVE", "PADDLE_SWEEP", "LOFTED_SHOT", "FORWARD_DEFENCE", "BACKWARD_DEFENCE", "UNKNOWN"]),
+            "batting_types": sorted(list(bat_styles)),
+            "bowling_types": sorted(list(bowl_styles)),
+            "years": years
+        }
+    except Exception as e:
+        print(f"Failed to generate global filters cache: {e}")
+        return {
+            "formats": ["ODI", "T20I", "Test"], "leagues": [], "phases": [], "venues": [],
+            "opponents": [], "wicket_types": [], "pitch_lengths": [], "pitch_lines": [],
+            "shot_types": [], "batting_types": [], "bowling_types": [], "years": []
+        }
+
+    return _global_filters_cache
 
 
 def get_batter_filters(player_id, filters):
@@ -1079,7 +1260,21 @@ def get_batter_filters(player_id, filters):
                    (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {pid}) as my_team,
                    cp.inningNumber as innings,
                    m.title,
-                   cp.dismissalType,
+                   CASE 
+                                          WHEN cp.dismissalType = 1 THEN 'caught'
+                                          WHEN cp.dismissalType = 2 THEN 'bowled'
+                                          WHEN cp.dismissalType = 3 THEN 'lbw'
+                                          WHEN cp.dismissalType = 4 THEN 'run out'
+                                          WHEN cp.dismissalType = 5 THEN 'stumped'
+                                          WHEN cp.dismissalType = 6 THEN 'hit wicket'
+                                          WHEN cp.dismissalType = 7 THEN 'handled the ball'
+                                          WHEN cp.dismissalType = 8 THEN 'obstructing the field'
+                                          WHEN cp.dismissalType = 10 THEN 'timed out'
+                                          WHEN cp.dismissalType = 11 THEN 'retired out'
+                                          WHEN cp.dismissalType = 13 THEN 'retired hurt'
+                                          WHEN cp.dismissalType IS NOT NULL THEN CAST(cp.dismissalType AS VARCHAR)
+                                          ELSE NULL 
+                                      END AS dismissalType,
                    cp.isWicket,
                    cp.pitchLength,
                    cp.pitchLine,
@@ -1174,8 +1369,8 @@ def get_batter_filters(player_id, filters):
 def get_bowler_filters(player_id, filters):
     """Available filter values for a specific bowler."""
     pid = int(player_id)
-    ci_w = _build_ci_where(filters, player_id_field="cp.bowlerPlayerId")
-    cs_w = _build_cs_where(filters, player_id_field=str(pid))
+    ci_w = _build_ci_where(filters, player_id_field="cp.bowlerPlayerId", is_batter=False)
+    cs_w = _build_cs_where(filters, player_id_field=str(pid), is_batter=False)
 
     names = _get_player_names(pid)
     ns = _names_sql(names)
@@ -1189,7 +1384,21 @@ def get_bowler_filters(player_id, filters):
                    m.winnerTeamId,
                    (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {pid}) as my_team,
                    cp.inningNumber as innings,
-                   cp.dismissalType,
+                   CASE 
+                                          WHEN cp.dismissalType = 1 THEN 'caught'
+                                          WHEN cp.dismissalType = 2 THEN 'bowled'
+                                          WHEN cp.dismissalType = 3 THEN 'lbw'
+                                          WHEN cp.dismissalType = 4 THEN 'run out'
+                                          WHEN cp.dismissalType = 5 THEN 'stumped'
+                                          WHEN cp.dismissalType = 6 THEN 'hit wicket'
+                                          WHEN cp.dismissalType = 7 THEN 'handled the ball'
+                                          WHEN cp.dismissalType = 8 THEN 'obstructing the field'
+                                          WHEN cp.dismissalType = 10 THEN 'timed out'
+                                          WHEN cp.dismissalType = 11 THEN 'retired out'
+                                          WHEN cp.dismissalType = 13 THEN 'retired hurt'
+                                          WHEN cp.dismissalType IS NOT NULL THEN CAST(cp.dismissalType AS VARCHAR)
+                                          ELSE NULL 
+                                      END AS dismissalType,
                    cp.isWicket,
                    cp.pitchLength,
                    cp.pitchLine,
@@ -1284,15 +1493,28 @@ def get_bowler_filters(player_id, filters):
 
 def get_faceoff_filters(batter_id, bowler_id, filters):
     """Available filter values for a batter-bowler faceoff."""
-    bid  = int(batter_id)
-    boid = int(bowler_id)
-    ci_w = _build_ci_where(filters)
-    cs_w = _build_cs_where(filters, player_id_field=str(bid))
+    bid = int(batter_id) if batter_id and batter_id != "All" else None
+    boid = int(bowler_id) if bowler_id and bowler_id != "All" else None
+    
+    ci_w = _build_ci_where(filters, player_id_field="cp.batsmanPlayerId" if bid else None)
+    cs_w = _build_cs_where(filters, player_id_field=str(bid) if bid else None)
 
-    bat_names = _get_player_names(bid)
-    bowl_names = _get_player_names(boid)
-    bn = _names_sql(bat_names)
-    bwn = _names_sql(bowl_names)
+    ci_player_filter = []
+    if bid: ci_player_filter.append(f"cp.batsmanPlayerId = {bid}")
+    if boid: ci_player_filter.append(f"cp.bowlerPlayerId = {boid}")
+    ci_player_sql = " AND ".join(ci_player_filter) if ci_player_filter else "1=1"
+    
+    cs_player_filter = []
+    if bid:
+        bn = _names_sql(_get_player_names(bid))
+        cs_player_filter.append(f"d.batter IN ({bn})")
+    if boid:
+        bwn = _names_sql(_get_player_names(boid))
+        cs_player_filter.append(f"d.bowler IN ({bwn})")
+    cs_player_sql = " AND ".join(cs_player_filter) if cs_player_filter else "1=1"
+    
+    # We need to know 'my_team' to resolve 'Won'/'Lost'. If no bid is given, my_team is just NULL.
+    my_team_sql = f"(SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = cp.batsmanPlayerId) as my_team" if not bid else f"(SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {bid}) as my_team"
 
     res = query_one(f"""
         WITH ci_data AS (
@@ -1300,16 +1522,32 @@ def get_faceoff_filters(batter_id, bowler_id, filters):
                    EXTRACT(YEAR FROM CAST(m.startDate AS DATE))::INT AS year,
                    m.team1Name AS t1, m.team2Name AS t2, m.title,
                    m.winnerTeamId,
-                   (SELECT MAX(teamId) FROM cricinfo_batting WHERE match_id = cp.match_id AND playerId = {bid}) as my_team,
+                   {my_team_sql},
                    cp.inningNumber as innings,
-                   cp.dismissalType,
+                   CASE 
+                                          WHEN cp.dismissalType = 1 THEN 'caught'
+                                          WHEN cp.dismissalType = 2 THEN 'bowled'
+                                          WHEN cp.dismissalType = 3 THEN 'lbw'
+                                          WHEN cp.dismissalType = 4 THEN 'run out'
+                                          WHEN cp.dismissalType = 5 THEN 'stumped'
+                                          WHEN cp.dismissalType = 6 THEN 'hit wicket'
+                                          WHEN cp.dismissalType = 7 THEN 'handled the ball'
+                                          WHEN cp.dismissalType = 8 THEN 'obstructing the field'
+                                          WHEN cp.dismissalType = 10 THEN 'timed out'
+                                          WHEN cp.dismissalType = 11 THEN 'retired out'
+                                          WHEN cp.dismissalType = 13 THEN 'retired hurt'
+                                          WHEN cp.dismissalType IS NOT NULL THEN CAST(cp.dismissalType AS VARCHAR)
+                                          ELSE NULL 
+                                      END AS dismissalType,
                    cp.isWicket,
                    cp.pitchLength,
                    cp.pitchLine,
-                   cp.shotType
+                   cp.shotType,
+                   cp.batsmanPlayerId,
+                   cp.bowlerPlayerId
             FROM cricinfo_parquet cp
             JOIN cricinfo_metadata m ON cp.match_id = m.match_id
-            WHERE cp.batsmanPlayerId = {bid} AND cp.bowlerPlayerId = {boid}
+            WHERE {ci_player_sql}
               AND (cp.skipped IS NULL OR cp.skipped = FALSE)
               {ci_w}
         ),
@@ -1327,7 +1565,7 @@ def get_faceoff_filters(batter_id, bowler_id, filters):
                    NULL AS shotType
             FROM cricsheet_deliveries d
             JOIN cricsheet_matches cm ON d.match_id = cm.match_id
-            WHERE d.batter IN ({bn}) AND d.bowler IN ({bwn})
+            WHERE {cs_player_sql}
               AND d.match_id NOT IN (SELECT match_id FROM cricinfo_match_ids)
               {cs_w}
         )
@@ -1349,7 +1587,9 @@ def get_faceoff_filters(batter_id, bowler_id, filters):
             (SELECT LIST(DISTINCT CASE WHEN isWicket = TRUE THEN CAST(dismissalType AS VARCHAR) ELSE 'Not Out' END) FROM (SELECT isWicket, dismissalType FROM ci_data UNION ALL SELECT isWicket, dismissalType FROM cs_data)) AS wicket_types,
             (SELECT LIST(DISTINCT pitchLength) FROM ci_data WHERE pitchLength IS NOT NULL) AS pitch_lengths,
             (SELECT LIST(DISTINCT pitchLine) FROM ci_data WHERE pitchLine IS NOT NULL) AS pitch_lines,
-            (SELECT LIST(DISTINCT shotType) FROM ci_data WHERE shotType IS NOT NULL) AS shot_types
+            (SELECT LIST(DISTINCT shotType) FROM ci_data WHERE shotType IS NOT NULL) AS shot_types,
+            (SELECT LIST(DISTINCT a.battingStyle) FROM ci_data cd JOIN cricinfo_player_styles a ON cd.batsmanPlayerId = a.playerId WHERE a.battingStyle IS NOT NULL) AS batting_types,
+            (SELECT LIST(DISTINCT a.bowlingStyle) FROM ci_data cd JOIN cricinfo_player_styles a ON cd.bowlerPlayerId = a.playerId WHERE a.bowlingStyle IS NOT NULL) AS bowling_types
     """)
 
     formats = _process_formats(res.get("formats"))
@@ -1374,6 +1614,8 @@ def get_faceoff_filters(batter_id, bowler_id, filters):
     pitch_lengths = sorted(p for p in _extract_list("pitch_lengths") if p)
     pitch_lines = sorted(p for p in _extract_list("pitch_lines") if p)
     shot_types = sorted(s for s in _extract_list("shot_types") if s)
+    batting_types = sorted(s for s in _extract_list("batting_types") if s)
+    bowling_types = sorted(s for s in _extract_list("bowling_types") if s)
 
     return {
         "formats": formats,
@@ -1388,4 +1630,6 @@ def get_faceoff_filters(batter_id, bowler_id, filters):
         "pitch_lengths": pitch_lengths,
         "pitch_lines": pitch_lines,
         "shot_types": shot_types,
+        "batting_types": batting_types,
+        "bowling_types": bowling_types,
     }

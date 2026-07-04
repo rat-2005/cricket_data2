@@ -1,0 +1,16 @@
+
+<!DOCTYPE html>
+<html>
+<body>
+<select id='test' multiple>
+  <option value='All'>All Formats</option>
+  <option value='ODI'>ODI</option>
+</select>
+<script>
+  const el = document.getElementById('test');
+  el.value = 'All';
+  console.log(el.selectedOptions.length);
+  console.log(el.selectedOptions[0]?.value);
+</script>
+</body>
+</html>

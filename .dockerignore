@@ -1,0 +1,15 @@
+# Ignore everything by default
+*
+
+# Allow the web app files explicitly
+!app.py
+!db.py
+!data_service.py
+!apply_filters_api.py
+!add_player_filters.py
+!add_player_route.py
+!requirements.txt
+!Dockerfile
+!templates/
+!static/
+!leagues.json

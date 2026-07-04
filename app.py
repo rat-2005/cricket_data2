@@ -34,7 +34,7 @@ def _filters(args):
     keys = [
         "format", "league", "opponent", "phase", "venue", "year", 
         "innings", "bowling_type", "batting_type", "recent", "result",
-        "wicket_type", "pitch_length", "pitch_line", "shot_type"
+        "wicket_type", "pitch_length", "pitch_line", "shot_type", "delivery_output"
     ]
     f = {}
     for k in keys:
@@ -150,20 +150,24 @@ def stats_batter():
     return jsonify(ds.get_batter_stats(pid, _filters(request.args)))
 
 
-@app.route("/api/stats/bowler")
+@app.route('/api/stats/bowler', methods=['GET'])
 def stats_bowler():
     pid = request.args.get("id")
-    if not pid:
-        return jsonify({"error": "missing id"}), 400
-    return jsonify(ds.get_bowler_stats(pid, _filters(request.args)))
+    if not pid: return jsonify({"error": "id required"}), 400
+    try:
+        return jsonify(ds.get_bowler_stats(pid, _filters(request.args)))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/stats/faceoff")
 def stats_faceoff():
     bid  = request.args.get("batter_id")
     boid = request.args.get("bowler_id")
-    if not bid or not boid:
-        return jsonify({"error": "missing ids"}), 400
+    if not bid and not request.args.get("batting_type"):
+        return jsonify({"error": "missing batter"}), 400
+    if not boid and not request.args.get("bowling_type"):
+        return jsonify({"error": "missing bowler"}), 400
     return jsonify(ds.get_faceoff_stats(bid, boid, _filters(request.args)))
 
 
@@ -192,12 +196,33 @@ def bowler_filters():
 def faceoff_filters():
     bid  = request.args.get("batter_id")
     boid = request.args.get("bowler_id")
-    if not bid or not boid:
-        return jsonify({"formats": [], "leagues": [], "venues": [], "phases": []})
+    if not bid and not request.args.get("batting_type"):
+        return jsonify({"error": "missing batter"}), 400
+    if not boid and not request.args.get("bowling_type"):
+        return jsonify({"error": "missing bowler"}), 400
     return jsonify(ds.get_faceoff_filters(bid, boid, _filters(request.args)))
 
 
 # ── Run ──────────────────────────────────────────────────────
+
+# Start daily background cron job to sync Parquet files
+import threading
+import time
+from db import sync_parquet_files, reload_db
+
+def run_daily_sync():
+    while True:
+        # Wait 24 hours
+        time.sleep(24 * 60 * 60)
+        try:
+            print("Running daily background Parquet sync...")
+            sync_parquet_files()
+            reload_db()
+        except Exception as e:
+            print(f"Error in daily sync: {e}")
+
+# Daemon thread will close when the server stops
+threading.Thread(target=run_daily_sync, daemon=True).start()
 
 if __name__ == "__main__":
     # use_reloader=False keeps DuckDB's singleton connection alive.

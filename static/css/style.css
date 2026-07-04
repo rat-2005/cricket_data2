@@ -661,3 +661,39 @@ select[multiple] {
     max-width: 90%;
     display: inline-block;
 }
+
+/* Custom Multi-Select Search */
+.custom-multi-search-wrapper {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.custom-multi-search-input {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: \'Inter\', sans-serif;
+    font-size: 0.85rem;
+}
+
+.custom-multi-search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.custom-multi-select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}

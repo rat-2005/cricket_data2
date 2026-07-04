@@ -8,6 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/static/css/style.css?v=2" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #94a3b8; transition: .4s; }
+        input:checked + .slider { background-color: var(--accent-color); border-color: var(--accent-color); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: white; }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+        #analyzeBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4) !important; }
+    </style>
 </head>
 <body>
     <div class="container fade-in">
@@ -23,16 +36,30 @@
         </header>
 
         <div class="dashboard">
+            
+            <!-- Cascaded Toggle Header -->
+            <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 1rem; position: relative; z-index: 100;">
+                <label style="display: flex; align-items: center; gap: 0.6rem; color: white; background: rgba(255, 255, 255, 0.05); padding: 0.6rem 1.2rem; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1); font-family: 'Inter', sans-serif; font-size: 0.95rem; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" title="When ON, selecting a filter narrows down the other options. When OFF, all options are always visible.">
+                    <input type="checkbox" id="cascadedToggle" checked style="accent-color: var(--accent-blue); width: 1.1rem; height: 1.1rem; cursor: pointer;">
+                    <i class="fas fa-filter" style="color: var(--accent-blue);"></i> <strong>Cascaded Filters</strong>
+                </label>
+            </div>
             <!-- Top Bar for Selection & Filters -->
             <div class="glass-panel" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; position: relative; z-index: 50;">
                 <div style="flex: 2; min-width: 200px; position: relative; z-index: 1000;">
-                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Batter</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Batter</label>
+                        <select id="filterBattingType" style="padding: 0.2rem 0.5rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary); font-size: 0.8rem;"><option value="All">All Types</option></select>
+                    </div>
                     <input type="text" id="batterSearch" placeholder="Search batter..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                     <div id="batterResults" class="search-results"></div>
                 </div>
                 
                 <div style="flex: 2; min-width: 200px; position: relative; z-index: 1000;">
-                    <label style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem; display: block; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Bowler</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;"><i class="fas fa-user"></i> Bowler</label>
+                        <select id="filterBowlingType" style="padding: 0.2rem 0.5rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary); font-size: 0.8rem;"><option value="All">All Types</option></select>
+                    </div>
                     <input type="text" id="bowlerSearch" placeholder="Search bowler..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
                     <div id="bowlerResults" class="search-results"></div>
                 </div>
@@ -41,7 +68,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelFormat" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Format</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterFormat', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterFormat', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -52,7 +78,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelLeague" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">League</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterLeague', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterLeague', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -63,7 +88,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Year</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterYear', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterYear', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -74,7 +98,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Phase</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPhase', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPhase', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -90,7 +113,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelVenue" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Venue</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterVenue', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterVenue', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -101,7 +123,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelInnings" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Innings</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterInnings', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterInnings', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -118,7 +139,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelResult" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Match Result</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterResult', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterResult', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -133,7 +153,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelRecent" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Recent Matches</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterRecent', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterRecent', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -149,7 +168,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelWicketType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Wicket Type</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterWicketType', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterWicketType', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -159,7 +177,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPitchLength" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Length</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLength', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLength', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -169,7 +186,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPitchLine" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Line</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLine', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLine', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -179,17 +195,34 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelShotType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Shot Type</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterShotType', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterShotType', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
                     <select id="filterShotType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Shots</option></select>
                 </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label id="labelDeliveryOutput" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Delivery Output</label>
+                        <div style="display: flex; gap: 0.25rem;">
+                            <button type="button" class="filter-btn" onclick="toggleNot('filterDeliveryOutput', this)" title="Exclude selected">Not</button>
+                        </div>
+                    </div>
+                    <select id="filterDeliveryOutput" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                        <option value="All">All Outputs</option>
+                        <option value="0">0 Runs</option>
+                        <option value="1">1 Run</option>
+                        <option value="2">2 Runs</option>
+                        <option value="3">3 Runs</option>
+                        <option value="4">4 Runs</option>
+                        <option value="5">5 Runs</option>
+                        <option value="6">6 Runs</option>
+                        <option value="7+">7+ Runs</option>
+                        <option value="Wicket">Wicket</option>
+                        <option value="Wide">Wide</option>
+                    </select>
+                </div>
                 
                 <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
-                        <input type="checkbox" id="splitByFormat" style="width: 16px; height: 16px; cursor: pointer;"> Split Formats
-                    </label>
                     <button onclick="fetchStats()" style="width: 100%; padding: 0.8rem 2rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--neon-glow); transition: transform 0.2s;">
                         Compare
                     </button>
@@ -334,6 +367,7 @@
             </div>
         </div>
         
+        <script src="/static/js/custom-select.js?v=4"></script>
         <script>
             let currentBatterId = "{{ batter_id or '' }}";
             let currentBowlerId = "{{ bowler_id or '' }}";
@@ -358,6 +392,21 @@
                         
                         const venSelect = document.getElementById('filterVenue');
                         venSelect.innerHTML += filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
+                        
+                        if (filters.batting_types) {
+                            const btSelect = document.getElementById('filterBattingType');
+                            if (btSelect) btSelect.innerHTML += filters.batting_types.map(t => `<option value="${t}">${t}</option>`).join('');
+                        }
+                        if (filters.bowling_types) {
+                            const bwtSelect = document.getElementById('filterBowlingType');
+                            if (bwtSelect) bwtSelect.innerHTML += filters.bowling_types.map(t => `<option value="${t}">${t}</option>`).join('');
+                        }
+                        
+                        convertToCustomMultiSelect('filterFormat');
+                        convertToCustomMultiSelect('filterLeague');
+                        convertToCustomMultiSelect('filterVenue');
+                        if (document.getElementById('filterBattingType')) convertToCustomMultiSelect('filterBattingType');
+                        if (document.getElementById('filterBowlingType')) convertToCustomMultiSelect('filterBowlingType');
                     }
                     
                     if (currentBatterId && currentBowlerId) {
@@ -368,13 +417,58 @@
                         if (boRes.ok) document.getElementById('bowlerName').textContent = (await boRes.json()).full_name;
                         
                         await fetchFaceoffFilters();
-                        fetchStats();
                     }
                 } catch(e) { console.error("Init failed", e); }
             }
             
+            function getFilterVal(id) {
+                const el = document.getElementById(id);
+                if (!el) return 'All';
+                
+                if (el.parentElement && el.parentElement.classList.contains('custom-multi-wrapper')) {
+                    const checkboxes = el.parentElement.querySelectorAll('.custom-multi-option input[type="checkbox"]:checked');
+                    if (checkboxes.length > 0) {
+                        return Array.from(checkboxes).map(cb => cb.value).join(',');
+                    } else {
+                        return 'All';
+                    }
+                }
+                
+                if (el.multiple) {
+                    const vals = Array.from(el.selectedOptions).map(o => o.value);
+                    return vals.length ? vals.join(',') : 'All';
+                }
+                return el.value || 'All';
+            }
+            
+            function getFilterNot(id) {
+                const el = document.getElementById(id);
+                return el ? (el.dataset.not === 'true') : false;
+            }
+            
+            function setFilterVal(id, val) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (typeof val === "string" && val.includes(",")) val = val.split(",");
+                if (Array.isArray(val)) {
+                    Array.from(el.options).forEach(opt => {
+                        opt.selected = val.includes(opt.value);
+                    });
+                } else {
+                    if (el.multiple) {
+                        Array.from(el.options).forEach(opt => {
+                            opt.selected = (opt.value === val);
+                        });
+                    } else {
+                        el.value = val;
+                    }
+                }
+                // Sync custom checkbox UI by dispatching a special event (no filter cascade)
+                el.dispatchEvent(new CustomEvent('syncui', { bubbles: false }));
+            }
+
             async function fetchFaceoffFilters(sourceId = null) {
-                if (!currentBatterId || !currentBowlerId) return;
+                if (!(currentBatterId || getFilterVal('filterBattingType') !== 'All') || !(currentBowlerId || getFilterVal('filterBowlingType') !== 'All')) return;
                 
                 const formatSelect = document.getElementById('filterFormat');
                 const leagueSelect = document.getElementById('filterLeague');
@@ -386,27 +480,31 @@
                 const recentSelect = document.getElementById('filterRecent');
                 const wicketSelect = document.getElementById('filterWicketType');
                 const plSelect = document.getElementById('filterPitchLength');
-                const plnSelect = document.getElementById('filterPitchLine');
+                const pitchLineSelect = document.getElementById('filterPitchLine');
                 const shotSelect = document.getElementById('filterShotType');
+                const deliveryOutputSelect = document.getElementById('filterDeliveryOutput');
 
-                const currentFormat = formatSelect ? formatSelect.value || 'All' : 'All';
-                const currentLeague = leagueSelect ? leagueSelect.value || 'All' : 'All';
-                const currentVenue = venSelect ? venSelect.value || 'All' : 'All';
-                const currentYear = yearSelect ? yearSelect.value || 'All' : 'All';
-                const currentPhase = phaseSelect ? phaseSelect.value || 'All' : 'All';
-                const currentInnings = inningsSelect ? inningsSelect.value || 'All' : 'All';
-                const currentResult = resultSelect ? resultSelect.value || 'All' : 'All';
-                const currentRecent = recentSelect ? recentSelect.value || 'All' : 'All';
-                const currentWicket = wicketSelect ? wicketSelect.value || 'All' : 'All';
-                const currentPitchLength = plSelect ? plSelect.value || 'All' : 'All';
-                const currentPitchLine = plnSelect ? plnSelect.value || 'All' : 'All';
-                const currentShotType = shotSelect ? shotSelect.value || 'All' : 'All';
+                const currentFormat = getFilterVal('filterFormat');
+                const currentLeague = getFilterVal('filterLeague');
+                const currentVenue = getFilterVal('filterVenue');
+                const currentYear = getFilterVal('filterYear');
+                const currentPhase = getFilterVal('filterPhase');
+                const currentInnings = getFilterVal('filterInnings');
+                const currentResult = getFilterVal('filterResult');
+                const currentRecent = getFilterVal('filterRecent');
+                const currentWicket = getFilterVal('filterWicketType');
+                const currentPitchLength = getFilterVal('filterPitchLength');
+                const currentPitchLine = getFilterVal('filterPitchLine');
+                const currentShotType = getFilterVal('filterShotType');
+                const currentDeliveryOutput = getFilterVal('filterDeliveryOutput');
                 
                 try {
+                    const btV = getFilterVal('filterBattingType');
+                    const bwtV = getFilterVal('filterBowlingType');
                     const params = new URLSearchParams({
-                        batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, league: currentLeague, venue: currentVenue,
+                        batter_id: currentBatterId || "", bowler_id: currentBowlerId || "", batting_type: btV, bowling_type: bwtV, format: currentFormat, league: currentLeague, venue: currentVenue,
                         year: currentYear, phase: currentPhase, recent: currentRecent, innings: currentInnings, result: currentResult,
-                        wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType
+                        wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType, delivery_output: currentDeliveryOutput
                     });
                     
                     const filterRes = await fetch(`/api/faceoff_filters?${params.toString()}`);
@@ -450,32 +548,83 @@
                             plSelect.innerHTML = '<option value="All">All Lengths</option>' + filters.pitch_lengths.map(p => `<option value="${p}">${p}</option>`).join('');
                             setFilterVal('filterPitchLength', currentPitchLength);
                         }
-                        if (sourceId !== 'filterPitchLine' && plnSelect && filters.pitch_lines) {
-                            plnSelect.innerHTML = '<option value="All">All Lines</option>' + filters.pitch_lines.map(p => `<option value="${p}">${p}</option>`).join('');
+                        if (sourceId !== 'filterPitchLine' && pitchLineSelect && filters.pitch_lines) {
+                            pitchLineSelect.innerHTML = '<option value="All">All Lines</option>' + filters.pitch_lines.map(p => `<option value="${p}">${p}</option>`).join('');
                             setFilterVal('filterPitchLine', currentPitchLine);
                         }
-                        if (sourceId !== 'filterShotType' && shotSelect && filters.shot_types) {
+                                                if (sourceId !== 'filterShotType' && shotSelect && filters.shot_types) {
                             shotSelect.innerHTML = '<option value="All">All Shots</option>' + filters.shot_types.map(s => `<option value="${s}">${s}</option>`).join('');
                             if (filters.shot_types.includes(currentShotType)) shotSelect.value = currentShotType;
                         }
+                        const btSelect = document.getElementById('filterBattingType');
+                        const bwtSelect = document.getElementById('filterBowlingType');
+                        if (sourceId !== 'filterBattingType' && btSelect && filters.batting_types) {
+                            const curr = btSelect.value;
+                            btSelect.innerHTML = '<option value="All">All Types</option>' + filters.batting_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.batting_types.includes(curr)) btSelect.value = curr;
+                        }
+                        if (sourceId !== 'filterBowlingType' && bwtSelect && filters.bowling_types) {
+                            const curr = bwtSelect.value;
+                            bwtSelect.innerHTML = '<option value="All">All Types</option>' + filters.bowling_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.bowling_types.includes(curr)) bwtSelect.value = curr;
+                        }
+                        const selectIds = ['filterFormat', 'filterLeague', 'filterVenue', 'filterYear', 'filterInnings', 'filterResult', 'filterWicketType', 'filterPitchLength', 'filterPitchLine', 'filterShotType', 'filterPhase', 'filterDeliveryOutput', 'filterBattingType', 'filterBowlingType'];
+                        selectIds.forEach(id => {
+                            if (sourceId !== id && document.getElementById(id)) {
+                                convertToCustomMultiSelect(id);
+                            }
+                        });
                     }
                 } catch(e) { 
                     console.error("Filter update failed", e); 
                 }
             }
 
-            if(document.getElementById('filterFormat')) document.getElementById('filterFormat').addEventListener('change', () => fetchFaceoffFilters('filterFormat'));
-            if(document.getElementById('filterLeague')) document.getElementById('filterLeague').addEventListener('change', () => fetchFaceoffFilters('filterLeague'));
-            if(document.getElementById('filterVenue')) document.getElementById('filterVenue').addEventListener('change', () => fetchFaceoffFilters('filterVenue'));
-            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchFaceoffFilters('filterYear'));
-            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchFaceoffFilters('filterPhase'));
-            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchFaceoffFilters('filterInnings'));
-            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchFaceoffFilters('filterResult'));
-            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchFaceoffFilters('filterRecent'));
-            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', () => fetchFaceoffFilters('filterWicketType'));
-            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', () => fetchFaceoffFilters('filterPitchLength'));
-            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', () => fetchFaceoffFilters('filterPitchLine'));
-            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', () => fetchFaceoffFilters('filterShotType'));
+            function showLoading() {
+                const es = document.getElementById('emptyState');
+                if (es) es.style.display = 'none';
+                document.getElementById('loadingState').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+
+            async function onFilterChange(sourceId) {
+                if (!(currentBatterId || getFilterVal('filterBattingType') !== 'All') ||
+                    !(currentBowlerId || getFilterVal('filterBowlingType') !== 'All')) return;
+                showLoading();
+                await fetchFaceoffFilters(sourceId);
+                // fetchStats(); (Wait for Analyze click)
+            }
+
+            if(document.getElementById('filterFormat')) document.getElementById('filterFormat').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterFormat')); }
+            if(document.getElementById('filterLeague')) document.getElementById('filterLeague').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterLeague')); }
+            if(document.getElementById('filterVenue')) document.getElementById('filterVenue').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterVenue')); }
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterYear')); }
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterPhase')); }
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterInnings')); }
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterResult')); }
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterRecent')); }
+            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterWicketType')); }
+            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterPitchLength')); }
+            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterPitchLine')); }
+            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterShotType')); }
+            if(document.getElementById('filterDeliveryOutput')) document.getElementById('filterDeliveryOutput').addEventListener('change', () => if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { onFilterChange('filterDeliveryOutput')); }
+
+            if(document.getElementById('filterBattingType')) document.getElementById('filterBattingType').addEventListener('change', async () => {
+                currentBatterId = null;
+                document.getElementById('batterSearch').value = '';
+                document.getElementById('batterName').textContent = 'Unknown Batter';
+                showLoading();
+                await fetchFaceoffFilters('filterBattingType');
+                // fetchStats(); (Wait for Analyze click)
+            });
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', async () => {
+                currentBowlerId = null;
+                document.getElementById('bowlerSearch').value = '';
+                document.getElementById('bowlerName').textContent = 'Unknown Bowler';
+                showLoading();
+                await fetchFaceoffFilters('filterBowlingType');
+                // fetchStats(); (Wait for Analyze click)
+            });
 
             function setupSearch(inputId, resultsId, isBatter) {
                 const input = document.getElementById(inputId);
@@ -493,8 +642,7 @@
                     timeout = setTimeout(async () => {
                         try {
                             let url = `/api/search?q=${encodeURIComponent(query)}`;
-                            if (isBatter && currentBowlerId) url += `&against_bowler=${currentBowlerId}`;
-                            else if (!isBatter && currentBatterId) url += `&against_batter=${currentBatterId}`;
+                            
                             
                             const response = await fetch(url);
                             const data = await response.json();
@@ -505,7 +653,8 @@
                                     return `
                                     <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}', ${isBatter})">
                                         <div style="font-weight: 600; font-family: 'Outfit'; color: white;">${p.full_name}</div>
-                                        <div style="font-size: 0.8rem;">${p.country_code || 'Unknown'}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.primary_team || ''}</div>
+                                        
                                     </div>`;
                                 }).join('');
                             } else {
@@ -519,24 +668,69 @@
                 });
             }
             
-            function selectPlayer(id, name, isBatter) {
+            async function selectPlayer(id, name, isBatter) {
+                // ── Immediate visual feedback ───────────────────────────────
+                const nameEl = document.getElementById(isBatter ? 'batterName' : 'bowlerName');
+                const loadingSpinner = `<span style="font-size:1rem; opacity:0.6;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>`;
+                if (nameEl) nameEl.innerHTML = loadingSpinner;
+
+                // Close search dropdown right away
+                if (isBatter) {
+                    document.getElementById('batterSearch').value = name;
+                    document.getElementById('batterResults').classList.remove('active');
+                } else {
+                    document.getElementById('bowlerSearch').value = name;
+                    document.getElementById('bowlerResults').classList.remove('active');
+                }
+
+                // ── Fetch athlete info (batting/bowling style) ──────────────
+                try {
+                    const infoRes = await fetch(`/api/athlete/${id}`);
+                    if (infoRes.ok) {
+                        const info = await infoRes.json();
+                        if (isBatter && info.battingStyle) {
+                            const sel = document.getElementById('filterBattingType');
+                            if (sel) {
+                                if(!Array.from(sel.options).some(o => o.value === info.battingStyle)) sel.innerHTML += `<option value="${info.battingStyle}">${info.battingStyle}</option>`;
+                                sel.value = info.battingStyle;
+                                convertToCustomMultiSelect('filterBattingType');
+                                setFilterVal('filterBattingType', info.battingStyle);
+                            }
+                        }
+                        if (!isBatter && info.bowlingStyle) {
+                            const sel = document.getElementById('filterBowlingType');
+                            if (sel) {
+                                if(!Array.from(sel.options).some(o => o.value === info.bowlingStyle)) sel.innerHTML += `<option value="${info.bowlingStyle}">${info.bowlingStyle}</option>`;
+                                sel.value = info.bowlingStyle;
+                                convertToCustomMultiSelect('filterBowlingType');
+                                setFilterVal('filterBowlingType', info.bowlingStyle);
+                            }
+                        }
+                    }
+                } catch(e) { console.warn('Athlete info fetch failed:', e); }
+
+                // ── Update player display ───────────────────────────────────
                 if (isBatter) {
                     currentBatterId = id;
                     document.getElementById('batterName').textContent = name;
                     document.getElementById('batterProfileLink').href = `/player/${id}`;
-                    document.getElementById('batterSearch').value = name;
-                    document.getElementById('batterResults').classList.remove('active');
                 } else {
                     currentBowlerId = id;
                     document.getElementById('bowlerName').textContent = name;
                     document.getElementById('bowlerProfileLink').href = `/player/${id}`;
-                    document.getElementById('bowlerSearch').value = name;
-                    document.getElementById('bowlerResults').classList.remove('active');
                 }
-                
-                if (currentBatterId && currentBowlerId) {
-                    fetchFaceoffFilters();
+
+                // ── Show loading in stats area while waiting for data ────────
+                const bothSelected = (currentBatterId || getFilterVal('filterBattingType') !== 'All') &&
+                                     (currentBowlerId || getFilterVal('filterBowlingType') !== 'All');
+
+                if (bothSelected) {
+                    // Show loading state immediately before async work
+                    showLoading();
+
+                    await fetchFaceoffFilters();
                 } else {
+                    // Only one player selected — update URL and show "waiting" state
                     const url = new URL(window.location);
                     if (isBatter) url.searchParams.set('batter_id', id);
                     else url.searchParams.set('bowler_id', id);
@@ -800,7 +994,7 @@
                     });
                     
                     let drawnSpokes = [];
-                    const batOriginY = centerY + 25; // Bottom popping crease
+                    const batOriginY = centerY - radius * 0.134; // Calibrated bat position
                     
                     // Draw Spokes
                     scatterData.forEach(w => {
@@ -919,18 +1113,17 @@
             }
 
             async function fetchStats() {
-                if (!currentBatterId || !currentBowlerId) {
-                    alert("Please select both a Batter and a Bowler before comparing.");
+                if (!(currentBatterId || getFilterVal('filterBattingType') !== 'All') || !(currentBowlerId || getFilterVal('filterBowlingType') !== 'All')) {
+                    alert("Please select players or player types before comparing.");
                     return;
                 }
                 
-                document.getElementById('emptyState').style.display = 'none';
-                document.getElementById('loadingState').style.display = 'flex';
+                showLoading();
                 
-                const splitMode = document.getElementById('splitByFormat').checked;
-                
+                const btV = getFilterVal('filterBattingType');
+                const bwtV = getFilterVal('filterBowlingType');
                 const baseParams = new URLSearchParams({
-                    batter_id: currentBatterId, bowler_id: currentBowlerId,
+                    batter_id: currentBatterId || '', bowler_id: currentBowlerId || '', batting_type: btV, bowling_type: bwtV,
                     league: getFilterVal('filterLeague'), league_not: getFilterNot('filterLeague'),
                     phase: getFilterVal('filterPhase'), phase_not: getFilterNot('filterPhase'),
                     venue: getFilterVal('filterVenue'), venue_not: getFilterNot('filterVenue'),
@@ -941,13 +1134,14 @@
                     wicket_type: getFilterVal('filterWicketType'), wicket_type_not: getFilterNot('filterWicketType'),
                     pitch_length: getFilterVal('filterPitchLength'), pitch_length_not: getFilterNot('filterPitchLength'),
                     pitch_line: getFilterVal('filterPitchLine'), pitch_line_not: getFilterNot('filterPitchLine'),
-                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType')
+                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType'),
+                    delivery_output: getFilterVal('filterDeliveryOutput'), delivery_output_not: getFilterNot('filterDeliveryOutput')
                 });
                 
                 try {
-                    document.getElementById('mainContent').style.display = 'block';
+                    // mainContent shown only after data loaded (below)
                     
-                    if (splitMode) {
+                    if (false) {
                         document.getElementById('chartsRow').style.display = 'none';
                         document.getElementById('statsGrid').className = '';
                         
@@ -994,6 +1188,7 @@
                         
                         document.getElementById('statsGrid').innerHTML = html;
                         document.getElementById('loadingState').style.display = 'none';
+                        document.getElementById('mainContent').style.display = 'block';
                         
                     } else {
                         document.getElementById('chartsRow').style.display = 'grid';
@@ -1067,20 +1262,25 @@
                         }
                         
                         document.getElementById('loadingState').style.display = 'none';
+                        document.getElementById('mainContent').style.display = 'block';
                     }
                     
                 } catch(e) {
                     console.error(e);
                     document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('emptyState').style.display = 'block';
-                    document.getElementById('emptyState').innerHTML = '<p style="color:var(--accent-red);">Failed to load faceoff data.</p>';
+                    const es = document.getElementById('emptyState');
+                    if (es) {
+                        es.style.display = 'block';
+                        es.innerHTML = '<p style="color:var(--accent-red);">Failed to load faceoff data.</p>';
+                    }
                 }
             }
             
             setupSearch('batterSearch', 'batterResults', true);
             setupSearch('bowlerSearch', 'bowlerResults', false);
             init();
-        </script>
+            initializeAllCustomSelects();
+</script>
     </div>
 </body>
 </html>

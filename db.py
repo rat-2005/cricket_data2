@@ -19,8 +19,50 @@ S3_BUCKET = "s3://cricket-telemetry-lake-thej/data_merged"
 _conn = None
 
 
+def sync_parquet_files():
+    """Downloads all necessary Parquet files from S3 to the local data/ folder."""
+    print("Syncing parquet files locally from S3...")
+    import os
+    os.makedirs('data', exist_ok=True)
+    temp_conn = duckdb.connect(":memory:")
+    try:
+        temp_conn.execute("INSTALL httpfs; LOAD httpfs; CALL load_aws_credentials(); SET s3_region='ap-south-1';")
+        
+        tables = [
+            "cricinfo_parquet", "cricinfo_batting", "cricinfo_bowling",       
+            "cricinfo_innings", "cricinfo_fow", "cricinfo_partnerships",  
+            "cricsheet_deliveries", "cricinfo_metadata", "cricsheet_matches",   
+            "cricsheet_people"
+        ]
+        
+        for t in tables:
+            s3_path = f"{S3_BUCKET}/{t}/data.parquet"
+            local_path = f"data/{t}.parquet"
+            print(f"Downloading {t}...")
+            # Use COPY to download efficiently
+            temp_conn.execute(f"COPY (SELECT * FROM read_parquet('{s3_path}')) TO '{local_path}' (FORMAT PARQUET)")
+            
+        print("Parquet sync complete.")
+    except Exception as e:
+        print(f"Failed to sync parquet files: {e}")
+        raise RuntimeError(f"S3 Download Failed: {e}")
+    finally:
+        temp_conn.close()
+
+def reload_db():
+    """Forces the global connection to be re-initialized (e.g. after a daily sync)."""
+    global _conn
+    if _conn:
+        _conn.close()
+    _conn = None
+    get_conn()
+
+
+import threading
+_init_lock = threading.Lock()
+
 def get_conn():
-    """Get or create the singleton DuckDB connection with S3 access.
+    """Get or create the singleton DuckDB connection reading from local data/.
 
     Uses a local 'conn' variable during initialization and only assigns
     to the global _conn AFTER everything succeeds. This prevents partially-
@@ -30,18 +72,23 @@ def get_conn():
     if _conn is not None:
         return _conn
 
-    print("Initializing DuckDB with S3 Parquet access...")
+    with _init_lock:
+        if _conn is not None:
+            return _conn
+            
+        import os
+        # Check if local data exists and is valid, if not, sync it
+        if not os.path.exists('data') or not os.path.exists('data/cricinfo_parquet.parquet') or os.path.getsize('data/cricinfo_parquet.parquet') < 1000:
+            sync_parquet_files()
+
+    print("Initializing DuckDB with local Parquet access...")
     import time
     max_retries = 3
     for attempt in range(max_retries):
         conn = duckdb.connect(":memory:")
 
         try:
-            # S3 access
-            conn.execute("INSTALL httpfs; LOAD httpfs;")
-            conn.execute("CALL load_aws_credentials();")
-
-            # ── Views for MASSIVE tables — stay lazily in S3 ─────────────
+            # ── Views for MASSIVE tables — query locally ─────────────
             large_tables = [
                 "cricinfo_parquet",       
                 "cricinfo_batting",       
@@ -52,7 +99,7 @@ def get_conn():
                 "cricsheet_deliveries",   
             ]
             for t in large_tables:
-                path = f"{S3_BUCKET}/{t}/data.parquet"
+                path = f"data/{t}.parquet"
                 conn.execute(
                     f"CREATE OR REPLACE VIEW {t} AS "
                     f"SELECT * FROM read_parquet('{path}')"
@@ -65,7 +112,7 @@ def get_conn():
                 "cricsheet_people",    
             ]
             for t in small_tables:
-                path = f"{S3_BUCKET}/{t}/data.parquet"
+                path = f"data/{t}.parquet"
                 conn.execute(
                     f"CREATE TABLE IF NOT EXISTS {t} AS "
                     f"SELECT * FROM read_parquet('{path}')"
@@ -92,6 +139,30 @@ def get_conn():
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS cricinfo_match_ids AS
                 SELECT DISTINCT match_id FROM cricinfo_metadata
+            """)
+
+            # ── player_primary_team: most frequent team played for ────────
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS player_primary_team AS
+                WITH team_counts AS (
+                    SELECT playerId, teamName, COUNT(*) as matches
+                    FROM cricinfo_batting
+                    GROUP BY playerId, teamName
+                ),
+                ranked_teams AS (
+                    SELECT playerId, teamName,
+                           ROW_NUMBER() OVER (PARTITION BY playerId ORDER BY matches DESC) as rn
+                    FROM team_counts
+                ),
+                total_matches AS (
+                    SELECT playerId, SUM(matches) as total_matches
+                    FROM team_counts
+                    GROUP BY playerId
+                )
+                SELECT r.playerId, r.teamName AS primary_team, t.total_matches
+                FROM ranked_teams r
+                JOIN total_matches t ON r.playerId = t.playerId
+                WHERE r.rn = 1
             """)
 
             # ── cricinfo_player_styles: internal ESPN ID -> bowling/batting styles ──

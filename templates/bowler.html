@@ -8,6 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/static/css/style.css?v=2" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #94a3b8; transition: .4s; }
+        input:checked + .slider { background-color: var(--accent-color); border-color: var(--accent-color); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: white; }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+        #analyzeBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4) !important; }
+    </style>
 </head>
 <body>
     <div class="container fade-in">
@@ -23,6 +36,14 @@
         </header>
 
         <div class="dashboard">
+            
+            <!-- Cascaded Toggle Header -->
+            <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 1rem; position: relative; z-index: 100;">
+                <label style="display: flex; align-items: center; gap: 0.6rem; color: white; background: rgba(255, 255, 255, 0.05); padding: 0.6rem 1.2rem; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1); font-family: 'Inter', sans-serif; font-size: 0.95rem; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" title="When ON, selecting a filter narrows down the other options. When OFF, all options are always visible.">
+                    <input type="checkbox" id="cascadedToggle" checked style="accent-color: var(--accent-blue); width: 1.1rem; height: 1.1rem; cursor: pointer;">
+                    <i class="fas fa-filter" style="color: var(--accent-blue);"></i> <strong>Cascaded Filters</strong>
+                </label>
+            </div>
             <!-- Top Bar for Selection & Filters -->
             <div class="glass-panel" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; position: relative; z-index: 50;">
                 <div style="flex: 2; min-width: 250px; position: relative; z-index: 1000;">
@@ -35,7 +56,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelFormat" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Format</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterFormat', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterFormat', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -46,7 +66,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelLeague" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">League</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterLeague', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterLeague', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -57,7 +76,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPhase" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Phase</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPhase', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPhase', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -73,7 +91,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelVenue" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Venue</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterVenue', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterVenue', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -84,7 +101,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelOpponent" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Opponent</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterOpponent', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterOpponent', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -95,7 +111,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelBattingType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Batting Type</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterBattingType', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterBattingType', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -106,7 +121,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelYear" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Year</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterYear', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterYear', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -117,7 +131,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelInnings" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Innings</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterInnings', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterInnings', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -134,7 +147,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelResult" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Match Result</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterResult', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterResult', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -149,7 +161,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelRecent" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Recent Matches</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterRecent', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterRecent', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -165,7 +176,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelWicketType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Wicket Type</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterWicketType', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterWicketType', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -175,7 +185,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPitchLength" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Length</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLength', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLength', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -185,7 +194,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelPitchLine" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Pitch Line</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterPitchLine', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterPitchLine', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
@@ -195,17 +203,38 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label id="labelShotType" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Shot Type</label>
                         <div style="display: flex; gap: 0.25rem;">
-                            <button type="button" class="filter-btn" onclick="toggleMulti('filterShotType', this)" title="Multi-select">Multi</button>
                             <button type="button" class="filter-btn" onclick="toggleNot('filterShotType', this)" title="Exclude selected">Not</button>
                         </div>
                     </div>
                     <select id="filterShotType" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;"><option value="All">All Shots</option></select>
                 </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label id="labelDeliveryOutput" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Delivery Output</label>
+                        <div style="display: flex; gap: 0.25rem;">
+                            <button type="button" class="filter-btn" onclick="toggleNot('filterDeliveryOutput', this)" title="Exclude selected">Not</button>
+                        </div>
+                    </div>
+                    <select id="filterDeliveryOutput" style="width: 100%; padding: 0.8rem 1rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                        <option value="All">All Outputs</option>
+                        <option value="0">0 Runs</option>
+                        <option value="1">1 Run</option>
+                        <option value="2">2 Runs</option>
+                        <option value="3">3 Runs</option>
+                        <option value="4">4 Runs</option>
+                        <option value="5">5 Runs</option>
+                        <option value="6">6 Runs</option>
+                        <option value="7+">7+ Runs</option>
+                        <option value="Wicket">Wicket</option>
+                        <option value="Wide">Wide</option>
+                    </select>
+                </div>
+                
                 
                 <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
-                        <input type="checkbox" id="splitByFormat" style="width: 16px; height: 16px; cursor: pointer;"> Split Formats
-                    </label>
+                    
+                    <button type="button" onclick="resetFilters()" style="padding: 0.8rem 2rem; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); color: white; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: background 0.2s;">Reset Options</button>
+
                     <button onclick="fetchStats()" style="padding: 0.8rem 2rem; border-radius: 12px; border: none; background: var(--accent-gradient); color: white; font-family: 'Outfit'; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--neon-glow); transition: transform 0.2s;">
                         Analyze
                     </button>
@@ -311,15 +340,6 @@
                             </div>
                         </div>
 
-                        <!-- Pace Profile -->
-                        <div class="glass-panel span-4 chart-container" style="min-height: 300px;">
-                            <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-tachometer-alt" style="color: var(--accent-green);"></i> Pace Profile Curve</h3>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="paceChart"></canvas>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
@@ -336,7 +356,7 @@
             let currentAthleteId = "{{ athlete_id or '' }}";
             let heatmapChartInstance = null;
             let wicketChartInstance = null;
-            let paceChartInstance = null;
+            
             
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.font.family = "'Inter', sans-serif";
@@ -352,13 +372,15 @@
                         leagueSelect.innerHTML += filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
                         const venSelect = document.getElementById('filterVenue');
                         venSelect.innerHTML += filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
+                        convertToCustomMultiSelect('filterFormat');
+                        convertToCustomMultiSelect('filterLeague');
+                        convertToCustomMultiSelect('filterVenue');
                     }
                     
                     if (currentAthleteId) {
                         const bRes = await fetch(`/api/athlete/${currentAthleteId}`);
                         if (bRes.ok) document.getElementById('athleteName').textContent = (await bRes.json()).full_name;
                         await fetchBowlerFilters();
-                        fetchStats();
                     }
                 } catch(e) { console.error("Init failed", e); }
             }
@@ -383,7 +405,7 @@
                 const currentLeague = getFilterVal('filterLeague'); const league_not = getFilterNot('filterLeague');
                 const currentVenue = getFilterVal('filterVenue'); const venue_not = getFilterNot('filterVenue');
                 const currentOpp = getFilterVal('filterOpponent'); const opponent_not = getFilterNot('filterOpponent');
-                const currentBowl = getFilterVal('filterBowlingType'); const bowling_type_not = getFilterNot('filterBowlingType');
+                const currentBat = getFilterVal('filterBattingType'); const batting_type_not = getFilterNot('filterBattingType');
                 const currentYear = getFilterVal('filterYear'); const year_not = getFilterNot('filterYear');
                 const currentInnings = getFilterVal('filterInnings'); const innings_not = getFilterNot('filterInnings');
                 const currentResult = getFilterVal('filterResult'); const result_not = getFilterNot('filterResult');
@@ -393,24 +415,38 @@
                 const currentPitchLength = getFilterVal('filterPitchLength'); const pitch_length_not = getFilterNot('filterPitchLength');
                 const currentPitchLine = getFilterVal('filterPitchLine'); const pitch_line_not = getFilterNot('filterPitchLine');
                 const currentShotType = getFilterVal('filterShotType'); const shot_type_not = getFilterNot('filterShotType');
+                const currentDeliveryOutput = getFilterVal('filterDeliveryOutput'); const delivery_output_not = getFilterNot('filterDeliveryOutput');
                 
                 try {
                     document.getElementById('loadingState').style.display = 'flex';
+                    
+                    const cascadedToggle = document.getElementById('cascadedToggle');
                     let params;
+                    if (cascadedToggle && !cascadedToggle.checked) {
+                        // OFF: Do not send current filter values
+                        if (typeof currentBatterId !== 'undefined' && typeof currentBowlerId !== 'undefined' && currentBatterId && currentBowlerId) {
+                            params = new URLSearchParams({ batter_id: currentBatterId, bowler_id: currentBowlerId });
+                        } else {
+                            params = new URLSearchParams({ id: typeof currentId !== 'undefined' ? currentId : '' });
+                        }
+                    } else {
+                        // ON: Send current filter values to cascade
+
                     if ('Bowler' === 'Faceoff') {
                         params = new URLSearchParams({
                             batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, league: currentLeague, venue: currentVenue,
                             opponent: currentOpp, batting_type: currentBat, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent,
-                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType
+                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType, delivery_output: currentDeliveryOutput
                         });
                     } else {
                         params = new URLSearchParams({
                             id: currentId, format: currentFormat, league: currentLeague, venue: currentVenue,
                             opponent: currentOpp, batting_type: currentBat, innings: currentInnings, result: currentResult, year: currentYear, phase: currentPhase, recent: currentRecent,
-                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType
+                            wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType, delivery_output: currentDeliveryOutput
                         });
                     }
                     
+                    }
                     const endpoint = 'Bowler' === 'Batter' ? '/api/batter_filters' : ('Bowler' === 'Bowler' ? '/api/bowler_filters' : '/api/faceoff_filters');
                     const filterRes = await fetch(`${endpoint}?${params.toString()}`);
                     
@@ -484,6 +520,13 @@
                             phaseSelect.innerHTML = '<option value="All">All Phases</option>' + filters.phases.map(p => `<option value="${p}">${p}</option>`).join('');
                             setFilterVal('filterPhase', currentPhase);
                         }
+                        const selectIds = ['filterFormat', 'filterLeague', 'filterVenue', 'filterOpponent', 'filterBattingType', 'filterYear', 'filterInnings', 'filterResult', 'filterWicketType', 'filterPitchLength', 'filterPitchLine', 'filterShotType', 'filterPhase', 'filterDeliveryOutput'];
+                        selectIds.forEach(id => {
+                            if (sourceId !== id && document.getElementById(id)) {
+                                convertToCustomMultiSelect(id);
+                            }
+                        });
+
                     }
                 } catch(e) { 
                     console.error("Filter fetch failed", e); 
@@ -492,20 +535,21 @@
                 }
             }
 
-            document.getElementById('filterFormat').addEventListener('change', () => fetchBowlerFilters('filterFormat'));
-            document.getElementById('filterLeague').addEventListener('change', () => fetchBowlerFilters('filterLeague'));
-            document.getElementById('filterVenue').addEventListener('change', () => fetchBowlerFilters('filterVenue'));
-            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchBowlerFilters('filterOpponent'));
-            if(document.getElementById('filterBattingType')) document.getElementById('filterBattingType').addEventListener('change', () => fetchBowlerFilters('filterBattingType'));
-            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchBowlerFilters('filterYear'));
-            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchBowlerFilters('filterInnings'));
-            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBowlerFilters('filterResult'));
-            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBowlerFilters('filterPhase'));
-            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBowlerFilters('filterRecent'));
-            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', () => fetchBowlerFilters('filterWicketType'));
-            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', () => fetchBowlerFilters('filterPitchLength'));
-            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', () => fetchBowlerFilters('filterPitchLine'));
-            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', () => fetchBowlerFilters('filterShotType'));
+            document.getElementById('filterFormat').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterFormat'); } });
+            document.getElementById('filterLeague').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterLeague'); } });
+            document.getElementById('filterVenue').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterVenue'); } });
+            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterOpponent'); } });
+            if(document.getElementById('filterBattingType')) document.getElementById('filterBattingType').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterBattingType'); } });
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterYear'); } });
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterInnings'); } });
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterResult'); } });
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterPhase'); } });
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterRecent'); } });
+            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterWicketType'); } });
+            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterPitchLength'); } });
+            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterPitchLine'); } });
+            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterShotType'); } });
+            if(document.getElementById('filterDeliveryOutput')) document.getElementById('filterDeliveryOutput').addEventListener('change', async () => { if (document.getElementById('cascadedToggle') && document.getElementById('cascadedToggle').checked) { await fetchBowlerFilters('filterDeliveryOutput'); } });
 
 
             function getFilterVal(id) {
@@ -515,7 +559,7 @@
                 if (el.parentElement && el.parentElement.classList.contains('custom-multi-wrapper')) {
                     const checkboxes = el.parentElement.querySelectorAll('input[type="checkbox"]:checked');
                     if (checkboxes.length > 0) {
-                        return Array.from(checkboxes).map(cb => cb.dataset.value).join(',');
+                        return Array.from(checkboxes).map(cb => cb.value).join(',');
                     } else {
                         return 'All';
                     }
@@ -534,12 +578,19 @@
             function setFilterVal(id, val) {
                 const el = document.getElementById(id);
                 if (!el) return;
+                if (typeof val === "string" && val.includes(",")) val = val.split(",");
                 if (Array.isArray(val)) {
                     Array.from(el.options).forEach(opt => {
                         opt.selected = val.includes(opt.value);
                     });
                 } else {
-                    el.value = val;
+                    if (el.multiple) {
+                        Array.from(el.options).forEach(opt => {
+                            opt.selected = (opt.value === val);
+                        });
+                    } else {
+                        el.value = val;
+                    }
                 }
             }
             function toggleMulti(selectId, btn) {
@@ -616,7 +667,8 @@
                                     return `
                                     <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}')">
                                         <div style="font-weight: 600; font-family: 'Outfit'; color: white;">${p.full_name}</div>
-                                        <div style="font-size: 0.8rem;">${p.country_code || 'Unknown'}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.primary_team || ''}</div>
+                                        
                                     </div>`;
                                 }).join('');
                             } else {
@@ -667,26 +719,7 @@
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
                 });
 
-                // Pace Profile Curve
-                const paceCtx = document.getElementById('paceChart').getContext('2d');
-                if (paceChartInstance) paceChartInstance.destroy();
                 
-                paceChartInstance = new Chart(paceCtx, {
-                    type: 'line',
-                    data: {
-                        labels: Object.keys(data.pace_data || {}),
-                        datasets: [{
-                            label: 'Deliveries',
-                            data: Object.values(data.pace_data || {}),
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } }, elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 6 } } }
-                });
             }
 
             async function fetchStats() {
@@ -694,8 +727,6 @@
                 
                 document.getElementById('emptyState').style.display = 'none';
 document.getElementById('loadingState').style.display = 'flex';
-                
-                const splitMode = document.getElementById('splitByFormat').checked;
                 
                 const baseParams = new URLSearchParams({
                     id: currentAthleteId,
@@ -712,13 +743,14 @@ document.getElementById('loadingState').style.display = 'flex';
                     wicket_type: getFilterVal('filterWicketType'), wicket_type_not: getFilterNot('filterWicketType'),
                     pitch_length: getFilterVal('filterPitchLength'), pitch_length_not: getFilterNot('filterPitchLength'),
                     pitch_line: getFilterVal('filterPitchLine'), pitch_line_not: getFilterNot('filterPitchLine'),
-                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType')
+                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType'),
+                    delivery_output: getFilterVal('filterDeliveryOutput'), delivery_output_not: getFilterNot('filterDeliveryOutput')
                 });
                 
                 try {
                     document.getElementById('mainContent').style.display = 'block';
                     
-                    if (splitMode) {
+                    if (false) {
                         document.getElementById('chartsRow').style.display = 'none';
                         document.getElementById('statsGrid').className = '';
                         
@@ -959,7 +991,8 @@ document.getElementById('loadingState').style.display = 'flex';
             setupSearch();
 
             init();
-        </script>
+            initializeAllCustomSelects();
+</script>
     </div>
 </body>
 </html>

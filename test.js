@@ -1,9 +1,9 @@
-
-            let currentAthleteId = "{{ athlete_id or '' }}";
+            let currentBatterId = "{{ batter_id or '' }}";
+            let currentBowlerId = "{{ bowler_id or '' }}";
+            let lengthChartInstance = null;
             let wagonChartInstance = null;
-            let shotChartInstance = null;
-            let vulnChartInstance = null;
             
+            // Chart.js Default Config for Dark Theme
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.font.family = "'Inter', sans-serif";
             
@@ -12,81 +12,135 @@
                     const filterRes = await fetch(`/api/filters`);
                     if(filterRes.ok) {
                         const filters = await filterRes.json();
+                        
                         const formatSelect = document.getElementById('filterFormat');
                         formatSelect.innerHTML += filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
+                        
                         const leagueSelect = document.getElementById('filterLeague');
                         leagueSelect.innerHTML += filters.leagues.map(l => `<option value="${l}">${l}</option>`).join('');
+                        
                         const venSelect = document.getElementById('filterVenue');
                         venSelect.innerHTML += filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
+                        
+                        if (filters.batting_types) {
+                            const btSelect = document.getElementById('filterBattingType');
+                            if (btSelect) btSelect.innerHTML += filters.batting_types.map(t => `<option value="${t}">${t}</option>`).join('');
+                        }
+                        if (filters.bowling_types) {
+                            const bwtSelect = document.getElementById('filterBowlingType');
+                            if (bwtSelect) bwtSelect.innerHTML += filters.bowling_types.map(t => `<option value="${t}">${t}</option>`).join('');
+                        }
+                        
+                        convertToCustomMultiSelect('filterFormat');
+                        convertToCustomMultiSelect('filterLeague');
+                        convertToCustomMultiSelect('filterVenue');
+                        if (document.getElementById('filterBattingType')) convertToCustomMultiSelect('filterBattingType');
+                        if (document.getElementById('filterBowlingType')) convertToCustomMultiSelect('filterBowlingType');
                     }
                     
-                    if (currentAthleteId) {
-                        const bRes = await fetch(`/api/athlete/${currentAthleteId}`);
-                        if (bRes.ok) document.getElementById('athleteName').textContent = (await bRes.json()).full_name;
-                        await fetchBatterFilters();
+                    if (currentBatterId && currentBowlerId) {
+                        const bRes = await fetch(`/api/athlete/${currentBatterId}`);
+                        if (bRes.ok) document.getElementById('batterName').textContent = (await bRes.json()).full_name;
+                        
+                        const boRes = await fetch(`/api/athlete/${currentBowlerId}`);
+                        if (boRes.ok) document.getElementById('bowlerName').textContent = (await boRes.json()).full_name;
+                        
+                        await fetchFaceoffFilters();
                         fetchStats();
                     }
                 } catch(e) { console.error("Init failed", e); }
             }
             
-            async function fetchBatterFilters(sourceId = null) {
-                let currentId = '';
-                if ('Batter' === 'Faceoff') {
-                    if (!currentBatterId || !currentBowlerId) return;
-                } else {
-                    if (!currentAthleteId) return;
-                    currentId = currentAthleteId;
+            function getFilterVal(id) {
+                const el = document.getElementById(id);
+                if (!el) return 'All';
+                
+                if (el.parentElement && el.parentElement.classList.contains('custom-multi-wrapper')) {
+                    const checkboxes = el.parentElement.querySelectorAll('.custom-multi-option input[type="checkbox"]:checked');
+                    if (checkboxes.length > 0) {
+                        return Array.from(checkboxes).map(cb => cb.value).join(',');
+                    } else {
+                        return 'All';
+                    }
                 }
+                
+                if (el.multiple) {
+                    const vals = Array.from(el.selectedOptions).map(o => o.value);
+                    return vals.length ? vals.join(',') : 'All';
+                }
+                return el.value || 'All';
+            }
+            
+            function getFilterNot(id) {
+                const el = document.getElementById(id);
+                return el ? (el.dataset.not === 'true') : false;
+            }
+            
+            function setFilterVal(id, val) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (typeof val === "string" && val.includes(",")) val = val.split(",");
+                if (Array.isArray(val)) {
+                    Array.from(el.options).forEach(opt => {
+                        opt.selected = val.includes(opt.value);
+                    });
+                } else {
+                    if (el.multiple) {
+                        Array.from(el.options).forEach(opt => {
+                            opt.selected = (opt.value === val);
+                        });
+                    } else {
+                        el.value = val;
+                    }
+                }
+            }
+
+            async function fetchFaceoffFilters(sourceId = null) {
+                const bt = document.getElementById("filterBattingType"); const bwt = document.getElementById("filterBowlingType");
+                if (!(currentBatterId || (bt && bt.value !== "All")) || !(currentBowlerId || (bwt && bwt.value !== "All"))) return;
                 
                 const formatSelect = document.getElementById('filterFormat');
                 const leagueSelect = document.getElementById('filterLeague');
                 const venSelect = document.getElementById('filterVenue');
-                const oppSelect = document.getElementById('filterOpponent');
-                const bowlSelect = document.getElementById('filterBowlingType');
                 const yearSelect = document.getElementById('filterYear');
-                // phase, innings, result, recent are static or independent, but we send them
-                
-                const currentFormat = getFilterVal('filterFormat'); const format_not = getFilterNot('filterFormat');
-                const currentLeague = getFilterVal('filterLeague'); const league_not = getFilterNot('filterLeague');
-                const currentVenue = getFilterVal('filterVenue'); const venue_not = getFilterNot('filterVenue');
-                const currentOpp = getFilterVal('filterOpponent'); const opponent_not = getFilterNot('filterOpponent');
-                const currentBowl = getFilterVal('filterBowlingType'); const bowling_type_not = getFilterNot('filterBowlingType');
-                const currentYear = getFilterVal('filterYear'); const year_not = getFilterNot('filterYear');
-                const currentInnings = getFilterVal('filterInnings'); const innings_not = getFilterNot('filterInnings');
-                const currentResult = getFilterVal('filterResult'); const result_not = getFilterNot('filterResult');
-                const currentPhase = getFilterVal('filterPhase'); const phase_not = getFilterNot('filterPhase');
-                const currentRecent = getFilterVal('filterRecent'); const recent_not = getFilterNot('filterRecent');
-                const currentWicket = getFilterVal('filterWicketType'); const wicket_type_not = getFilterNot('filterWicketType');
-                const currentPitchLength = getFilterVal('filterPitchLength'); const pitch_length_not = getFilterNot('filterPitchLength');
-                const currentPitchLine = getFilterVal('filterPitchLine'); const pitch_line_not = getFilterNot('filterPitchLine');
-                const currentShotType = getFilterVal('filterShotType'); const shot_type_not = getFilterNot('filterShotType');
+                const phaseSelect = document.getElementById('filterPhase');
+                const inningsSelect = document.getElementById('filterInnings');
+                const resultSelect = document.getElementById('filterResult');
+                const recentSelect = document.getElementById('filterRecent');
+                const wicketSelect = document.getElementById('filterWicketType');
+                const plSelect = document.getElementById('filterPitchLength');
+                const pitchLineSelect = document.getElementById('filterPitchLine');
+                const shotSelect = document.getElementById('filterShotType');
+                const deliveryOutputSelect = document.getElementById('filterDeliveryOutput');
+
+                const currentFormat = formatSelect ? formatSelect.value || 'All' : 'All';
+                const currentLeague = leagueSelect ? leagueSelect.value || 'All' : 'All';
+                const currentVenue = venSelect ? venSelect.value || 'All' : 'All';
+                const currentYear = yearSelect ? yearSelect.value || 'All' : 'All';
+                const currentPhase = phaseSelect ? phaseSelect.value || 'All' : 'All';
+                const currentInnings = inningsSelect ? inningsSelect.value || 'All' : 'All';
+                const currentResult = resultSelect ? resultSelect.value || 'All' : 'All';
+                const currentRecent = recentSelect ? recentSelect.value || 'All' : 'All';
+                const currentWicket = wicketSelect ? wicketSelect.value || 'All' : 'All';
+                const currentPitchLength = plSelect ? plSelect.value || 'All' : 'All';
+                const currentPitchLine = pitchLineSelect ? pitchLineSelect.value || 'All' : 'All';
+                const currentShotType = shotSelect ? shotSelect.value || 'All' : 'All';
+                const currentDeliveryOutput = deliveryOutputSelect ? deliveryOutputSelect.value || 'All' : 'All';
                 
                 try {
-                    document.getElementById('loadingState').style.display = 'flex';
-                    let params;
-                    if ('Batter' === 'Faceoff') {
-                        params = new URLSearchParams({
-                            batter_id: currentBatterId, bowler_id: currentBowlerId, format: currentFormat, format_not, league: currentLeague, league_not, venue: currentVenue, venue_not,
-                            opponent: currentOpp, opponent_not, bowling_type: currentBowl, bowling_type_not, innings: currentInnings, innings_not, 
-                            result: currentResult, result_not, year: currentYear, year_not, phase: currentPhase, phase_not, recent: currentRecent, recent_not,
-                            wicket_type: currentWicket, wicket_type_not, pitch_length: currentPitchLength, pitch_length_not, pitch_line: currentPitchLine, pitch_line_not, shot_type: currentShotType, shot_type_not
-                        });
-                    } else {
-                        params = new URLSearchParams({
-                            id: currentId, format: currentFormat, format_not, league: currentLeague, league_not, venue: currentVenue, venue_not,
-                            opponent: currentOpp, opponent_not, bowling_type: currentBowl, bowling_type_not, innings: currentInnings, innings_not, 
-                            result: currentResult, result_not, year: currentYear, year_not, phase: currentPhase, phase_not, recent: currentRecent, recent_not,
-                            wicket_type: currentWicket, wicket_type_not, pitch_length: currentPitchLength, pitch_length_not, pitch_line: currentPitchLine, pitch_line_not, shot_type: currentShotType, shot_type_not
-                        });
-                    }
+                    const btV = document.getElementById("filterBattingType") ? document.getElementById("filterBattingType").value : "All";
+                    const bwtV = document.getElementById("filterBowlingType") ? document.getElementById("filterBowlingType").value : "All";
+                    const params = new URLSearchParams({
+                        batter_id: currentBatterId || "", bowler_id: currentBowlerId || "", batting_type: btV, bowling_type: bwtV, format: currentFormat, league: currentLeague, venue: currentVenue,
+                        year: currentYear, phase: currentPhase, recent: currentRecent, innings: currentInnings, result: currentResult,
+                        wicket_type: currentWicket, pitch_length: currentPitchLength, pitch_line: currentPitchLine, shot_type: currentShotType, delivery_output: currentDeliveryOutput
+                    });
                     
-                    const endpoint = 'Batter' === 'Batter' ? '/api/batter_filters' : ('Batter' === 'Bowler' ? '/api/bowler_filters' : '/api/faceoff_filters');
-                    const filterRes = await fetch(`${endpoint}?${params.toString()}`);
+                    const filterRes = await fetch(`/api/faceoff_filters?${params.toString()}`);
                     
                     if(filterRes.ok) {
                         const filters = await filterRes.json();
                         
-                                                                        
                         if (sourceId !== 'filterFormat' && formatSelect && filters.formats) {
                             formatSelect.innerHTML = '<option value="All">All Formats</option>' + filters.formats.map(f => `<option value="${f}">${f}</option>`).join('');
                             setFilterVal('filterFormat', currentFormat);
@@ -99,137 +153,94 @@
                             venSelect.innerHTML = '<option value="All">All Venues</option>' + filters.venues.map(v => `<option value="${v}">${v}</option>`).join('');
                             setFilterVal('filterVenue', currentVenue);
                         }
-                        if (sourceId !== 'filterOpponent' && oppSelect && filters.opponents) {
-                            oppSelect.innerHTML = '<option value="All">All Opponents</option>' + filters.opponents.map(o => `<option value="${o}">${o}</option>`).join('');
-                            setFilterVal('filterOpponent', currentOpp);
-                        }
-                        if (sourceId !== 'filterBowlingType' && bowlSelect && filters.bowling_types) {
-                            bowlSelect.innerHTML = '<option value="All">All Types</option>' + filters.bowling_types.map(b => `<option value="${b}">${b}</option>`).join('');
-                            setFilterVal('filterBowlingType', currentBowl);
-                        }
                         if (sourceId !== 'filterYear' && yearSelect && filters.years) {
-                            let labelEl = document.getElementById('labelYear');
-                            let isLeague = (currentLeague && currentLeague !== 'All');
-                            if (labelEl) labelEl.innerText = isLeague ? 'Season' : 'Year';
-                            let defaultTxt = isLeague ? 'All Seasons' : 'All Years';
-                            yearSelect.innerHTML = `<option value="All">${defaultTxt}</option>` + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
+                            yearSelect.innerHTML = '<option value="All">All Years</option>' + filters.years.map(y => `<option value="${y}">${y}</option>`).join('');
                             setFilterVal('filterYear', currentYear);
                         }
-                        
-                        const inningsSelect = document.getElementById('filterInnings');
-                        if (sourceId !== 'filterInnings' && inningsSelect && filters.innings) {
-                            inningsSelect.innerHTML = '<option value="All">All Innings</option>' + filters.innings.map(i => `<option value="${i}">Innings ${i}</option>`).join('');
-                            setFilterVal('filterInnings', currentInnings);
-                        }
-
-                        const resultSelect = document.getElementById('filterResult');
-                        if (sourceId !== 'filterResult' && resultSelect && filters.results) {
-                            resultSelect.innerHTML = '<option value="All">All Results</option>' + filters.results.map(r => `<option value="${r}">${r}</option>`).join('');
-                            setFilterVal('filterResult', currentResult);
-                        }
-
-                        const wtSelect = document.getElementById('filterWicketType');
-                        if (sourceId !== 'filterWicketType' && wtSelect && filters.wicket_types) {
-                            wtSelect.innerHTML = '<option value="All">All Types</option>' + filters.wicket_types.map(w => `<option value="${w}">${w}</option>`).join('');
-                            setFilterVal('filterWicketType', currentWicket);
-                        }
-
-                        const plSelect = document.getElementById('filterPitchLength');
-                        if (sourceId !== 'filterPitchLength' && plSelect && filters.pitch_lengths) {
-                            plSelect.innerHTML = '<option value="All">All Lengths</option>' + filters.pitch_lengths.map(p => `<option value="${p}">${p}</option>`).join('');
-                            setFilterVal('filterPitchLength', currentPitchLength);
-                        }
-
-                        const plnSelect = document.getElementById('filterPitchLine');
-                        if (sourceId !== 'filterPitchLine' && plnSelect && filters.pitch_lines) {
-                            plnSelect.innerHTML = '<option value="All">All Lines</option>' + filters.pitch_lines.map(p => `<option value="${p}">${p}</option>`).join('');
-                            setFilterVal('filterPitchLine', currentPitchLine);
-                        }
-
-                        const stSelect = document.getElementById('filterShotType');
-                        if (sourceId !== 'filterShotType' && stSelect && filters.shot_types) {
-                            stSelect.innerHTML = '<option value="All">All Shots</option>' + filters.shot_types.map(s => `<option value="${s}">${s}</option>`).join('');
-                            setFilterVal('filterShotType', currentShotType);
-                        }
-
-                        const phaseSelect = document.getElementById('filterPhase');
                         if (sourceId !== 'filterPhase' && phaseSelect && filters.phases) {
                             phaseSelect.innerHTML = '<option value="All">All Phases</option>' + filters.phases.map(p => `<option value="${p}">${p}</option>`).join('');
                             setFilterVal('filterPhase', currentPhase);
                         }
+                        if (sourceId !== 'filterInnings' && inningsSelect && filters.innings) {
+                            inningsSelect.innerHTML = '<option value="All">All Innings</option>' + filters.innings.map(i => `<option value="${i}">Innings ${i}</option>`).join('');
+                            if (filters.innings.includes(currentInnings) || filters.innings.includes(parseInt(currentInnings))) inningsSelect.value = currentInnings;
+                        }
+                        if (sourceId !== 'filterResult' && resultSelect && filters.results) {
+                            resultSelect.innerHTML = '<option value="All">All Results</option>' + filters.results.map(r => `<option value="${r}">${r}</option>`).join('');
+                            setFilterVal('filterResult', currentResult);
+                        }
+                        if (sourceId !== 'filterWicketType' && wicketSelect && filters.wicket_types) {
+                            wicketSelect.innerHTML = '<option value="All">All Types</option>' + filters.wicket_types.map(w => `<option value="${w}">${w}</option>`).join('');
+                            if (filters.wicket_types.includes(currentWicket)) wicketSelect.value = currentWicket;
+                        }
+                        if (sourceId !== 'filterPitchLength' && plSelect && filters.pitch_lengths) {
+                            plSelect.innerHTML = '<option value="All">All Lengths</option>' + filters.pitch_lengths.map(p => `<option value="${p}">${p}</option>`).join('');
+                            setFilterVal('filterPitchLength', currentPitchLength);
+                        }
+                        if (sourceId !== 'filterPitchLine' && pitchLineSelect && filters.pitch_lines) {
+                            pitchLineSelect.innerHTML = '<option value="All">All Lines</option>' + filters.pitch_lines.map(p => `<option value="${p}">${p}</option>`).join('');
+                            setFilterVal('filterPitchLine', currentPitchLine);
+                        }
+                                                if (sourceId !== 'filterShotType' && shotSelect && filters.shot_types) {
+                            shotSelect.innerHTML = '<option value="All">All Shots</option>' + filters.shot_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.shot_types.includes(currentShotType)) shotSelect.value = currentShotType;
+                        }
+                        const btSelect = document.getElementById('filterBattingType');
+                        const bwtSelect = document.getElementById('filterBowlingType');
+                        if (sourceId !== 'filterBattingType' && btSelect && filters.batting_types) {
+                            const curr = btSelect.value;
+                            btSelect.innerHTML = '<option value="All">All Types</option>' + filters.batting_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.batting_types.includes(curr)) btSelect.value = curr;
+                        }
+                        if (sourceId !== 'filterBowlingType' && bwtSelect && filters.bowling_types) {
+                            const curr = bwtSelect.value;
+                            bwtSelect.innerHTML = '<option value="All">All Types</option>' + filters.bowling_types.map(s => `<option value="${s}">${s}</option>`).join('');
+                            if (filters.bowling_types.includes(curr)) bwtSelect.value = curr;
+                        }
+                        const selectIds = ['filterFormat', 'filterLeague', 'filterVenue', 'filterYear', 'filterInnings', 'filterResult', 'filterWicketType', 'filterPitchLength', 'filterPitchLine', 'filterShotType', 'filterPhase', 'filterDeliveryOutput', 'filterBattingType', 'filterBowlingType'];
+                        selectIds.forEach(id => {
+                            if (sourceId !== id && document.getElementById(id)) {
+                                convertToCustomMultiSelect(id);
+                            }
+                        });
                     }
                 } catch(e) { 
-                    console.error("Filter fetch failed", e);
-                } finally {
-                    document.getElementById('loadingState').style.display = 'none';
+                    console.error("Filter update failed", e); 
                 }
             }
 
-            document.getElementById('filterFormat').addEventListener('change', () => fetchBatterFilters('filterFormat'));
-            document.getElementById('filterLeague').addEventListener('change', () => fetchBatterFilters('filterLeague'));
-            document.getElementById('filterVenue').addEventListener('change', () => fetchBatterFilters('filterVenue'));
-            if(document.getElementById('filterOpponent')) document.getElementById('filterOpponent').addEventListener('change', () => fetchBatterFilters('filterOpponent'));
-            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', () => fetchBatterFilters('filterBowlingType'));
-            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', () => fetchBatterFilters('filterYear'));
-            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', () => fetchBatterFilters('filterInnings'));
-            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', () => fetchBatterFilters('filterResult'));
-            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', () => fetchBatterFilters('filterPhase'));
-            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', () => fetchBatterFilters('filterRecent'));
-            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', () => fetchBatterFilters('filterWicketType'));
-            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', () => fetchBatterFilters('filterPitchLength'));
-            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', () => fetchBatterFilters('filterPitchLine'));
-            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', () => fetchBatterFilters('filterShotType'));
+            if(document.getElementById('filterFormat')) document.getElementById('filterFormat').addEventListener('change', async () => { await fetchFaceoffFilters('filterFormat'); fetchStats(); });
+            if(document.getElementById('filterLeague')) document.getElementById('filterLeague').addEventListener('change', async () => { await fetchFaceoffFilters('filterLeague'); fetchStats(); });
+            if(document.getElementById('filterVenue')) document.getElementById('filterVenue').addEventListener('change', async () => { await fetchFaceoffFilters('filterVenue'); fetchStats(); });
+            if(document.getElementById('filterYear')) document.getElementById('filterYear').addEventListener('change', async () => { await fetchFaceoffFilters('filterYear'); fetchStats(); });
+            if(document.getElementById('filterPhase')) document.getElementById('filterPhase').addEventListener('change', async () => { await fetchFaceoffFilters('filterPhase'); fetchStats(); });
+            if(document.getElementById('filterInnings')) document.getElementById('filterInnings').addEventListener('change', async () => { await fetchFaceoffFilters('filterInnings'); fetchStats(); });
+            if(document.getElementById('filterResult')) document.getElementById('filterResult').addEventListener('change', async () => { await fetchFaceoffFilters('filterResult'); fetchStats(); });
+            if(document.getElementById('filterRecent')) document.getElementById('filterRecent').addEventListener('change', async () => { await fetchFaceoffFilters('filterRecent'); fetchStats(); });
+            if(document.getElementById('filterWicketType')) document.getElementById('filterWicketType').addEventListener('change', async () => { await fetchFaceoffFilters('filterWicketType'); fetchStats(); });
+            if(document.getElementById('filterPitchLength')) document.getElementById('filterPitchLength').addEventListener('change', async () => { await fetchFaceoffFilters('filterPitchLength'); fetchStats(); });
+            if(document.getElementById('filterPitchLine')) document.getElementById('filterPitchLine').addEventListener('change', async () => { await fetchFaceoffFilters('filterPitchLine'); fetchStats(); });
+            if(document.getElementById('filterShotType')) document.getElementById('filterShotType').addEventListener('change', async () => { await fetchFaceoffFilters('filterShotType'); fetchStats(); });
+            if(document.getElementById('filterDeliveryOutput')) document.getElementById('filterDeliveryOutput').addEventListener('change', async () => { await fetchFaceoffFilters('filterDeliveryOutput'); fetchStats(); });
 
+            if(document.getElementById('filterBattingType')) document.getElementById('filterBattingType').addEventListener('change', async () => {
+                currentBatterId = null;
+                document.getElementById('batterSearch').value = '';
+                document.getElementById('batterName').textContent = 'Unknown Batter';
+                await fetchFaceoffFilters('filterBattingType');
+                fetchStats();
+            });
+            if(document.getElementById('filterBowlingType')) document.getElementById('filterBowlingType').addEventListener('change', async () => {
+                currentBowlerId = null;
+                document.getElementById('bowlerSearch').value = '';
+                document.getElementById('bowlerName').textContent = 'Unknown Bowler';
+                await fetchFaceoffFilters('filterBowlingType');
+                fetchStats();
+            });
 
-            function getFilterVal(id) {
-                const el = document.getElementById(id);
-                if (!el) return 'All';
-                if (el.hasAttribute('multiple')) {
-                    const vals = Array.from(el.selectedOptions).map(o => o.value);
-                    return vals.length ? vals : 'All';
-                }
-                return el.value || 'All';
-            }
-            function getFilterNot(id) {
-                const el = document.getElementById(id);
-                return el ? (el.dataset.not === 'true') : false;
-            }
-            function setFilterVal(id, val) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (Array.isArray(val)) {
-                    Array.from(el.options).forEach(opt => {
-                        opt.selected = val.includes(opt.value);
-                    });
-                } else {
-                    el.value = val;
-                }
-            }
-            function toggleMulti(selectId, btn) {
-                const sel = document.getElementById(selectId);
-                if (!sel) return;
-                if (sel.hasAttribute('multiple')) {
-                    sel.removeAttribute('multiple');
-                    btn.classList.remove('active-multi');
-                } else {
-                    sel.setAttribute('multiple', 'multiple');
-                    btn.classList.add('active-multi');
-                }
-            }
-            function toggleNot(selectId, btn) {
-                const sel = document.getElementById(selectId);
-                if (!sel) return;
-                if (sel.dataset.not === "true") {
-                    sel.dataset.not = "false";
-                    btn.classList.remove('active-not');
-                } else {
-                    sel.dataset.not = "true";
-                    btn.classList.add('active-not');
-                }
-            }
-            function setupSearch() {
-                const input = document.getElementById('athleteSearch');
-                const results = document.getElementById('searchResults');
+            function setupSearch(inputId, resultsId, isBatter) {
+                const input = document.getElementById(inputId);
+                const results = document.getElementById(resultsId);
                 let timeout;
                 
                 input.addEventListener('input', (e) => {
@@ -242,14 +253,18 @@
 
                     timeout = setTimeout(async () => {
                         try {
-                            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                            let url = `/api/search?q=${encodeURIComponent(query)}`;
+                            if (isBatter && currentBowlerId) url += `&against_bowler=${currentBowlerId}`;
+                            else if (!isBatter && currentBatterId) url += `&against_batter=${currentBatterId}`;
+                            
+                            const response = await fetch(url);
                             const data = await response.json();
                             
                             if(data.length > 0) {
                                 results.innerHTML = data.map(p => {
                                     const safeName = (p.full_name || '').replace(/'/g, "\\'");
                                     return `
-                                    <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}')">
+                                    <div class="search-result-item" onclick="selectPlayer('${p.id}', '${safeName}', ${isBatter})">
                                         <div style="font-weight: 600; font-family: 'Outfit'; color: white;">${p.full_name}</div>
                                         <div style="font-size: 0.8rem;">${p.country_code || 'Unknown'}</div>
                                     </div>`;
@@ -265,22 +280,209 @@
                 });
             }
             
-            function selectPlayer(id, name) {
-                currentAthleteId = id;
-                document.getElementById('athleteName').textContent = name;
-                document.getElementById('athleteProfileLink').href = `/player/${id}`;
-                getFilterVal('athleteSearch'), athletesearch_not: getFilterNot('athleteSearch') = name;
-                document.getElementById('searchResults').classList.remove('active');
+            async function selectPlayer(id, name, isBatter) {
+                try {
+                    const infoRes = await fetch(`/api/athlete/${id}`);
+                    if (infoRes.ok) {
+                        const info = await infoRes.json();
+                        if (isBatter && info.battingStyle) {
+                            const sel = document.getElementById('filterBattingType');
+                            if (sel) {
+                                if(!Array.from(sel.options).some(o => o.value === info.battingStyle)) sel.innerHTML += `<option value="${info.battingStyle}">${info.battingStyle}</option>`;
+                                sel.value = info.battingStyle;
+                            }
+                        }
+                        if (!isBatter && info.bowlingStyle) {
+                            const sel = document.getElementById('filterBowlingType');
+                            if (sel) {
+                                if(!Array.from(sel.options).some(o => o.value === info.bowlingStyle)) sel.innerHTML += `<option value="${info.bowlingStyle}">${info.bowlingStyle}</option>`;
+                                sel.value = info.bowlingStyle;
+                            }
+                        }
+                    }
+                } catch(e) {}
+
+                if (isBatter) {
+                    currentBatterId = id;
+                    document.getElementById('batterName').textContent = name;
+                    document.getElementById('batterProfileLink').href = `/player/${id}`;
+                    document.getElementById('batterSearch').value = name;
+                    document.getElementById('batterResults').classList.remove('active');
+                } else {
+                    currentBowlerId = id;
+                    document.getElementById('bowlerName').textContent = name;
+                    document.getElementById('bowlerProfileLink').href = `/player/${id}`;
+                    document.getElementById('bowlerSearch').value = name;
+                    document.getElementById('bowlerResults').classList.remove('active');
+                }
                 
-                fetchBatterFilters();
-                
-                const url = new URL(window.location);
-                url.searchParams.set('id', id);
-                window.history.pushState({}, '', url);
+                const bt = document.getElementById('filterBattingType'); const bwt = document.getElementById('filterBowlingType');
+                if ((currentBatterId || (bt && bt.value !== 'All')) && (currentBowlerId || (bwt && bwt.value !== 'All'))) {
+                    await fetchFaceoffFilters();
+                    fetchStats();
+                } else {
+                    const url = new URL(window.location);
+                    if (isBatter) url.searchParams.set('batter_id', id);
+                    else url.searchParams.set('bowler_id', id);
+                    window.history.pushState({}, '', url);
+                }
             }
             
-            function initCharts(data) {
-                // Wagon Wheel Chart (Custom HTML5 Canvas)
+            function renderPitchHeatmap(heatmapData) {
+                const grid = document.getElementById('pitchHeatmapGrid');
+                if (!grid) return;
+                
+                // Keep the first 4 children (the headers)
+                while (grid.children.length > 4) {
+                    grid.removeChild(grid.lastChild);
+                }
+                
+                const lengths = ['FULL_TOSS', 'YORKER', 'FULL', 'GOOD_LENGTH', 'SHORT_OF_A_GOOD_LENGTH', 'SHORT'];
+                const lengthLabels = ['Full Toss', 'Yorker', 'Full Length', 'Good Length', 'Short of good length', 'Short Length'];
+                const lines = ['WIDE_OUTSIDE_OFFSTUMP', 'OUTSIDE_OFFSTUMP', 'ON_THE_STUMPS', 'DOWN_LEG', 'WIDE_DOWN_LEG'];
+                
+                let maxWickets = 0;
+                let maxRuns = 0;
+                const map = {};
+                if (heatmapData && heatmapData.length) {
+                    heatmapData.forEach(d => {
+                        if (!map[d.length]) map[d.length] = {};
+                        map[d.length][d.line] = d;
+                        if (d.wickets > maxWickets) maxWickets = d.wickets;
+                        if (d.runs > maxRuns) maxRuns = d.runs;
+                    });
+                }
+                
+                const maxWGradient = maxWickets > 0 ? maxWickets : 1;
+                const maxRGradient = maxRuns > 0 ? maxRuns : 1;
+
+                for (let r = 0; r < lengths.length; r++) {
+                    const labelCell = document.createElement('div');
+                    labelCell.className = 'pitch-label';
+                    labelCell.textContent = lengthLabels[r];
+                    grid.appendChild(labelCell);
+                    
+                    for (let c = 0; c < lines.length; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'pitch-cell';
+                        
+                        const cellData = map[lengths[r]] && map[lengths[r]][lines[c]];
+                        if (cellData) {
+                            if (cellData.wickets > 0) {
+                                const intensity = 0.4 + (0.6 * (cellData.wickets / maxWGradient));
+                                cell.style.background = `rgba(249, 115, 22, ${intensity})`;
+                                cell.style.borderColor = `rgba(249, 115, 22, 0.4)`;
+                                cell.textContent = cellData.wickets + 'W';
+                            } else if (cellData.runs > 0) {
+                                const intensity = 0.1 + (0.3 * (cellData.runs / maxRGradient));
+                                cell.style.background = `rgba(59, 130, 246, ${intensity})`;
+                                cell.style.borderColor = `rgba(59, 130, 246, 0.2)`;
+                            }
+                            let tooltipText = `Runs: ${cellData.runs} | Balls: ${cellData.balls} | Wickets: ${cellData.wickets}\n`;
+                            if (cellData.runs > 0 && cellData.shots && Object.keys(cellData.shots).length > 0) {
+                                tooltipText += `\n-- Runs by Shot --\n`;
+                                // Sort shots by runs descending
+                                const sortedShots = Object.entries(cellData.shots).sort((a,b) => b[1] - a[1]);
+                                for (const [shot, r] of sortedShots) {
+                                    tooltipText += `${shot.charAt(0).toUpperCase() + shot.slice(1)}: ${r}\n`;
+                                }
+                            }
+                            if (cellData.wickets > 0 && cellData.wicket_events && cellData.wicket_events.length > 0) {
+                                tooltipText += `\n-- Wickets --\n`;
+                                cellData.wicket_events.forEach(w => {
+                                    tooltipText += `• ${w.shot} \u2192 ${w.type}\n`;
+                                });
+                            }
+                            // Setup custom tooltip
+                            cell.addEventListener('mouseenter', (e) => {
+                                cell.style.transform = 'scale(1.15)';
+                                cell.style.zIndex = '10';
+                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+                                let tooltip = document.getElementById('heatmap-tooltip');
+                                if (!tooltip) {
+                                    tooltip = document.createElement('div');
+                                    tooltip.id = 'heatmap-tooltip';
+                                    tooltip.style.position = 'fixed';
+                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
+                                    tooltip.style.color = '#f8fafc';
+                                    tooltip.style.padding = '12px 16px';
+                                    tooltip.style.borderRadius = '8px';
+                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                                    tooltip.style.pointerEvents = 'none';
+                                    tooltip.style.zIndex = '9999';
+                                    tooltip.style.fontSize = '12px';
+                                    tooltip.style.fontFamily = 'Inter, sans-serif';
+                                    tooltip.style.whiteSpace = 'pre-wrap';
+                                    tooltip.style.lineHeight = '1.5';
+                                    document.body.appendChild(tooltip);
+                                }
+                                tooltip.style.display = 'block';
+                                tooltip.textContent = tooltipText.trim();
+                            });
+                            cell.addEventListener('mousemove', (e) => {
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) {
+                                    tooltip.style.left = (e.clientX + 15) + 'px';
+                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                }
+                            });
+                            cell.addEventListener('mouseleave', (e) => {
+                                cell.style.transform = 'scale(1)';
+                                cell.style.zIndex = '1';
+                                cell.style.boxShadow = 'none';
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) tooltip.style.display = 'none';
+                            });
+                        } else {
+                            cell.style.backgroundColor = `rgba(255, 255, 255, 0.02)`;
+                            cell.addEventListener('mouseenter', (e) => {
+                                cell.style.transform = 'scale(1.15)';
+                                cell.style.zIndex = '10';
+                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+                                let tooltip = document.getElementById('heatmap-tooltip');
+                                if (!tooltip) {
+                                    tooltip = document.createElement('div');
+                                    tooltip.id = 'heatmap-tooltip';
+                                    tooltip.style.position = 'fixed';
+                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
+                                    tooltip.style.color = '#f8fafc';
+                                    tooltip.style.padding = '12px 16px';
+                                    tooltip.style.borderRadius = '8px';
+                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                                    tooltip.style.pointerEvents = 'none';
+                                    tooltip.style.zIndex = '9999';
+                                    tooltip.style.fontSize = '12px';
+                                    tooltip.style.fontFamily = 'Inter, sans-serif';
+                                    tooltip.style.whiteSpace = 'pre-wrap';
+                                    tooltip.style.lineHeight = '1.5';
+                                    document.body.appendChild(tooltip);
+                                }
+                                tooltip.style.display = 'block';
+                                tooltip.textContent = "No data";
+                            });
+                            cell.addEventListener('mousemove', (e) => {
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) {
+                                    tooltip.style.left = (e.clientX + 15) + 'px';
+                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                }
+                            });
+                            cell.addEventListener('mouseleave', (e) => {
+                                cell.style.transform = 'scale(1)';
+                                cell.style.zIndex = '1';
+                                cell.style.boxShadow = 'none';
+                                const tooltip = document.getElementById('heatmap-tooltip');
+                                if (tooltip) tooltip.style.display = 'none';
+                            });
+                        }
+                        grid.appendChild(cell);
+                    }
+                }
+            }
+
+            function initWagonChart(data) {
                 let canvas = document.getElementById('wagonChart');
                 
                 // Remove old listeners by cloning BEFORE drawing
@@ -321,10 +523,11 @@
                         ctx.fillRect(0, i, width, 20);
                     }
                     
-                    const centerX = canvas.width / 2;
-                    const centerY = canvas.height / 2;
-                    const radius = Math.min(centerX, centerY) - 20;
-                    const batOriginY = centerY - radius * 0.134; // Calibrated bat position             // Draw Boundary
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(centerX, centerY) - 10;
+                    
+                    // Draw Boundary
                     ctx.beginPath();
                     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                     ctx.strokeStyle = '#ffffff';
@@ -381,6 +584,7 @@
                     });
                     
                     let drawnSpokes = [];
+                    const batOriginY = centerY - radius * 0.134; // Calibrated bat position
                     
                     // Draw Spokes
                     scatterData.forEach(w => {
@@ -496,244 +700,40 @@
                         tooltip.style.display = 'none';
                     });
                 }
-
-                // Shot Mastery Chart (Bar)
-                const shotCtx = document.getElementById('shotChart').getContext('2d');
-                if (shotChartInstance) shotChartInstance.destroy();
-                
-                const sLabels = Object.keys(data.shot_data || {});
-                const sValues = Object.values(data.shot_data || {});
-                
-                shotChartInstance = new Chart(shotCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: sLabels,
-                        datasets: [{
-                            label: 'Occurrences',
-                            data: sValues,
-                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
-                    }
-                });
-
-                // Vulnerability Matrix (Bar/Doughnut)
-                const vulnCtx = document.getElementById('vulnChart').getContext('2d');
-                if (vulnChartInstance) vulnChartInstance.destroy();
-                
-                const vLabels = Object.keys(data.vuln_data || {});
-                const vValues = Object.values(data.vuln_data || {});
-                
-                vulnChartInstance = new Chart(vulnCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: vLabels,
-                        datasets: [{
-                            label: 'Dismissals',
-                            data: vValues,
-                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
-                    }
-                });
-
-                // Pitch Heatmap
-                renderPitchHeatmap(data.pitch_heatmap);
-            }
-
-            function renderPitchHeatmap(heatmapData) {
-                const grid = document.getElementById('pitchHeatmapGrid');
-                if (!grid) return;
-                
-                // Keep the first 4 children (the headers)
-                while (grid.children.length > 4) {
-                    grid.removeChild(grid.lastChild);
-                }
-                
-                const lengths = ['FULL_TOSS', 'YORKER', 'FULL', 'GOOD_LENGTH', 'SHORT_OF_A_GOOD_LENGTH', 'SHORT'];
-                const lengthLabels = ['Full Toss', 'Yorker', 'Full Length', 'Good Length', 'Short of good length', 'Short Length'];
-                const lines = ['WIDE_OUTSIDE_OFFSTUMP', 'OUTSIDE_OFFSTUMP', 'ON_THE_STUMPS', 'DOWN_LEG', 'WIDE_DOWN_LEG'];
-                
-                let maxWickets = 0;
-                let maxRuns = 0;
-                const map = {};
-                if (heatmapData && heatmapData.length) {
-                    heatmapData.forEach(d => {
-                        if (!map[d.length]) map[d.length] = {};
-                        map[d.length][d.line] = d;
-                        if (d.wickets > maxWickets) maxWickets = d.wickets;
-                        if (d.runs > maxRuns) maxRuns = d.runs;
-                    });
-                }
-                
-                const maxWGradient = maxWickets > 0 ? maxWickets : 1;
-                const maxRGradient = maxRuns > 0 ? maxRuns : 1;
-
-                for (let r = 0; r < lengths.length; r++) {
-                    const labelCell = document.createElement('div');
-                    labelCell.className = 'pitch-label';
-                    labelCell.textContent = lengthLabels[r];
-                    grid.appendChild(labelCell);
-                    
-                    for (let c = 0; c < lines.length; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'pitch-cell';
-                        
-                        const cellData = map[lengths[r]] && map[lengths[r]][lines[c]];
-                        if (cellData) {
-                            if (cellData.wickets > 0) {
-                                const intensity = 0.4 + (0.6 * (cellData.wickets / maxWGradient));
-                                cell.style.background = `rgba(249, 115, 22, ${intensity})`;
-                                cell.style.borderColor = `rgba(249, 115, 22, 0.4)`;
-                                cell.textContent = cellData.wickets + 'W';
-                            } else if (cellData.runs > 0) {
-                                const intensity = 0.1 + (0.3 * (cellData.runs / maxRGradient));
-                                cell.style.background = `rgba(59, 130, 246, ${intensity})`;
-                                cell.style.borderColor = `rgba(59, 130, 246, 0.2)`;
-                            }
-                            let tooltipText = `Runs: ${cellData.runs} | Balls: ${cellData.balls} | Wickets: ${cellData.wickets}\n`;
-                            if (cellData.runs > 0 && cellData.shots && Object.keys(cellData.shots).length > 0) {
-                                tooltipText += `\n-- Runs by Shot --\n`;
-                                // Sort shots by runs descending
-                                const sortedShots = Object.entries(cellData.shots).sort((a,b) => b[1] - a[1]);
-                                for (const [shot, r] of sortedShots) {
-                                    tooltipText += `${shot.charAt(0).toUpperCase() + shot.slice(1)}: ${r}\n`;
-                                }
-                            }
-                            if (cellData.wickets > 0 && cellData.wicket_events && cellData.wicket_events.length > 0) {
-                                tooltipText += `\n-- Wickets --\n`;
-                                cellData.wicket_events.forEach(w => {
-                                    tooltipText += `• ${w.shot} \u2192 ${w.type}\n`;
-                                });
-                            }
-                            // Setup custom tooltip
-                            cell.addEventListener('mouseenter', (e) => {
-                                cell.style.transform = 'scale(1.15)';
-                                cell.style.zIndex = '10';
-                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
-                                let tooltip = document.getElementById('heatmap-tooltip');
-                                if (!tooltip) {
-                                    tooltip = document.createElement('div');
-                                    tooltip.id = 'heatmap-tooltip';
-                                    tooltip.style.position = 'fixed';
-                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
-                                    tooltip.style.color = '#f8fafc';
-                                    tooltip.style.padding = '12px 16px';
-                                    tooltip.style.borderRadius = '8px';
-                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
-                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                                    tooltip.style.pointerEvents = 'none';
-                                    tooltip.style.zIndex = '9999';
-                                    tooltip.style.fontSize = '12px';
-                                    tooltip.style.fontFamily = 'Inter, sans-serif';
-                                    tooltip.style.whiteSpace = 'pre-wrap';
-                                    tooltip.style.lineHeight = '1.5';
-                                    document.body.appendChild(tooltip);
-                                }
-                                tooltip.style.display = 'block';
-                                tooltip.textContent = tooltipText.trim();
-                            });
-                            cell.addEventListener('mousemove', (e) => {
-                                const tooltip = document.getElementById('heatmap-tooltip');
-                                if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
-                                }
-                            });
-                            cell.addEventListener('mouseleave', (e) => {
-                                cell.style.transform = 'scale(1)';
-                                cell.style.zIndex = '1';
-                                cell.style.boxShadow = 'none';
-                                const tooltip = document.getElementById('heatmap-tooltip');
-                                if (tooltip) tooltip.style.display = 'none';
-                            });
-                        } else {
-                            cell.addEventListener('mouseenter', (e) => {
-                                cell.style.transform = 'scale(1.15)';
-                                cell.style.zIndex = '10';
-                                cell.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
-                                let tooltip = document.getElementById('heatmap-tooltip');
-                                if (!tooltip) {
-                                    tooltip = document.createElement('div');
-                                    tooltip.id = 'heatmap-tooltip';
-                                    tooltip.style.position = 'fixed';
-                                    tooltip.style.background = 'rgba(15, 23, 42, 0.95)';
-                                    tooltip.style.color = '#f8fafc';
-                                    tooltip.style.padding = '12px 16px';
-                                    tooltip.style.borderRadius = '8px';
-                                    tooltip.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
-                                    tooltip.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                                    tooltip.style.pointerEvents = 'none';
-                                    tooltip.style.zIndex = '9999';
-                                    tooltip.style.fontSize = '12px';
-                                    tooltip.style.fontFamily = 'Inter, sans-serif';
-                                    tooltip.style.whiteSpace = 'pre-wrap';
-                                    tooltip.style.lineHeight = '1.5';
-                                    document.body.appendChild(tooltip);
-                                }
-                                tooltip.style.display = 'block';
-                                tooltip.textContent = "No data";
-                            });
-                            cell.addEventListener('mousemove', (e) => {
-                                const tooltip = document.getElementById('heatmap-tooltip');
-                                if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
-                                }
-                            });
-                            cell.addEventListener('mouseleave', (e) => {
-                                cell.style.transform = 'scale(1)';
-                                cell.style.zIndex = '1';
-                                cell.style.boxShadow = 'none';
-                                const tooltip = document.getElementById('heatmap-tooltip');
-                                if (tooltip) tooltip.style.display = 'none';
-                            });
-                        }
-                        grid.appendChild(cell);
-                    }
-                }
             }
 
             async function fetchStats() {
-                if (!currentAthleteId) return;
+                const bt = document.getElementById('filterBattingType'); const bwt = document.getElementById('filterBowlingType');
+                if (!(currentBatterId || (bt && bt.value !== 'All')) || !(currentBowlerId || (bwt && bwt.value !== 'All'))) {
+                    alert("Please select players or player types before comparing.");
+                    return;
+                }
                 
                 document.getElementById('emptyState').style.display = 'none';
                 document.getElementById('loadingState').style.display = 'flex';
                 
-                const splitMode = document.getElementById('splitByFormat').checked;
-                
+                const btV = document.getElementById('filterBattingType') ? document.getElementById('filterBattingType').value : 'All';
+                const bwtV = document.getElementById('filterBowlingType') ? document.getElementById('filterBowlingType').value : 'All';
                 const baseParams = new URLSearchParams({
-                    id: currentAthleteId,
-                    format: getFilterVal('filterFormat'), format_not: getFilterNot('filterFormat'),
+                    batter_id: currentBatterId || '', bowler_id: currentBowlerId || '', batting_type: btV, bowling_type: bwtV,
                     league: getFilterVal('filterLeague'), league_not: getFilterNot('filterLeague'),
                     phase: getFilterVal('filterPhase'), phase_not: getFilterNot('filterPhase'),
                     venue: getFilterVal('filterVenue'), venue_not: getFilterNot('filterVenue'),
-                    opponent: getFilterVal('filterOpponent'), opponent_not: getFilterNot('filterOpponent'),
-                    bowling_type: getFilterVal('filterBowlingType'), bowling_type_not: getFilterNot('filterBowlingType'),
+                    year: getFilterVal('filterYear'), year_not: getFilterNot('filterYear'),
                     innings: getFilterVal('filterInnings'), innings_not: getFilterNot('filterInnings'),
                     result: getFilterVal('filterResult'), result_not: getFilterNot('filterResult'),
-                    year: getFilterVal('filterYear'), year_not: getFilterNot('filterYear'),
                     recent: getFilterVal('filterRecent'), recent_not: getFilterNot('filterRecent'),
                     wicket_type: getFilterVal('filterWicketType'), wicket_type_not: getFilterNot('filterWicketType'),
                     pitch_length: getFilterVal('filterPitchLength'), pitch_length_not: getFilterNot('filterPitchLength'),
                     pitch_line: getFilterVal('filterPitchLine'), pitch_line_not: getFilterNot('filterPitchLine'),
-                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType')
+                    shot_type: getFilterVal('filterShotType'), shot_type_not: getFilterNot('filterShotType'),
+                    delivery_output: getFilterVal('filterDeliveryOutput'), delivery_output_not: getFilterNot('filterDeliveryOutput')
                 });
                 
                 try {
                     document.getElementById('mainContent').style.display = 'block';
                     
-                    if (splitMode) {
+                    if (false) {
                         document.getElementById('chartsRow').style.display = 'none';
                         document.getElementById('statsGrid').className = '';
                         
@@ -742,28 +742,32 @@
                         
                         for (let fmt of formats) {
                             baseParams.set('format', fmt);
-                            const res = await fetch(`/api/stats/batter?${baseParams.toString()}`);
+                            const res = await fetch(`/api/stats/faceoff?${baseParams.toString()}`);
                             const data = await res.json();
                             
-                            if (data.runs > 0 || data.balls > 0) {
+                            if (data.balls > 0) {
                                 html += `
                                 <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--accent-blue); display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-trophy"></i> ${fmt} Breakdown</h3>
                                 <div class="bento-grid">
                                     <div class="glass-panel stat-box">
                                         <div class="stat-label">Runs Scored</div>
                                         <div class="stat-value">${data.runs}</div>
-                                    </div>
-                                    <div class="glass-panel stat-box">
-                                        <div class="stat-label">Highest Score</div>
-                                        <div class="stat-value small">${data.hs}</div>
+                                        <div class="stat-subtext">Avg: ${data.avg}</div>
                                     </div>
                                     <div class="glass-panel stat-box">
                                         <div class="stat-label">Strike Rate</div>
                                         <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                                        <div class="stat-subtext">Off ${data.balls} balls</div>
                                     </div>
                                     <div class="glass-panel stat-box">
-                                        <div class="stat-label">Sixes Hit</div>
-                                        <div class="stat-value">${data.sixes}</div>
+                                        <div class="stat-label">Dismissals</div>
+                                        <div class="stat-value" style="color: var(--accent-red); background: none; -webkit-text-fill-color: var(--accent-red);">${data.dismissals}</div>
+                                        <div class="stat-subtext">${data.dot_pct}% Dot Balls</div>
+                                    </div>
+                                    <div class="glass-panel stat-box">
+                                        <div class="stat-label">Boundaries</div>
+                                        <div class="stat-value">${data.boundaries}<span style="font-size:1.5rem; color:var(--text-secondary);">/</span>${data.sixes}</div>
+                                        <div class="stat-subtext">Fours / Sixes</div>
                                     </div>
                                 </div>
                                 `;
@@ -771,7 +775,7 @@
                         }
                         
                         if (html === '') {
-                            html = '<div style="text-align:center; padding: 3rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); border-radius: 12px;"><i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 1rem; display:block;"></i>No historical data found for the selected filters.</div>';
+                            html = '<div style="text-align:center; padding: 3rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); border-radius: 12px;"><i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 1rem; display:block;"></i>No historical matchups found for the selected filters.</div>';
                         }
                         
                         document.getElementById('statsGrid').innerHTML = html;
@@ -780,31 +784,74 @@
                     } else {
                         document.getElementById('chartsRow').style.display = 'grid';
                         document.getElementById('statsGrid').className = 'bento-grid';
-                        baseParams.set('format', getFilterVal('filterFormat'), format_not: getFilterNot('filterFormat'));
                         
-                        const res = await fetch(`/api/stats/batter?${baseParams.toString()}`);
+                        
+                        const res = await fetch(`/api/stats/faceoff?${baseParams.toString()}`);
                         const data = await res.json();
                         
                         document.getElementById('statsGrid').innerHTML = `
                             <div class="glass-panel stat-box">
                                 <div class="stat-label">Runs Scored</div>
                                 <div class="stat-value">${data.runs}</div>
-                            </div>
-                            <div class="glass-panel stat-box">
-                                <div class="stat-label">Highest Score</div>
-                                <div class="stat-value small">${data.hs}</div>
+                                <div class="stat-subtext">Avg: ${data.avg}</div>
                             </div>
                             <div class="glass-panel stat-box">
                                 <div class="stat-label">Strike Rate</div>
                                 <div class="stat-value" style="color: var(--accent-green); background: none; -webkit-text-fill-color: var(--accent-green);">${data.sr}</div>
+                                <div class="stat-subtext">Off ${data.balls} balls</div>
                             </div>
                             <div class="glass-panel stat-box">
-                                <div class="stat-label">Sixes Hit</div>
-                                <div class="stat-value">${data.sixes}</div>
+                                <div class="stat-label">Dismissals</div>
+                                <div class="stat-value" style="color: var(--accent-red); background: none; -webkit-text-fill-color: var(--accent-red);">${data.dismissals}</div>
+                                <div class="stat-subtext">${data.dot_pct}% Dot Balls</div>
+                            </div>
+                            <div class="glass-panel stat-box">
+                                <div class="stat-label">Boundaries</div>
+                                <div class="stat-value">${data.boundaries}<span style="font-size:1.5rem; color:var(--text-secondary);">/</span>${data.sixes}</div>
+                                <div class="stat-subtext">Fours / Sixes</div>
+                            </div>
+                            <div class="glass-panel stat-box span-2">
+                                <div class="stat-label">Favorite Shot</div>
+                                <div class="stat-value small">${data.favorite_shot}</div>
+                            </div>
+                            <div class="glass-panel stat-box span-2">
+                                <div class="stat-label">Dangerous Shot</div>
+                                <div class="stat-value small">${data.dangerous_shot}</div>
                             </div>
                         `;
                         
-                        initCharts(data);
+                        // Render Chart
+                        if (data.pitch_heatmap) {
+                            renderPitchHeatmap(data.pitch_heatmap);
+                        }
+                        if (data.wagon_wheel) {
+                            initWagonChart(data);
+                        }
+                        
+                        // Recent Matches
+                        const recentList = document.getElementById('recentMatchesList');
+                        if (data.recent_matches && data.recent_matches.length > 0) {
+                            recentList.innerHTML = data.recent_matches.map(rm => `
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600; color: white;">${rm.date}</div>
+                                        <span class="badge ${rm.source.toLowerCase()}">${rm.source}</span>
+                                    </td>
+                                    <td>
+                                        <div style="font-family: 'Outfit'; font-size: 1.1rem; font-weight: 600;">${rm.runs} <span style="font-size:0.8rem; color:var(--text-secondary);">runs</span></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${rm.balls} balls</div>
+                                    </td>
+                                    <td>
+                                        ${rm.dismissals > 0 
+                                            ? `<span style="color: var(--accent-red); font-weight: 600;"><i class="fas fa-skull" style="margin-right:0.25rem;"></i> Out</span>` 
+                                            : `<span style="color: var(--accent-green); font-weight: 600;"><i class="fas fa-shield-alt" style="margin-right:0.25rem;"></i> Not Out</span>`}
+                                    </td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            recentList.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No recent match data available</td></tr>';
+                        }
+                        
                         document.getElementById('loadingState').style.display = 'none';
                     }
                     
@@ -812,10 +859,11 @@
                     console.error(e);
                     document.getElementById('loadingState').style.display = 'none';
                     document.getElementById('emptyState').style.display = 'block';
-                    document.getElementById('emptyState').innerHTML = '<p style="color:var(--accent-red);">Failed to load batter data.</p>';
+                    document.getElementById('emptyState').innerHTML = '<p style="color:var(--accent-red);">Failed to load faceoff data.</p>';
                 }
             }
             
-            setupSearch();
+            setupSearch('batterSearch', 'batterResults', true);
+            setupSearch('bowlerSearch', 'bowlerResults', false);
             init();
-        
+            initializeAllCustomSelects();
