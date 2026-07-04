@@ -877,8 +877,14 @@
                             cell.addEventListener('mousemove', (e) => {
                                 const tooltip = document.getElementById('heatmap-tooltip');
                                 if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                    let tWidth = tooltip.offsetWidth || 200;
+                                    let tHeight = tooltip.offsetHeight || 100;
+                                    let leftPos = e.clientX + 15;
+                                    let topPos = e.clientY + 15;
+                                    if (leftPos + tWidth > window.innerWidth) leftPos = e.clientX - tWidth - 10;
+                                    if (topPos + tHeight > window.innerHeight) topPos = e.clientY - tHeight - 10;
+                                    tooltip.style.left = leftPos + 'px';
+                                    tooltip.style.top = topPos + 'px';
                                 }
                             });
                             cell.addEventListener('mouseleave', (e) => {
@@ -919,8 +925,14 @@
                             cell.addEventListener('mousemove', (e) => {
                                 const tooltip = document.getElementById('heatmap-tooltip');
                                 if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                    let tWidth = tooltip.offsetWidth || 200;
+                                    let tHeight = tooltip.offsetHeight || 100;
+                                    let leftPos = e.clientX + 15;
+                                    let topPos = e.clientY + 15;
+                                    if (leftPos + tWidth > window.innerWidth) leftPos = e.clientX - tWidth - 10;
+                                    if (topPos + tHeight > window.innerHeight) topPos = e.clientY - tHeight - 10;
+                                    tooltip.style.left = leftPos + 'px';
+                                    tooltip.style.top = topPos + 'px';
                                 }
                             });
                             cell.addEventListener('mouseleave', (e) => {
@@ -1122,8 +1134,14 @@
                         
                         if (closest) {
                             tooltip.style.display = 'block';
-                            tooltip.style.left = (e.clientX + 15) + 'px';
-                            tooltip.style.top = (e.clientY + 15) + 'px';
+                            let tWidth = tooltip.offsetWidth || 200;
+                            let tHeight = tooltip.offsetHeight || 100;
+                            let leftPos = e.clientX + 15;
+                            let topPos = e.clientY + 15;
+                            if (leftPos + tWidth > window.innerWidth) leftPos = e.clientX - tWidth - 10;
+                            if (topPos + tHeight > window.innerHeight) topPos = e.clientY - tHeight - 10;
+                            tooltip.style.left = leftPos + 'px';
+                            tooltip.style.top = topPos + 'px';
                             
                             let runColor = '#facc15';
                             if (closest.data.runs === 4) runColor = '#3b82f6';

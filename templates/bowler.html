@@ -962,8 +962,14 @@ document.getElementById('loadingState').style.display = 'flex';
                             cell.addEventListener('mousemove', (e) => {
                                 const tooltip = document.getElementById('heatmap-tooltip');
                                 if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                    let tWidth = tooltip.offsetWidth || 200;
+                                    let tHeight = tooltip.offsetHeight || 100;
+                                    let leftPos = e.clientX + 15;
+                                    let topPos = e.clientY + 15;
+                                    if (leftPos + tWidth > window.innerWidth) leftPos = e.clientX - tWidth - 10;
+                                    if (topPos + tHeight > window.innerHeight) topPos = e.clientY - tHeight - 10;
+                                    tooltip.style.left = leftPos + 'px';
+                                    tooltip.style.top = topPos + 'px';
                                 }
                             });
                             cell.addEventListener('mouseleave', (e) => {
@@ -1003,8 +1009,14 @@ document.getElementById('loadingState').style.display = 'flex';
                             cell.addEventListener('mousemove', (e) => {
                                 const tooltip = document.getElementById('heatmap-tooltip');
                                 if (tooltip) {
-                                    tooltip.style.left = (e.clientX + 15) + 'px';
-                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                    let tWidth = tooltip.offsetWidth || 200;
+                                    let tHeight = tooltip.offsetHeight || 100;
+                                    let leftPos = e.clientX + 15;
+                                    let topPos = e.clientY + 15;
+                                    if (leftPos + tWidth > window.innerWidth) leftPos = e.clientX - tWidth - 10;
+                                    if (topPos + tHeight > window.innerHeight) topPos = e.clientY - tHeight - 10;
+                                    tooltip.style.left = leftPos + 'px';
+                                    tooltip.style.top = topPos + 'px';
                                 }
                             });
                             cell.addEventListener('mouseleave', (e) => {
