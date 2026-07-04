@@ -590,7 +590,7 @@
             async function onFilterChange(sourceId) {
                 if (!(currentBatterId || getFilterVal('filterBattingType') !== 'All') ||
                     !(currentBowlerId || getFilterVal('filterBowlingType') !== 'All')) return;
-                showLoading();
+                
                 await fetchFaceoffFilters(sourceId);
                 // fetchStats(); (Wait for Analyze click)
             }
@@ -613,7 +613,7 @@
                 currentBatterId = null;
                 document.getElementById('batterSearch').value = '';
                 document.getElementById('batterName').textContent = 'Unknown Batter';
-                showLoading();
+                
                 await fetchFaceoffFilters('filterBattingType');
                 // fetchStats(); (Wait for Analyze click)
             });
@@ -621,7 +621,7 @@
                 currentBowlerId = null;
                 document.getElementById('bowlerSearch').value = '';
                 document.getElementById('bowlerName').textContent = 'Unknown Bowler';
-                showLoading();
+                
                 await fetchFaceoffFilters('filterBowlingType');
                 // fetchStats(); (Wait for Analyze click)
             });
@@ -725,9 +725,6 @@
                                      (currentBowlerId || getFilterVal('filterBowlingType') !== 'All');
 
                 if (bothSelected) {
-                    // Show loading state immediately before async work
-                    showLoading();
-
                     await fetchFaceoffFilters();
                 } else {
                     // Only one player selected — update URL and show "waiting" state
