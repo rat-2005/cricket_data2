@@ -159,9 +159,27 @@ def convert_zips_to_parquet(global_mapping):
         chunk_index = 1
         base_name = zip_name.replace('_json.zip', '')
         
+        # Load existing match IDs from merged dataset to avoid redundant processing
+        existing_match_ids = set()
+        merged_file = os.path.join("data_merged", "cricsheet_matches", "data.parquet")
+        if os.path.exists(merged_file):
+            try:
+                import duckdb
+                con = duckdb.connect(":memory:")
+                res = con.execute(f"SELECT DISTINCT match_id FROM read_parquet('{merged_file}')").fetchall()
+                existing_match_ids = set(str(r[0]) for r in res if r[0] is not None)
+                print(f"Found {len(existing_match_ids)} existing matches. Will skip parsing them.")
+                con.close()
+            except Exception as e:
+                print(f"Warning: Could not read merged parquet file for existing matches: {e}")
+
         with zipfile.ZipFile(zip_name, 'r') as z:
             for filename in z.namelist():
                 if not filename.endswith('.json'):
+                    continue
+                    
+                match_id = filename.replace('.json', '')
+                if match_id in existing_match_ids:
                     continue
                     
                 with z.open(filename) as f:

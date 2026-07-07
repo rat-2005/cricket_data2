@@ -526,6 +526,19 @@ async def main(limit=None):
     # Filter out already downloaded
     existing = set([f.split('_')[1] for f in os.listdir(OUTPUT_DIR) if f.endswith('.parquet')])
     
+    # NEW: Check S3 merged data file (from DuckDB) to prevent re-downloading on clean GitHub Actions runner
+    merged_file = os.path.join("data_merged", "cricinfo_parquet", "data.parquet")
+    if os.path.exists(merged_file):
+        try:
+            import duckdb
+            con = duckdb.connect(":memory:")
+            res = con.execute(f"SELECT DISTINCT match_id FROM read_parquet('{merged_file}')").fetchall()
+            merged_ids = set(str(r[0]) for r in res if r[0] is not None)
+            existing.update(merged_ids)
+            print(f"Found {len(merged_ids)} existing matches in merged dataset.")
+            con.close()
+        except Exception as e:
+            print(f"Warning: Could not read merged parquet file for existing matches: {e}")
     # Load previously failed matches if they exist to force retry them
     failed_matches = set()
     if os.path.exists("failed_matches.txt"):
