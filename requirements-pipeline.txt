@@ -1,0 +1,6 @@
+pandas
+pyarrow
+requests
+curl_cffi
+duckdb
+python-dotenv
