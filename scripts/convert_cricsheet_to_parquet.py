@@ -29,7 +29,7 @@ def load_people_mapping():
     """Returns a dict mapping Cricsheet ID -> Cricinfo ID and converts CSV to Parquet"""
     mapping = {}
     
-    download_if_missing('people.csv', 'https://cricsheet.org/downloads/people.csv')
+    download_if_missing('people.csv', 'https://cricsheet.org/register/people.csv')
     
     if not os.path.exists('people.csv'):
         print("people.csv not found, player IDs will not be mapped.")
