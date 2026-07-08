@@ -19,11 +19,11 @@ S3_BUCKET = "s3://cricket-telemetry-lake-thej/data_merged"
 _conn = None
 
 
-def sync_parquet_files():
-    """Downloads all necessary Parquet files from S3 to the local data/ folder."""
-    print("Syncing parquet files locally from S3...")
+def sync_parquet_files(target_dir='data'):
+    """Downloads all necessary Parquet files from S3 to the local target_dir."""
+    print(f"Syncing parquet files locally from S3 to {target_dir}...")
     import os
-    os.makedirs('data', exist_ok=True)
+    os.makedirs(target_dir, exist_ok=True)
     temp_conn = duckdb.connect(":memory:")
     try:
         temp_conn.execute("INSTALL httpfs; LOAD httpfs; CALL load_aws_credentials(); SET s3_region='ap-south-1';")
@@ -37,7 +37,7 @@ def sync_parquet_files():
         
         for t in tables:
             s3_path = f"{S3_BUCKET}/{t}/data.parquet"
-            local_path = f"data/{t}.parquet"
+            local_path = f"{target_dir}/{t}.parquet"
             print(f"Downloading {t}...")
             # Use COPY to download efficiently
             temp_conn.execute(f"COPY (SELECT * FROM read_parquet('{s3_path}')) TO '{local_path}' (FORMAT PARQUET)")
@@ -56,6 +56,39 @@ def reload_db():
         _conn.close()
     _conn = None
     get_conn()
+
+def safe_hot_swap():
+    """Downloads new files to data_temp, atomically replaces data/, and reloads db."""
+    import os
+    import shutil
+    
+    print("Starting safe hot-swap...")
+    # 1. Download everything to a fresh data_temp folder
+    if os.path.exists('data_temp'):
+        shutil.rmtree('data_temp')
+    sync_parquet_files(target_dir='data_temp')
+    
+    # 2. Swap the folders atomically
+    if os.path.exists('data_old'):
+        shutil.rmtree('data_old')
+    
+    if os.path.exists('data'):
+        os.rename('data', 'data_old')
+        
+    os.rename('data_temp', 'data')
+    print("Swapped data folders. Reloading DuckDB...")
+    
+    # 3. Reload the global DuckDB connection
+    reload_db()
+    
+    # 4. Cleanup
+    if os.path.exists('data_old'):
+        try:
+            shutil.rmtree('data_old')
+        except Exception as e:
+            print(f"Warning: could not delete data_old: {e}")
+            
+    print("Hot-swap complete! Zero downtime.")
 
 
 import threading

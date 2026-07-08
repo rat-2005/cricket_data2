@@ -9,3 +9,5 @@ flask
 curl_cffi
 pandas
 gunicorn
+APScheduler==3.10.4
+pytz==2024.1

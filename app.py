@@ -274,24 +274,20 @@ def faceoff_filters():
 
 # ── Run ──────────────────────────────────────────────────────
 
-# Start daily background cron job to sync Parquet files
-import threading
-import time
-from db import sync_parquet_files, reload_db
+# Start daily background cron job to sync Parquet files at 4:30 AM IST (23:00 UTC)
+from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
+from db import safe_hot_swap
 
-def run_daily_sync():
-    while True:
-        # Wait 24 hours
-        time.sleep(24 * 60 * 60)
-        try:
-            print("Running daily background Parquet sync...")
-            sync_parquet_files()
-            reload_db()
-        except Exception as e:
-            print(f"Error in daily sync: {e}")
+def start_scheduler():
+    scheduler = BackgroundScheduler(timezone=pytz.utc)
+    # 23:00 UTC is exactly 04:30 AM IST. 
+    # This runs 1.5 hours after the GitHub Actions pipeline starts at 3:00 AM IST.
+    scheduler.add_job(safe_hot_swap, 'cron', hour=23, minute=0)
+    scheduler.start()
 
-# Daemon thread will close when the server stops
-threading.Thread(target=run_daily_sync, daemon=True).start()
+# Start it automatically
+start_scheduler()
 
 if __name__ == "__main__":
     # use_reloader=False keeps DuckDB's singleton connection alive.
