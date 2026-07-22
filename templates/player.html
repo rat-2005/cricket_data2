@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
+    <title>{% if athlete %}{{ athlete.full_name }} Complete Cricket Profile | Cricket Analytics{% else %}Player Profile{% endif %}</title>
+    
+    {% if athlete %}
+    <meta name="description" content="Complete cricket profile for {{ athlete.full_name }}. View batting and bowling statistics, recent performances, and detailed analytics.">
+    <meta property="og:title" content="{{ athlete.full_name }} - Cricket Profile">
+    <meta property="og:description" content="View full batting & bowling analytics for {{ athlete.full_name }}.">
+    <meta property="og:type" content="profile">
+    <link rel="canonical" href="https://thej05-cricket-stats.hf.space/player/{{ slug }}">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{{ athlete.full_name }}",
+      "url": "https://thej05-cricket-stats.hf.space/player/{{ slug }}",
+      "description": "Cricket statistics and analytics for {{ athlete.full_name }}"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://thej05-cricket-stats.hf.space/"},
+        {"@type": "ListItem", "position": 2, "name": "Players"},
+        {"@type": "ListItem", "position": 3, "name": "{{ athlete.full_name }}"}
+      ]
+    }
+    </script>
+    {% endif %}
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .logo a {
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+        
+        .nav-links a.active {
+            background: var(--accent-gradient);
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-container input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: background 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-item img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: var(--accent-gradient);
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
+            background: #1e293b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .profile-info {
+            z-index: 1;
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .profile-tags {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tag i {
+            color: var(--accent-color);
+        }
+
+        /* Stats Grid */
+        .stats-section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stats-section-title i {
+            color: var(--accent-color);
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .format-card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .format-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .format-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #38bdf8;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .format-card h3 span {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            color: var(--text-primary);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-value.highlight {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            background: var(--surface-color);
+            border-radius: 24px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <a href="/"><h1>Cricket Analytics</h1></a>
+            </div>
+            
+            <div class="nav-links" style="display: flex; gap: 1rem;">
+                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter Analytics</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler Analytics</a>
+                <a href="/faceoff"><i class="fas fa-people-arrows"></i> Face-off</a>
+                <a href="/player" class="active"><i class="fas fa-user"></i> Player Profile</a>
+            </div>
+            
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="playerSearch" placeholder="Search another player..." autocomplete="off">
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </header>
+
+        
+        {% if not athlete %}
+        <div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Find a Player</h2>
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
+                <input type="text" id="mainPlayerSearch" placeholder="Type a player name..." autocomplete="off" style="width: 100%; padding: 1.5rem 1.5rem 1.5rem 4rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 100px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 1.2rem; outline: none; transition: all 0.3s ease;">
+                <div id="mainSearchResults" class="search-results"></div>
+            </div>
+        </div>
+        
+        <script>
+            const mainSearchInput = document.getElementById('mainPlayerSearch');
+            const mainSearchResults = document.getElementById('mainSearchResults');
+            let mainSearchTimeout;
+
+            mainSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(mainSearchTimeout);
+                if (query.length < 2) {
+                    mainSearchResults.classList.remove('active');
+                    return;
+                }
+                mainSearchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                        const data = await response.json();
+                        if (data.length > 0) {
+                            mainSearchResults.innerHTML = data.map(player => `
+                                <a href="/player/${player.id}" class="search-item" style="padding: 1rem 1.5rem; text-align: left;">
+                                    <div>
+                                        <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>
+                                    </div>
+                                </a>
+                            `).join('');
+                            mainSearchResults.classList.add('active');
+                        } else {
+                            mainSearchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                            mainSearchResults.classList.add('active');
+                        }
+                    } catch (err) {
+                        console.error('Search failed:', err);
+                    }
+                }, 300);
+            });
+            document.addEventListener('click', (e) => {
+                if (!mainSearchInput.contains(e.target) && !mainSearchResults.contains(e.target)) {
+                    mainSearchResults.classList.remove('active');
+                }
+            });
+        </script>
+        {% else %}
+        <div class="profile-header">
+            <img src="{{ athlete.image_url or 'https://ui-avatars.com/api/?name=' + athlete.full_name|urlencode + '&background=1e293b&color=fff' }}" 
+                 alt="{{ athlete.full_name }}" class="profile-img" 
+                 onerror="this.src='https://ui-avatars.com/api/?name={{ athlete.full_name|urlencode }}&background=1e293b&color=fff'">
+            <div class="profile-info">
+                <h1>{{ athlete.full_name }}</h1>
+                <div class="profile-tags">
+                    <div class="tag"><i class="fas fa-flag"></i> {{ athlete.country_code or 'Unknown' }}</div>
+                    {% if athlete.batting_style %}
+                    <div class="tag"><i class="fas fa-baseball-bat-ball"></i> {{ athlete.batting_style }}</div>
+                    {% endif %}
+                    {% if athlete.bowling_style %}
+                    <div class="tag"><i class="fas fa-baseball"></i> {{ athlete.bowling_style }}</div>
+                    {% endif %}
+                    {% if athlete.position %}
+                    <div class="tag"><i class="fas fa-user-tag"></i> {{ athlete.position }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <h2 class="stats-section-title"><i class="fas fa-baseball-bat-ball"></i> Batting Statistics</h2>
+        {% if batting %}
+        <div class="format-grid">
+            {% for fmt, stats in batting.items() %}
+            <div class="format-card">
+                <h3>{{ fmt }}</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Runs</span>
+                    <span class="stat-value highlight">{{ "{:,}".format(stats.runs) }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Highest Score</span>
+                    <span class="stat-value">{{ stats.hs }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Strike Rate</span>
+                    <span class="stat-value">{{ stats.sr }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Balls Faced</span>
+                    <span class="stat-value">{{ "{:,}".format(stats.balls) }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Sixes</span>
+                    <span class="stat-value">{{ stats.sixes }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            No batting data recorded for this player.
+        </div>
+        {% endif %}
+
+        <h2 class="stats-section-title"><i class="fas fa-bolt"></i> Bowling Statistics</h2>
+        {% if bowling %}
+        <div class="format-grid">
+            {% for fmt, stats in bowling.items() %}
+            <div class="format-card">
+                <h3>{{ fmt }}</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Wickets</span>
+                    <span class="stat-value highlight">{{ "{:,}".format(stats.wickets) }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Best Bowling</span>
+                    <span class="stat-value">{{ stats.bb }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Economy</span>
+                    <span class="stat-value">{{ stats.econ }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Overs</span>
+                    <span class="stat-value">{{ stats.overs }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Runs Conceded</span>
+                    <span class="stat-value">{{ "{:,}".format(stats.runs) }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            No bowling data recorded for this player.
+        </div>
+        {% endif %}
+
+        {% endif %}
+
+        <h2 class="stats-section-title" style="margin-top: 3rem;"><i class="fas fa-star" style="color: #fbbf24;"></i> Player Favorites</h2>
+        {% if favorites %}
+        <div class="format-grid">
+            <div class="format-card" style="border-top: 4px solid #fbbf24;">
+                <h3 style="color: #fbbf24;">Batting Favorites</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Opponent</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.batting_opponent.name if favorites.batting_opponent else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Runs Against</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.batting_opponent.total) if favorites.batting_opponent else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Venue</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.batting_venue.name if favorites.batting_venue else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Runs At</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.batting_venue.total) if favorites.batting_venue else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Shot</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.favorite_shot.name if favorites.favorite_shot else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Times Played</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.favorite_shot.total) if favorites.favorite_shot else '0' }}</span>
+                </div>
+            </div>
+
+            <div class="format-card" style="border-top: 4px solid #38bdf8;">
+                <h3 style="color: #38bdf8;">Bowling Favorites</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Opponent</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.bowling_opponent.name if favorites.bowling_opponent else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Wickets Against</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.bowling_opponent.total) if favorites.bowling_opponent else '0' }}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Favorite Venue</span>
+                    <span class="stat-value highlight" style="font-size: 1.1rem; text-align: right; max-width: 60%;">{{ favorites.bowling_venue.name if favorites.bowling_venue else 'N/A' }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Most Wickets At</span>
+                    <span class="stat-value">{{ "{:,}".format(favorites.bowling_venue.total) if favorites.bowling_venue else '0' }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('playerSearch');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.length > 0) {
+                        searchResults.innerHTML = data.map(player => `
+                            <a href="/player/${player.id}" class="search-item">
+                                <div>
+                                    <div style="font-weight: 600; font-family: 'Outfit', sans-serif;">${player.full_name}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${player.country_code || 'Unknown'}</div>
+                                </div>
+                            </a>
+                        `).join('');
+                        searchResults.classList.add('active');
+                    } else {
+                        searchResults.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">No players found</div>';
+                        searchResults.classList.add('active');
+                    }
+                } catch (err) {
+                    console.error('Search failed:', err);
+                }
+            }, 300);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

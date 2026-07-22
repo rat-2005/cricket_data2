@@ -1,0 +1,14 @@
+asyncpg
+aiohttp
+python-dotenv
+psycopg2-binary
+requests
+duckdb
+pyarrow
+flask
+curl_cffi
+pandas
+gunicorn
+APScheduler==3.10.4
+pytz==2024.1
+python-json-logger

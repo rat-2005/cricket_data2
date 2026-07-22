@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
+    <title>Cricket Analytics Engine - Player Stats & Face-offs</title>
+    <meta name="description" content="Advanced cricket statistics and analytics. Compare head-to-head records, pitch maps, wagon wheels, and dynamic filters for all top cricketers.">
+    
+    <meta property="og:title" content="Cricket Analytics Engine">
+    <meta property="og:description" content="Deep dive into cricket analytics with interactive wagon wheels, face-offs, and advanced pitch maps.">
+    <meta property="og:type" content="website">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://thej05-cricket-stats.hf.space/",
+      "name": "Cricket Analytics",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://thej05-cricket-stats.hf.space/player?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 80vh;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .portal-card {
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--accent-blue);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon-glow);
+        }
+
+        .portal-card:hover::before { opacity: 1; }
+
+        .portal-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1;
+        }
+
+        .portal-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            z-index: 1;
+        }
+
+        .portal-card p {
+            font-size: 1rem;
+            margin: 0;
+            z-index: 1;
+        }
+        
+        .db-stat {
+            position: absolute;
+            bottom: 2rem;
+            color: var(--text-secondary);
+            font-family: 'Outfit';
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .portal-grid { grid-template-columns: 1fr; max-width: 400px; }
+            .hero h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <header style="border-bottom: none;">
+            <div class="logo">
+                <a href="/" style="text-decoration: none;"><h1>Cricket Analytics</h1></a>
+            </div>
+            <div class="nav-links">
+                <a href="/batter"><i class="fas fa-baseball-bat-ball"></i> Batter</a>
+                <a href="/bowler"><i class="fas fa-bolt"></i> Bowler</a>
+                <a href="/faceoff"><i class="fas fa-people-arrows"></i> Face-off</a>
+            </div>
+        </header>
+
+        <main class="hero">
+            <h1>The Deep Data<br>Engine</h1>
+            <p>Accessing 24 million deliveries across ESPN, Cricsheet, and ICC to visualize Wagon Wheels, Shot Masteries, and Pitching Heatmaps in real-time.</p>
+            
+            <div class="portal-grid">
+                <a href="/batter" class="portal-card">
+                    <i class="fas fa-baseball-bat-ball portal-icon"></i>
+                    <h2>Batter Analytics</h2>
+                    <p>Wagon Wheels & Shot Mastery</p>
+                </a>
+                
+                <a href="/faceoff" class="portal-card">
+                    <i class="fas fa-people-arrows portal-icon"></i>
+                    <h2>Head-to-Head</h2>
+                    <p>Ultimate Matchup Simulator</p>
+                </a>
+
+                <a href="/bowler" class="portal-card">
+                    <i class="fas fa-bolt portal-icon"></i>
+                    <h2>Bowler Analytics</h2>
+                    <p>Heatmaps & Pace Profiles</p>
+                </a>
+            </div>
+            
+            <div class="db-stat">
+                <i class="fas fa-database"></i> 24,198,402 Deliveries Indexed
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /data/positions.yaml
+
+clients:
+  - url: ${LOKI_URL}
+    basic_auth:
+      username: ${LOKI_USER}
+      password: ${LOKI_PASSWORD}
+
+scrape_configs:
+  - job_name: cricket_app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: flask_app
+          __path__: /data/app.log
+    pipeline_stages:
+      - json:
+          expressions:
+            level: levelname
+      - drop:
+          expression: ".*"
+          if: '{{ eq .level "DEBUG" }}'
+
