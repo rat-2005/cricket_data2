@@ -20,7 +20,16 @@ def download_if_missing(filename, url):
         print(f"Downloading {filename} from {url} (This may take a minute...)")
         response = requests.get(url, stream=True)
         response.raise_for_status()
+        
+        # Validate we got CSV, not an HTML error/challenge page
+        content_type = response.headers.get('Content-Type', '')
+        first_chunk = next(response.iter_content(chunk_size=8192), b'')
+        if b'<html' in first_chunk.lower() or b'<!doctype' in first_chunk.lower():
+            print(f"WARNING: {url} returned HTML instead of CSV (likely Cloudflare challenge). Skipping download.")
+            return
+        
         with open(filename, 'wb') as fd:
+            fd.write(first_chunk)
             for chunk in response.iter_content(chunk_size=8192):
                 fd.write(chunk)
         print(f"Finished downloading {filename}.")
@@ -34,8 +43,13 @@ def load_people_mapping():
     if not os.path.exists('people.csv'):
         print("people.csv not found, player IDs will not be mapped.")
         return mapping
-        
-    df = pd.read_csv('people.csv', dtype=str)
+    
+    try:
+        df = pd.read_csv('people.csv', dtype=str)
+    except pd.errors.ParserError as e:
+        print(f"WARNING: people.csv is malformed ({e}). Deleting and skipping player ID mapping.")
+        os.remove('people.csv')
+        return mapping
     
     # Save a copy as Parquet in the people folder
     parquet_path = os.path.join(PEOPLE_DIR, "people.parquet")
