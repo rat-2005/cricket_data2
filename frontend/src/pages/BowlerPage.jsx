@@ -130,6 +130,15 @@ export default function BowlerPage() {
 
   return (
     <div className="dashboard">
+      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1005, marginBottom: '1rem' }}>
+        <div style={{ flex: 1, minWidth: 250, position: 'relative', zIndex: 1000 }}>
+          <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block', fontWeight: 600, textTransform: 'uppercase' }}>
+            <i className="fas fa-user"></i> Select Bowler
+          </label>
+          <PlayerSearch placeholder="Search bowler..." onSelect={handlePlayerSelect} initialValue={athleteName !== '?' ? athleteName : ''} />
+        </div>
+      </div>
+
       <FilterPanel
         visibleFilters={BOWLER_FILTERS}
         filterOptions={filterOptions}
@@ -142,15 +151,6 @@ export default function BowlerPage() {
         onReset={handleReset}
         onAnalyze={handleAnalyze}
       />
-
-      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1000, marginTop: '-1rem' }}>
-        <div style={{ flex: 2, minWidth: 250, position: 'relative', zIndex: 1000 }}>
-          <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block', fontWeight: 600, textTransform: 'uppercase' }}>
-            <i className="fas fa-user"></i> Select Bowler
-          </label>
-          <PlayerSearch placeholder="Search bowler..." onSelect={handlePlayerSelect} initialValue={athleteName !== '?' ? athleteName : ''} />
-        </div>
-      </div>
 
       <div>
         <div className="player-header">

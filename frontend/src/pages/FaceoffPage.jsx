@@ -141,21 +141,8 @@ export default function FaceoffPage() {
 
   return (
     <div className="dashboard">
-      <FilterPanel
-        visibleFilters={FACEOFF_FILTERS}
-        filterOptions={filterOptions}
-        values={filterValues}
-        negations={negations}
-        cascaded={cascaded}
-        onCascadeToggle={setCascaded}
-        onFilterChange={handleFilterChange}
-        onNegationToggle={handleNegationToggle}
-        onReset={handleReset}
-        onAnalyze={handleAnalyze}
-      />
-
       {/* Dual Player Search */}
-      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1000, marginTop: '-1rem' }}>
+      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1005, marginBottom: '1rem' }}>
         <div style={{ flex: 1, minWidth: 250, position: 'relative', zIndex: 1001 }}>
           <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block', fontWeight: 600, textTransform: 'uppercase' }}>
             <i className="fas fa-user"></i> Batter
@@ -169,6 +156,19 @@ export default function FaceoffPage() {
           <PlayerSearch placeholder="Search bowler..." onSelect={handleBowlerSelect} initialValue={bowlerName !== '?' ? bowlerName : ''} />
         </div>
       </div>
+
+      <FilterPanel
+        visibleFilters={FACEOFF_FILTERS}
+        filterOptions={filterOptions}
+        values={filterValues}
+        negations={negations}
+        cascaded={cascaded}
+        onCascadeToggle={setCascaded}
+        onFilterChange={handleFilterChange}
+        onNegationToggle={handleNegationToggle}
+        onReset={handleReset}
+        onAnalyze={handleAnalyze}
+      />
 
       <div>
         <div className="player-header">

@@ -141,6 +141,20 @@ export default function BatterPage() {
 
   return (
     <div className="dashboard">
+      {/* Player Search */}
+      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1005, marginBottom: '1rem' }}>
+        <div style={{ flex: 1, minWidth: 250, position: 'relative', zIndex: 1000 }}>
+          <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block', fontWeight: 600, textTransform: 'uppercase' }}>
+            <i className="fas fa-user"></i> Select Batter
+          </label>
+          <PlayerSearch
+            placeholder="Search batter..."
+            onSelect={handlePlayerSelect}
+            initialValue={athleteName !== '?' ? athleteName : ''}
+          />
+        </div>
+      </div>
+
       <FilterPanel
         visibleFilters={BATTER_FILTERS}
         filterOptions={filterOptions}
@@ -152,23 +166,7 @@ export default function BatterPage() {
         onNegationToggle={handleNegationToggle}
         onReset={handleReset}
         onAnalyze={handleAnalyze}
-      >
-        {/* Player search as first item */}
-      </FilterPanel>
-
-      {/* Player Search (before the filter panel in the glass-panel) */}
-      <div className="glass-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-end', position: 'relative', zIndex: 1000, marginTop: '-1rem' }}>
-        <div style={{ flex: 2, minWidth: 250, position: 'relative', zIndex: 1000 }}>
-          <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block', fontWeight: 600, textTransform: 'uppercase' }}>
-            <i className="fas fa-user"></i> Select Batter
-          </label>
-          <PlayerSearch
-            placeholder="Search batter..."
-            onSelect={handlePlayerSelect}
-            initialValue={athleteName !== '?' ? athleteName : ''}
-          />
-        </div>
-      </div>
+      />
 
       {/* Player Header */}
       <div>
