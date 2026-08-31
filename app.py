@@ -260,22 +260,6 @@ def debug_query():
     except Exception as e:
         return jsonify({"error": str(e)})
 
-from flask import send_from_directory
-import os
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve_react(path):
-    if path.startswith("api/"):
-        return jsonify({"error": "not found"}), 404
-    
-    # Serve static assets directly if they exist
-    full_path = os.path.join(app.static_folder, path)
-    if path and os.path.exists(full_path):
-        return send_from_directory(app.static_folder, path)
-    
-    # Otherwise fallback to index.html for React Router
-    return send_from_directory(app.static_folder, "index.html")
 
 # ── APIs ─────────────────────────────────────────────────────
 
@@ -379,6 +363,24 @@ def start_scheduler():
 
 # Start it automatically
 start_scheduler()
+
+from flask import send_from_directory
+import os
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    if path.startswith("api/"):
+        return jsonify({"error": "not found"}), 404
+    
+    # Serve static assets directly if they exist
+    full_path = os.path.join(app.static_folder, path)
+    if path and os.path.exists(full_path):
+        return send_from_directory(app.static_folder, path)
+    
+    # Otherwise fallback to index.html for React Router
+    return send_from_directory(app.static_folder, "index.html")
+
 
 if __name__ == "__main__":
     # use_reloader=False keeps DuckDB's singleton connection alive.
