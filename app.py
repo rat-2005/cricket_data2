@@ -82,7 +82,7 @@ for logger_name in ('gunicorn.error', 'werkzeug'):
 log = logging.getLogger('app')
 log.info({"event": "app_startup", "log_file": _log_file, "security_log": _security_log_file})
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static/react", static_url_path="/")
 
 # ═══════════════════════════════════════════════════════════════
 # REQUEST LIFECYCLE MIDDLEWARE (Enterprise Observability)
@@ -260,120 +260,22 @@ def debug_query():
     except Exception as e:
         return jsonify({"error": str(e)})
 
-@app.route("/")
-def index():
-    fmt = request.args.get("format", "All")
-    batters, bowlers, stats = ds.get_dashboard_data(fmt)
-    return render_template(
-        "index.html",
-        batters=batters,
-        bowlers=bowlers,
-        stats=stats,
-        current_format=fmt,
-    )
+from flask import send_from_directory
+import os
 
-
-@app.route("/batter")
-@app.route("/batter/<slug>")
-def batter_page(slug=None):
-    athlete_id = request.args.get("id")
-    info = None
-    if slug:
-        info = ds.get_player_by_slug(slug)
-        if info: athlete_id = info["id"]
-    elif athlete_id:
-        info = ds.get_player_info(athlete_id)
-        if info and "slug" in info:
-            return redirect(f"/batter/{info['slug']}")
-    return render_template("batter.html", athlete_id=athlete_id, info=info)
-
-
-@app.route("/bowler")
-@app.route("/bowler/<slug>")
-def bowler_page(slug=None):
-    athlete_id = request.args.get("id")
-    info = None
-    if slug:
-        info = ds.get_player_by_slug(slug)
-        if info: athlete_id = info["id"]
-    elif athlete_id:
-        info = ds.get_player_info(athlete_id)
-        if info and "slug" in info:
-            return redirect(f"/bowler/{info['slug']}")
-    return render_template("bowler.html", athlete_id=athlete_id, info=info)
-
-
-@app.route("/faceoff")
-@app.route("/faceoff/<slug>")
-def faceoff_page(slug=None):
-    batter_id = request.args.get("batter_id", "")
-    bowler_id = request.args.get("bowler_id", "")
-    batter_info = None
-    bowler_info = None
-
-    if slug and "-vs-" in slug:
-        parts = slug.split("-vs-")
-        batter_slug, bowler_slug = parts[0], parts[1]
-        batter_info = ds.get_player_by_slug(batter_slug)
-        bowler_info = ds.get_player_by_slug(bowler_slug)
-        if batter_info: batter_id = batter_info["id"]
-        if bowler_info: bowler_id = bowler_info["id"]
-
-    if batter_id and not batter_info:
-        batter_info = ds.get_player_info(batter_id)
-    if bowler_id and not bowler_info:
-        bowler_info = ds.get_player_info(bowler_id)
-
-    if batter_info and bowler_info:
-        expected_slug = f"{batter_info.get('slug','')}-vs-{bowler_info.get('slug','')}"
-        if slug != expected_slug:
-            return redirect(f"/faceoff/{expected_slug}")
-
-    return render_template(
-        "faceoff.html",
-        batter_id=batter_id,
-        bowler_id=bowler_id,
-        batter_info=batter_info,
-        bowler_info=bowler_info,
-    )
-
-
-@app.route("/player/<identifier>")
-def player_page(identifier):
-    info = ds.get_player_by_slug(identifier)
-    if info:
-        athlete_id = info["id"]
-    else:
-        # Fallback to ID
-        athlete_id = identifier
-        info = ds.get_player_info(athlete_id)
-        if info and "slug" in info:
-            return redirect(f"/player/{info['slug']}")
-            
-    data = ds.get_player_profile(athlete_id)
-    if not data:
-        return "Player not found", 404
-        
-    return render_template(
-        "player.html",
-        athlete=data["athlete"],
-        batting=data["batting"],
-        bowling=data["bowling"],
-        slug=info["slug"] if info and "slug" in info else identifier
-    )
-
-
-@app.route("/robots.txt")
-def robots_txt():
-    content = f"User-agent: *\nAllow: /\nSitemap: {request.host_url}sitemap.xml\n"
-    from flask import Response
-    return Response(content, mimetype="text/plain")
-
-@app.route("/sitemap.xml")
-def sitemap_xml():
-    # In a real app, generate from database of top players and faceoffs.
-    # We will return a basic static sitemap for now or dynamic if easy.
-    return render_template("sitemap.xml", host=request.host_url)
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    if path.startswith("api/"):
+        return jsonify({"error": "not found"}), 404
+    
+    # Serve static assets directly if they exist
+    full_path = os.path.join(app.static_folder, path)
+    if path and os.path.exists(full_path):
+        return send_from_directory(app.static_folder, path)
+    
+    # Otherwise fallback to index.html for React Router
+    return send_from_directory(app.static_folder, "index.html")
 
 # ── APIs ─────────────────────────────────────────────────────
 
